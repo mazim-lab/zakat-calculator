@@ -55,6 +55,9 @@ export default function RootLayout({
               <Link href="/inheritance" className="hover:text-[var(--emerald)] transition-colors no-underline">
                 Inheritance
               </Link>
+              <Link href="/find-your-school" className="hover:text-[var(--gold-dark)] transition-colors no-underline text-[var(--gold)]">
+                🧭
+              </Link>
             </div>
           </div>
         </nav>

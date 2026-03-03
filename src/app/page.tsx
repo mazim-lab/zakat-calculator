@@ -88,11 +88,17 @@ export default function Home() {
             حساب إسلامي
           </p>
           <p className="text-sm text-[var(--ink-faint)] mb-6">islamichisab.com</p>
-          <p className="text-xl text-[var(--ink-light)] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-[var(--ink-light)] max-w-2xl mx-auto leading-relaxed mb-4">
             A comprehensive suite of Islamic calculators — built with scholarly rigor,
             supporting all major schools of jurisprudence, and designed to make
             your religious obligations clear and accessible.
           </p>
+          <Link
+            href="/find-your-school"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--parchment)] border border-[var(--sand)] text-sm font-medium text-[var(--ink-muted)] hover:border-[var(--gold)] hover:text-[var(--gold-dark)] transition-all no-underline"
+          >
+            🧭 Not sure which school you follow?
+          </Link>
         </motion.div>
 
         {/* Calculator Cards */}
