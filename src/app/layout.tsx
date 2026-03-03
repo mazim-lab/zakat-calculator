@@ -42,6 +42,9 @@ export default function RootLayout({
               <Link href="/zakat" className="hover:text-[var(--emerald)] transition-colors no-underline">
                 Zakat
               </Link>
+              <Link href="/zakat-fitr" className="hover:text-[var(--emerald)] transition-colors no-underline">
+                Fiṭr
+              </Link>
               <Link href="/inheritance" className="hover:text-[var(--emerald)] transition-colors no-underline">
                 Inheritance
               </Link>

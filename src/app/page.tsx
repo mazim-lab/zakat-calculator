@@ -14,6 +14,15 @@ const calculators = [
     status: "live" as const,
   },
   {
+    href: "/zakat-fitr",
+    icon: "🌙",
+    title: "Zakat al-Fiṭr",
+    titleAr: "زكاة الفطر",
+    description: "Per-person payment due before the Eid al-Fiṭr prayer at the end of Ramadan — separate from annual Zakat al-Māl.",
+    detail: "Calculate for your entire household. Covers food weight equivalents, cash permissibility by school, and timing rules.",
+    status: "live" as const,
+  },
+  {
     href: "/inheritance",
     icon: "📜",
     title: "Inheritance",
