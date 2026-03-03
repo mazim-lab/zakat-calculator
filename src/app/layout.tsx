@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Zakat Calculator — Calculate Your Obligation with Confidence",
+  title: "Ḥisāb — Islamic Encyclopedic Calculator",
   description:
-    "A comprehensive, multi-methodology Zakat calculator supporting all four schools of Islamic jurisprudence. Calculate Zakat on cash, gold, silver, investments, real estate, and more.",
+    "A comprehensive suite of Islamic calculators: Zakat, Inheritance (Mīrāth), Fidya, Kaffārah, and more. Multi-school support across all major schools of Islamic jurisprudence.",
 };
 
 export default function RootLayout({
@@ -26,7 +27,37 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--cream)]/90 backdrop-blur-md border-b border-[var(--sand)]">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2 no-underline">
+              <span className="font-['Noto_Naskh_Arabic',serif] text-xl text-[var(--gold-dark)]">
+                حساب
+              </span>
+              <span className="font-['Amiri',serif] font-bold text-lg text-[var(--ink)]">
+                Ḥisāb
+              </span>
+            </Link>
+            <div className="flex items-center gap-4 text-sm font-medium text-[var(--ink-muted)]">
+              <Link href="/zakat" className="hover:text-[var(--emerald)] transition-colors no-underline">
+                Zakat
+              </Link>
+              <Link href="/inheritance" className="hover:text-[var(--emerald)] transition-colors no-underline">
+                Inheritance
+              </Link>
+              <Link href="/fidya" className="hover:text-[var(--emerald)] transition-colors no-underline">
+                Fidya
+              </Link>
+              <Link href="/kaffarah" className="hover:text-[var(--emerald)] transition-colors no-underline">
+                Kaffārah
+              </Link>
+            </div>
+          </div>
+        </nav>
+        <div className="pt-14">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
