@@ -221,7 +221,7 @@ export default function Home() {
                   <p className="text-[var(--ink-light)] leading-relaxed mb-4">
                     Select a school of Islamic jurisprudence to pre-configure your calculation,
                     or choose Custom to make each decision yourself.
-                    <a href="/find-your-school" className="block mt-2 text-sm text-[var(--gold-dark)] hover:text-[var(--emerald)] transition-colors">
+                    <a href="/find-your-school" className="block mt-3 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--emerald)] bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl px-4 py-2.5 transition-all hover:shadow-sm no-underline">
                       🧭 Not sure which school you follow? Take our short quiz →
                     </a>
                   </p>

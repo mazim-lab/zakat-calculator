@@ -150,7 +150,7 @@ export default function InheritanceCalculatorPage() {
                 <h2 className="heading-display mb-4">Step 3: Choose School of Law (Madhab)</h2>
                 <p className="mb-4 text-center">
                   Different schools have minor variations in some complex cases. Choose the one you wish to follow.
-                  <a href="/find-your-school" className="block mt-2 text-sm text-[var(--gold-dark)] hover:text-[var(--emerald)] transition-colors">
+                  <a href="/find-your-school" className="block mt-3 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--emerald)] bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl px-4 py-2.5 transition-all hover:shadow-sm no-underline">
                     🧭 Not sure which school you follow? Take our short quiz →
                   </a>
                 </p>
