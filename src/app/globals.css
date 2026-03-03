@@ -283,14 +283,14 @@ body {
 /* Style the dropdown to match our design */
 .goog-te-gadget {
   font-family: "Cormorant Garamond", Georgia, serif !important;
-  font-size: 0.8rem !important;
-  color: transparent !important; /* hide "Powered by" text but keep layout */
+  font-size: 0 !important;
   line-height: 0 !important;
 }
 
 .goog-te-gadget .goog-te-combo {
   font-family: "Cormorant Garamond", Georgia, serif !important;
-  font-size: 0.8rem;
+  font-size: 0.8rem !important;
+  line-height: normal !important;
   padding: 4px 8px;
   border: 1px solid var(--sand);
   border-radius: 8px;
@@ -299,8 +299,6 @@ body {
   cursor: pointer;
   outline: none;
   transition: border-color 0.25s ease;
-  -webkit-appearance: none;
-  appearance: none;
 }
 
 .goog-te-gadget .goog-te-combo:hover {
