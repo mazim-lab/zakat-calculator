@@ -41,19 +41,20 @@ export function LanguageSwitcher() {
 
   const handleChange = (lang: string) => {
     if (lang === "") {
-      // Revert to English: nuke all googtrans cookies and do a clean reload
+      // Revert to English: use Google's own restore mechanism
+      // The most reliable way is to set the cookie to /en/en and reload
       const hostname = window.location.hostname;
-      const paths = ["/"];
-      const domains = ["", hostname, "." + hostname];
-      for (const p of paths) {
-        for (const d of domains) {
-          const dm = d ? `; domain=${d}` : "";
-          document.cookie = `googtrans=; path=${p}${dm}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
-          document.cookie = `googtrans=; path=${p}${dm}; max-age=0`;
-        }
-      }
-      // Force a hard reload bypassing cache
-      window.location.href = window.location.pathname;
+      const cookieStr = "googtrans=/en/en; path=/";
+      document.cookie = cookieStr;
+      document.cookie = cookieStr + "; domain=" + hostname;
+      document.cookie = cookieStr + "; domain=." + hostname;
+      // Also try clearing it entirely
+      const clearStr = "googtrans=; path=/; max-age=0";
+      document.cookie = clearStr;
+      document.cookie = clearStr + "; domain=" + hostname;
+      document.cookie = clearStr + "; domain=." + hostname;
+      // Hard reload with cache bust
+      window.location.href = window.location.pathname + "?_=" + Date.now();
       return;
     }
 
