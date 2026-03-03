@@ -29,21 +29,6 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              function googleTranslateElementInit() {
-                new google.translate.TranslateElement({
-                  pageLanguage: 'en',
-                  includedLanguages: 'ar,ur,id,ms,fr,tr,bn,fa,sw,ha,so,de,es,pt,ru,zh-CN,hi,ja,ko,th',
-                  layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
-                  autoDisplay: false,
-                  gaTrack: false,
-                }, 'google_translate_element');
-              }
-            `,
-          }}
-        />
-        <script
           src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
           async
         />

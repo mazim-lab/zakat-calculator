@@ -5,16 +5,37 @@ import { useEffect, useRef } from "react";
 export function LanguageSwitcher() {
   const selectRef = useRef<HTMLSelectElement>(null);
 
-  // On mount, sync our dropdown with any active translation
   useEffect(() => {
-    const checkCookie = () => {
+    // Initialize Google Translate once the component mounts
+    const initGT = () => {
+      if (typeof window !== "undefined" && (window as any).google?.translate) {
+        new (window as any).google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            includedLanguages:
+              "ar,ur,id,ms,fr,tr,bn,fa,sw,ha,so,de,es,hi,zh-CN,ru",
+            autoDisplay: false,
+          },
+          "google_translate_element"
+        );
+      }
+    };
+
+    // Check if the script is already loaded
+    if ((window as any).google?.translate) {
+      initGT();
+    } else {
+      // Set the callback for when the script loads
+      (window as any).googleTranslateElementInit = initGT;
+    }
+
+    // Sync dropdown with active cookie
+    const timer = setTimeout(() => {
       const match = document.cookie.match(/googtrans=\/en\/([a-z-]+)/i);
       if (match && selectRef.current) {
         selectRef.current.value = match[1];
       }
-    };
-    // Check after Google Translate initializes
-    const timer = setTimeout(checkCookie, 1500);
+    }, 2000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -45,7 +66,10 @@ export function LanguageSwitcher() {
 
   return (
     <>
-      <div id="google_translate_element" style={{ display: "none" }} />
+      <div
+        id="google_translate_element"
+        style={{ position: "absolute", top: "-9999px", left: "-9999px" }}
+      />
       <select
         ref={selectRef}
         aria-label="Translate page"
