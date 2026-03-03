@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import "./globals.css";
 
@@ -76,6 +77,7 @@ export default function RootLayout({
             </a>
           </footer>
         </div>
+        <Analytics />
       </body>
     </html>
   );
