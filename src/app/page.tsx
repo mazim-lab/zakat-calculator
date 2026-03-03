@@ -72,7 +72,20 @@ export default function Home() {
     key: K,
     value: MethodologyChoices[K]
   ) => {
-    setChoices((prev) => ({ ...prev, [key]: value }));
+    setChoices((prev) => {
+      const updated = { ...prev, [key]: value };
+      // If user changes a methodology option, check if it still matches the selected preset
+      if (key !== "madhab" && prev.madhab !== "custom") {
+        const preset = MADHAB_PRESETS[prev.madhab as Exclude<Madhab, "custom">];
+        const diverged = (Object.keys(preset) as (keyof typeof preset)[]).some(
+          (k) => (k === key ? value : prev[k]) !== preset[k]
+        );
+        if (diverged) {
+          updated.madhab = "custom";
+        }
+      }
+      return updated;
+    });
   };
 
   const updateAsset = <K extends keyof AssetInputs>(
@@ -180,6 +193,9 @@ export default function Home() {
                     Select a school of Islamic jurisprudence to pre-configure your calculation,
                     or choose Custom to make each decision yourself.
                   </p>
+                  <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-4 mb-4 text-sm text-[var(--ink-muted)]">
+                    <strong>How it works:</strong> Selecting a school will automatically configure the recommended positions for every step of the calculator — nisab standard, jewelry treatment, stock method, debt deduction, and more. You can still override any individual choice in the next step if you follow different guidance on a specific question.
+                  </div>
                   {(["hanafi", "maliki", "shafii", "hanbali", "jafari", "custom"] as Madhab[]).map(
                     (m) => (
                       <OptionCard
@@ -213,6 +229,16 @@ export default function Home() {
               {/* Step 1: Methodology Details */}
               {step === 1 && (
                 <div className="space-y-6">
+                  {choices.madhab !== "custom" && (
+                    <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-4 text-sm text-[var(--ink-muted)]">
+                      These options have been pre-configured based on the <strong>{MADHAB_INFO[choices.madhab]?.name}</strong> school. You may override any choice — if you do, your configuration will be marked as <strong>Custom</strong>.
+                    </div>
+                  )}
+                  {choices.madhab === "custom" && (
+                    <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl p-4 text-sm text-[var(--ink-muted)]">
+                      ✏️ <strong>Custom configuration</strong> — you&apos;ve either selected Custom or changed an option from the school default. Each choice below is independent.
+                    </div>
+                  )}
                   {/* Nisab */}
                   <div>
                     <h3 className="font-['Amiri',serif] font-bold text-xl mb-3">
@@ -386,26 +412,28 @@ export default function Home() {
                         onClick={() => updateChoice("stockMethod", "full_market_value")}
                         title="Full Market Value"
                         description="2.5% on total market value. Best for active/short-term traders."
-                        badge="Common"
+                        badge="Ḥanafī Majority"
                       />
                       <OptionCard
                         selected={choices.stockMethod === "zakatable_assets"}
                         onClick={() => updateChoice("stockMethod", "zakatable_assets")}
                         title="Zakatable Assets Method"
                         description="2.5% on your prorated share of the company's zakatable assets. Best for long-term investors."
-                        badge="FCNA"
+                        badge="Mālikī / Shāfiʿī / Ḥanbalī"
                       />
                       <OptionCard
                         selected={choices.stockMethod === "cri_approximation"}
                         onClick={() => updateChoice("stockMethod", "cri_approximation")}
                         title="CRI / 30% Approximation"
                         description="Approximate 30% of market value as zakatable. Best for index fund/ETF holders."
+                        badge="FCNA / Modern"
                       />
                       <OptionCard
                         selected={choices.stockMethod === "dividends_only"}
                         onClick={() => updateChoice("stockMethod", "dividends_only")}
                         title="Dividends Only (10%)"
-                        description="10% on dividends received, analogized to agricultural produce. Qaradawi method."
+                        description="10% on dividends received, analogized to agricultural produce."
+                        badge="Qaraḍāwī"
                       />
                     </div>
                     <InfoAccordion info={STOCK_INFO} />
@@ -524,7 +552,7 @@ export default function Home() {
                         }
                         title="Include Full Balance Annually"
                         description="Pay 2.5% on the total balance each year."
-                        badge="FCNA"
+                        badge="Ḥanafī (strict)"
                       />
                       <OptionCard
                         selected={
@@ -538,7 +566,7 @@ export default function Home() {
                         }
                         title="Exclude Until Withdrawal"
                         description="No Zakat until funds are actually accessed."
-                        badge="Zakat Foundation"
+                        badge="Mālikī / Shāfiʿī / Ḥanbalī"
                       />
                       <OptionCard
                         selected={choices.retirementApproach === "reduced_rate"}
@@ -578,7 +606,7 @@ export default function Home() {
                         }
                         title="Like Currency"
                         description="Add market value to overall wealth, apply 2.5%."
-                        badge="Common"
+                        badge="Ḥanafī / Modern Majority"
                       />
                       <OptionCard
                         selected={choices.cryptoTreatment === "like_trade_goods"}
@@ -595,7 +623,7 @@ export default function Home() {
                         }
                         title="Not Zakatable"
                         description="Excluded from Zakat calculation."
-                        badge="Minority"
+                        badge="Ja'farī / Minority"
                       />
                     </div>
                     <InfoAccordion info={CRYPTO_INFO} />
