@@ -1,26 +1,267 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm sanctuary palette */
+  --cream: #faf6f0;
+  --cream-light: #fdfbf7;
+  --parchment: #f3ece0;
+  --sand: #e8dcc8;
+  --sand-dark: #d4c4a8;
+
+  /* Deep jewel tones */
+  --emerald: #1a6b4a;
+  --emerald-deep: #0f4d35;
+  --emerald-light: #2d8f66;
+  --emerald-muted: #3a7d5e;
+
+  /* Gold accents */
+  --gold: #c4a24e;
+  --gold-light: #dbb96a;
+  --gold-dark: #a68832;
+  --gold-shimmer: #e8d48b;
+
+  /* Warm darks */
+  --ink: #2a2118;
+  --ink-light: #4a3f32;
+  --ink-muted: #6b5e4e;
+  --ink-faint: #8a7d6d;
+
+  /* Functional */
+  --info-bg: #f0f7f3;
+  --info-border: #c8e0d4;
+  --info-text: #1a5a3a;
+  --warning-bg: #fdf8ec;
+  --warning-border: #e8d9a8;
+
+  /* Shadows */
+  --shadow-soft: 0 2px 20px rgba(42, 33, 24, 0.06);
+  --shadow-medium: 0 4px 30px rgba(42, 33, 24, 0.1);
+  --shadow-elevated: 0 8px 40px rgba(42, 33, 24, 0.12);
+
+  /* Geometry */
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Arabesque geometric pattern as SVG background */
+.arabesque-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M40 0L80 40L40 80L0 40Z' fill='none' stroke='%23c4a24e' stroke-width='0.5'/%3E%3Cpath d='M40 10L70 40L40 70L10 40Z' fill='none' stroke='%23c4a24e' stroke-width='0.3'/%3E%3Cpath d='M40 20L60 40L40 60L20 40Z' fill='none' stroke='%23c4a24e' stroke-width='0.3'/%3E%3Ccircle cx='40' cy='40' r='8' fill='none' stroke='%23c4a24e' stroke-width='0.3'/%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+/* Luminous top gradient */
+.luminous-header {
+  background: linear-gradient(
+    180deg,
+    rgba(200, 176, 120, 0.08) 0%,
+    rgba(250, 246, 240, 0) 100%
+  );
+}
+
+/* Card styles */
+.card {
+  background: var(--cream-light);
+  border: 1px solid var(--sand);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-medium);
+}
+
+.card-selected {
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 2px rgba(26, 107, 74, 0.15), var(--shadow-medium);
+}
+
+/* Scholarly info panels */
+.info-panel {
+  background: var(--info-bg);
+  border-left: 3px solid var(--emerald-muted);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem 1.25rem;
+}
+
+/* Gold decorative line */
+.gold-line {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--gold-light) 20%,
+    var(--gold) 50%,
+    var(--gold-light) 80%,
+    transparent 100%
+  );
+}
+
+/* Input styling */
+input[type="number"],
+input[type="text"] {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1.125rem;
+  font-weight: 500;
+  background: white;
+  border: 1.5px solid var(--sand);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  color: var(--ink);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  width: 100%;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--emerald);
+  box-shadow: 0 0 0 3px rgba(26, 107, 74, 0.1);
+}
+
+input[type="number"]::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--parchment);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--sand-dark);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-faint);
+}
+
+/* Bismillah calligraphy styling */
+.bismillah {
+  font-family: "Noto Naskh Arabic", "Amiri", serif;
+  font-size: 2rem;
+  color: var(--gold-dark);
+  letter-spacing: 0.02em;
+}
+
+/* Display headings */
+.heading-display {
+  font-family: "Amiri", "Cormorant Garamond", serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+/* Decorative star */
+.star-ornament {
+  display: inline-block;
+  color: var(--gold);
+  font-size: 1.25rem;
+}
+
+/* Progress bar */
+.progress-track {
+  background: var(--sand);
+  border-radius: 100px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--emerald) 0%, var(--emerald-light) 100%);
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+}
+
+.tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 50;
+}
+
+.tooltip:hover .tooltip-content {
+  opacity: 1;
+}
+
+/* Subtle shimmer for gold elements */
+@keyframes shimmer {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+.gold-shimmer {
+  animation: shimmer 3s ease-in-out infinite;
 }
