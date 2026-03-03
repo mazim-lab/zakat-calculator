@@ -61,8 +61,17 @@ const defaultAssets: AssetInputs = {
   sheepGoats: 0,
   cattle: 0,
   camels: 0,
-  totalDebt: 0,
-  currentlyDueDebt: 0,
+  creditCardBalance: 0,
+  personalLoans: 0,
+  otherShortTermDebt: 0,
+  monthlyMortgagePayment: 0,
+  monthlyMortgagePrincipal: 0,
+  monthlyStudentLoanPayment: 0,
+  monthlyStudentLoanPrincipal: 0,
+  monthlyCarLoanPayment: 0,
+  monthlyCarLoanPrincipal: 0,
+  monthlyOtherLongTermPayment: 0,
+  monthlyOtherLongTermPrincipal: 0,
 };
 
 const defaultChoices: MethodologyChoices = {
@@ -769,22 +778,31 @@ export default function Home() {
                     </h3>
                     <div className="space-y-2">
                       <OptionCard
-                        selected={choices.debtDeduction === "full_deduction"}
+                        selected={choices.debtDeduction === "twelve_months_principal"}
                         onClick={() =>
-                          updateChoice("debtDeduction", "full_deduction")
+                          updateChoice("debtDeduction", "twelve_months_principal")
                         }
-                        title="Full Debt Deduction"
-                        description="Deduct total outstanding debt from zakatable wealth."
+                        title="12 Months of Principal Payments"
+                        description="Short-term debts fully deducted. Long-term debts: up to 12 months of principal (interest excluded)."
                         badge="Ḥanafī / Ḥanbalī"
                       />
                       <OptionCard
-                        selected={choices.debtDeduction === "currently_due_only"}
+                        selected={choices.debtDeduction === "single_installment"}
                         onClick={() =>
-                          updateChoice("debtDeduction", "currently_due_only")
+                          updateChoice("debtDeduction", "single_installment")
                         }
-                        title="Currently Due Payments Only"
-                        description="Only deduct payments due at your Zakat date — not total loan balance."
-                        badge="Modern Majority"
+                        title="Single Currently-Due Installment"
+                        description="Short-term debts fully deducted. Long-term debts: only one month's principal payment."
+                        badge="Stricter Ḥanafī / Ḥanbalī"
+                      />
+                      <OptionCard
+                        selected={choices.debtDeduction === "hidden_wealth_only"}
+                        onClick={() =>
+                          updateChoice("debtDeduction", "hidden_wealth_only")
+                        }
+                        title="Deductible Against Hidden Wealth Only"
+                        description="Debts reduce cash, gold, silver, and trade goods — but not livestock or crops."
+                        badge="Mālikī"
                       />
                       <OptionCard
                         selected={choices.debtDeduction === "no_deduction"}
@@ -792,31 +810,126 @@ export default function Home() {
                           updateChoice("debtDeduction", "no_deduction")
                         }
                         title="No Debt Deduction"
-                        description="Zakat and debt are separate obligations."
-                        badge="Shāfiʿī"
+                        description="Debt does not reduce zakatable wealth. Zakat is a right attached to the wealth itself."
+                        badge="Shāfiʿī / Jaʿfarī"
                       />
                     </div>
                     <InfoAccordion info={DEBT_INFO} />
                   </div>
 
-                  <div className="gold-line" />
+                  {choices.debtDeduction !== "no_deduction" && (
+                    <>
+                      <div className="gold-line" />
 
-                  {choices.debtDeduction === "full_deduction" && (
-                    <CurrencyInput
-                      label="Total Outstanding Debt"
-                      value={assets.totalDebt}
-                      onChange={(v) => updateAsset("totalDebt", v)}
-                      hint="Total of all debts: mortgage, student loans, personal loans, credit cards, etc."
-                    />
-                  )}
+                      {/* Short-term debts */}
+                      <div>
+                        <h3 className="font-['Amiri',serif] font-bold text-lg mb-1">
+                          Short-Term Debts
+                        </h3>
+                        <p className="text-xs text-[var(--ink-faint)] mb-3">
+                          Debts due in full within 12 months. These are fully deductible.
+                        </p>
+                        <div className="space-y-3">
+                          <CurrencyInput
+                            label="Credit Card Balance"
+                            value={assets.creditCardBalance}
+                            onChange={(v) => updateAsset("creditCardBalance", v)}
+                            hint="Total balance on all credit cards as of your Zakat date"
+                          />
+                          <CurrencyInput
+                            label="Personal Loans (due within 12 months)"
+                            value={assets.personalLoans}
+                            onChange={(v) => updateAsset("personalLoans", v)}
+                            hint="Loans from family, friends, or lenders that are callable or due within a year"
+                          />
+                          <CurrencyInput
+                            label="Other Short-Term Debts"
+                            value={assets.otherShortTermDebt}
+                            onChange={(v) => updateAsset("otherShortTermDebt", v)}
+                            hint="Bills currently due, taxes owed, overdue payments, etc."
+                          />
+                        </div>
+                      </div>
 
-                  {choices.debtDeduction === "currently_due_only" && (
-                    <CurrencyInput
-                      label="Currently Due Debt Payments"
-                      value={assets.currentlyDueDebt}
-                      onChange={(v) => updateAsset("currentlyDueDebt", v)}
-                      hint="Total payments due on or near your Zakat Due Date (e.g., this month's mortgage + loan payments)"
-                    />
+                      <div className="gold-line" />
+
+                      {/* Long-term debts */}
+                      <div>
+                        <h3 className="font-['Amiri',serif] font-bold text-lg mb-1">
+                          Long-Term Debts
+                        </h3>
+                        <p className="text-xs text-[var(--ink-faint)] mb-3">
+                          Mortgage, student loans, car loans, etc. Only the <strong>principal portion</strong> of
+                          your monthly payment is deductible — interest (ribā) is not a legitimate Islamic liability.
+                        </p>
+                        <div className="space-y-4">
+                          {/* Mortgage */}
+                          <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
+                            <p className="text-sm font-medium text-[var(--ink)]">🏠 Mortgage</p>
+                            <CurrencyInput
+                              label="Monthly Mortgage Payment (total)"
+                              value={assets.monthlyMortgagePayment}
+                              onChange={(v) => updateAsset("monthlyMortgagePayment", v)}
+                              hint="Your full monthly mortgage payment including principal + interest"
+                            />
+                            <CurrencyInput
+                              label="Monthly Principal Portion"
+                              value={assets.monthlyMortgagePrincipal}
+                              onChange={(v) => updateAsset("monthlyMortgagePrincipal", v)}
+                              hint="The principal-only portion (check your mortgage statement or amortization schedule)"
+                            />
+                          </div>
+
+                          {/* Student Loans */}
+                          <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
+                            <p className="text-sm font-medium text-[var(--ink)]">🎓 Student Loans</p>
+                            <CurrencyInput
+                              label="Monthly Student Loan Payment (total)"
+                              value={assets.monthlyStudentLoanPayment}
+                              onChange={(v) => updateAsset("monthlyStudentLoanPayment", v)}
+                              hint="Total monthly payment across all student loans"
+                            />
+                            <CurrencyInput
+                              label="Monthly Principal Portion"
+                              value={assets.monthlyStudentLoanPrincipal}
+                              onChange={(v) => updateAsset("monthlyStudentLoanPrincipal", v)}
+                              hint="Principal-only portion (check your loan servicer statement)"
+                            />
+                          </div>
+
+                          {/* Car Loan */}
+                          <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
+                            <p className="text-sm font-medium text-[var(--ink)]">🚗 Car Loan</p>
+                            <CurrencyInput
+                              label="Monthly Car Loan Payment (total)"
+                              value={assets.monthlyCarLoanPayment}
+                              onChange={(v) => updateAsset("monthlyCarLoanPayment", v)}
+                            />
+                            <CurrencyInput
+                              label="Monthly Principal Portion"
+                              value={assets.monthlyCarLoanPrincipal}
+                              onChange={(v) => updateAsset("monthlyCarLoanPrincipal", v)}
+                            />
+                          </div>
+
+                          {/* Other Long-term */}
+                          <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
+                            <p className="text-sm font-medium text-[var(--ink)]">📋 Other Long-Term Debt</p>
+                            <CurrencyInput
+                              label="Monthly Payment (total)"
+                              value={assets.monthlyOtherLongTermPayment}
+                              onChange={(v) => updateAsset("monthlyOtherLongTermPayment", v)}
+                              hint="Any other installment debt (personal line of credit, business loan, etc.)"
+                            />
+                            <CurrencyInput
+                              label="Monthly Principal Portion"
+                              value={assets.monthlyOtherLongTermPrincipal}
+                              onChange={(v) => updateAsset("monthlyOtherLongTermPrincipal", v)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </>
                   )}
                 </div>
               )}

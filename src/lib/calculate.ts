@@ -430,25 +430,90 @@ export function calculateZakat(
 
   // 11. Debt deduction
   let debtDeduction = 0;
-  if (choices.debtDeduction === "full_deduction" && inputs.totalDebt > 0) {
-    debtDeduction = inputs.totalDebt;
-    breakdown.push({
-      category: "Debt Deduction",
-      amount: -inputs.totalDebt,
-      rate: 0,
-      zakatDue: 0,
-      notes: "Full debt deducted from zakatable wealth",
-    });
-  } else if (choices.debtDeduction === "currently_due_only" && inputs.currentlyDueDebt > 0) {
-    debtDeduction = inputs.currentlyDueDebt;
-    breakdown.push({
-      category: "Debt Deduction",
-      amount: -inputs.currentlyDueDebt,
-      rate: 0,
-      zakatDue: 0,
-      notes: "Only currently due payments deducted",
-    });
+
+  // Short-term debts (fully deductible in all schools that allow debt deduction)
+  const shortTermDebt =
+    inputs.creditCardBalance +
+    inputs.personalLoans +
+    inputs.otherShortTermDebt;
+
+  // Long-term debts — principal portions only (interest is not a legitimate Islamic liability)
+  const monthlyLongTermPrincipal =
+    inputs.monthlyMortgagePrincipal +
+    inputs.monthlyStudentLoanPrincipal +
+    inputs.monthlyCarLoanPrincipal +
+    inputs.monthlyOtherLongTermPrincipal;
+
+  const singleInstallmentPrincipal = monthlyLongTermPrincipal; // one month
+  const twelveMonthsPrincipal = monthlyLongTermPrincipal * 12; // 12 months
+
+  if (choices.debtDeduction === "twelve_months_principal") {
+    // Ḥanafī / Ḥanbalī: short-term fully + up to 12 months of long-term principal
+    debtDeduction = shortTermDebt + twelveMonthsPrincipal;
+    if (debtDeduction > 0) {
+      breakdown.push({
+        category: "Debt Deduction (Short-term)",
+        amount: -shortTermDebt,
+        rate: 0,
+        zakatDue: 0,
+        notes: "Short-term debts due within 12 months — fully deducted",
+      });
+      if (twelveMonthsPrincipal > 0) {
+        breakdown.push({
+          category: "Debt Deduction (Long-term — 12 mo. principal)",
+          amount: -twelveMonthsPrincipal,
+          rate: 0,
+          zakatDue: 0,
+          notes: "12 months of principal payments on long-term debts (interest excluded)",
+        });
+      }
+    }
+  } else if (choices.debtDeduction === "single_installment") {
+    // Stricter sub-opinion: only single currently-due installment
+    debtDeduction = shortTermDebt + singleInstallmentPrincipal;
+    if (debtDeduction > 0) {
+      breakdown.push({
+        category: "Debt Deduction (Short-term)",
+        amount: -shortTermDebt,
+        rate: 0,
+        zakatDue: 0,
+        notes: "Short-term debts due within 12 months — fully deducted",
+      });
+      if (singleInstallmentPrincipal > 0) {
+        breakdown.push({
+          category: "Debt Deduction (Long-term — single installment)",
+          amount: -singleInstallmentPrincipal,
+          rate: 0,
+          zakatDue: 0,
+          notes: "Single currently-due principal installment only (interest excluded)",
+        });
+      }
+    }
+  } else if (choices.debtDeduction === "hidden_wealth_only") {
+    // Mālikī: debts deductible against hidden wealth (cash, gold, silver, trade goods)
+    // but NOT against visible wealth (livestock, crops). For most modern users this
+    // behaves like twelve_months_principal since their wealth is cash/investments.
+    debtDeduction = shortTermDebt + twelveMonthsPrincipal;
+    if (debtDeduction > 0) {
+      breakdown.push({
+        category: "Debt Deduction (Hidden Wealth — Short-term)",
+        amount: -shortTermDebt,
+        rate: 0,
+        zakatDue: 0,
+        notes: "Short-term debts deducted from hidden wealth (cash, gold, trade goods)",
+      });
+      if (twelveMonthsPrincipal > 0) {
+        breakdown.push({
+          category: "Debt Deduction (Hidden Wealth — Long-term principal)",
+          amount: -twelveMonthsPrincipal,
+          rate: 0,
+          zakatDue: 0,
+          notes: "12 months of principal on long-term debts, deducted from hidden wealth only",
+        });
+      }
+    }
   }
+  // "no_deduction" (Shāfiʿī / Jaʿfarī) — debtDeduction stays 0
 
   totalWealth -= debtDeduction;
 

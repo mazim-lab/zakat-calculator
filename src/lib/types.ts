@@ -14,8 +14,9 @@ export type RetirementApproach =
   | "reduced_rate";
 
 export type DebtDeduction =
-  | "full_deduction"
-  | "currently_due_only"
+  | "twelve_months_principal"
+  | "single_installment"
+  | "hidden_wealth_only"
   | "no_deduction";
 
 export type CryptoTreatment = "like_cash" | "like_trade_goods" | "not_zakatable";
@@ -83,9 +84,20 @@ export interface AssetInputs {
   cattle: number;
   camels: number;
 
-  // Debts
-  totalDebt: number;
-  currentlyDueDebt: number;
+  // Debts — Short-term (due in full within 12 months)
+  creditCardBalance: number;
+  personalLoans: number; // short-term, callable/due within 12 months
+  otherShortTermDebt: number;
+
+  // Debts — Long-term (mortgage, student loans, car loans)
+  monthlyMortgagePayment: number;
+  monthlyMortgagePrincipal: number; // principal portion only (excl. interest)
+  monthlyStudentLoanPayment: number;
+  monthlyStudentLoanPrincipal: number;
+  monthlyCarLoanPayment: number;
+  monthlyCarLoanPrincipal: number;
+  monthlyOtherLongTermPayment: number;
+  monthlyOtherLongTermPrincipal: number;
 }
 
 export interface ZakatBreakdown {
@@ -143,7 +155,7 @@ export const MADHAB_PRESETS: Record<
     combineGoldSilver: true,
     stockMethod: "full_market_value",
     retirementApproach: "include_annually",
-    debtDeduction: "full_deduction",
+    debtDeduction: "twelve_months_principal",
     cryptoTreatment: "like_cash",
     yearType: "lunar",
     agriculturalMinimum: false,
@@ -154,7 +166,7 @@ export const MADHAB_PRESETS: Record<
     combineGoldSilver: false,
     stockMethod: "zakatable_assets",
     retirementApproach: "exclude_until_withdrawal",
-    debtDeduction: "currently_due_only",
+    debtDeduction: "hidden_wealth_only",
     cryptoTreatment: "like_cash",
     yearType: "lunar",
     agriculturalMinimum: true,
@@ -176,7 +188,7 @@ export const MADHAB_PRESETS: Record<
     combineGoldSilver: false,
     stockMethod: "zakatable_assets",
     retirementApproach: "exclude_until_withdrawal",
-    debtDeduction: "full_deduction",
+    debtDeduction: "twelve_months_principal",
     cryptoTreatment: "like_cash",
     yearType: "lunar",
     agriculturalMinimum: true,

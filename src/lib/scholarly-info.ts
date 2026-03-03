@@ -156,27 +156,27 @@ export const RETIREMENT_INFO: InfoPanel = {
 
 export const DEBT_INFO: InfoPanel = {
   title: "Debt & Zakat",
-  description: "Whether and how debts reduce your zakatable wealth is a significant area of disagreement.",
+  description: "Whether and how debts reduce your zakatable wealth is one of the most consequential areas of scholarly disagreement — especially for people with mortgages or student loans.",
   positions: [
     {
-      school: "Ḥanafī & Ḥanbalī Schools",
-      position: "Full debt can be deducted from zakatable wealth",
-      reasoning: "Debt reduces your net wealth. If deducting debts brings you below nisab, you are not required to pay Zakat.",
+      school: "Ḥanafī School",
+      position: "Short-term debts fully deductible; long-term debts: up to 12 months of principal payments",
+      reasoning: "The general Ḥanafī principle is that debt prevents Zakat. However, contemporary Ḥanafī scholars (Maulana Khalid Saifullah Rahmani, JKN Fatawa) apply the deferred mahr analogy: since long-term creditors cannot demand the full balance, only up to 12 lunar months of upcoming payments are deductible. Only the principal portion counts — interest (ribā) is not a legitimate Islamic liability. A stricter sub-opinion allows only the single currently-due installment.",
     },
     {
-      school: "Mālikī School",
-      position: "Only debts that would bring wealth below nisab are deductible",
-      reasoning: "Partial deduction — debts are considered but only to the extent they affect your nisab eligibility.",
+      school: "Ḥanbalī School",
+      position: "Same principle as Ḥanafī — only currently demandable debt reduces zakatable wealth",
+      reasoning: "Debt with a human creditor who can demand payment reduces your wealth. For structured installment loans, only what the creditor can presently demand is deductible — not future installments. In practice, this aligns with the Ḥanafī 12-month or single-installment positions. Sources: Ibn Qudāma (al-Mughnī).",
     },
     {
       school: "Shāfiʿī School",
-      position: "Debts generally do not reduce zakatable wealth",
-      reasoning: "Zakat and debt are separate obligations. A minority opinion within the school allows some deduction.",
+      position: "Debt does NOT reduce zakatable wealth at all",
+      reasoning: "The relied-upon (muʿtamad) Shāfiʿī opinion is that Zakat is a right attached to the wealth itself, not a function of your net worth. Whether you have debts or not, if your zakatable assets reach nisab, you owe Zakat. Sources: Nawawī (Rawḍat al-Ṭālibīn), Shirbīnī (Mughnī al-Muḥtāj).",
     },
     {
-      school: "Modern Majority (for long-term debts)",
-      position: "Only currently-due payments are deductible (not total mortgage/student loan balance)",
-      reasoning: "Long-term debts like mortgages and student loans are repaid gradually. Only the payment currently owed at your Zakat Due Date should be deducted, not the entire remaining balance.",
+      school: "Mālikī School",
+      position: "Debts deductible against hidden wealth (cash, gold, silver, trade goods) but NOT visible wealth (livestock, crops)",
+      reasoning: "The Mālikī school distinguishes between hidden (bāṭin) and visible (ẓāhir) wealth. Debts reduce your hidden wealth — which for most modern people means cash, savings, and investments. Visible wealth like livestock and crops remains zakatable regardless of debt. Sources: Ruʿaynī (Mawāhib al-Jalīl), Jundī (Mukhtaṣar Khalīl).",
     },
     {
       school: "Ja'farī School",
@@ -184,7 +184,7 @@ export const DEBT_INFO: InfoPanel = {
       reasoning: "Since Ja'farī Zakat is only on the 9 specific items (crops, livestock, gold/silver coins), personal debts are not deducted from these categories. For Khums, legitimate debts and living expenses are deducted from income before calculating the 20% surplus — so debt relief is built into the Khums system instead.",
     },
   ],
-  note: "This is especially relevant for people with large mortgages or student loans. Under full deduction, a person with $100,000 in savings but $300,000 in mortgage debt would owe no Zakat. Under currently-due-only, they would deduct only the current monthly payment.",
+  note: "Interest (ribā) is never deductible — only the principal portion of loan payments counts. Example: Someone with $100,000 in savings and a $300,000 mortgage paying $2,000/month ($1,500 principal + $500 interest) would deduct $18,000 (12 × $1,500) under the Ḥanafī/Ḥanbalī approach, leaving $82,000 subject to Zakat. Under the Shāfiʿī approach, the full $100,000 is zakatable.",
 };
 
 export const CRYPTO_INFO: InfoPanel = {
