@@ -27,6 +27,25 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              function googleTranslateElementInit() {
+                new google.translate.TranslateElement({
+                  pageLanguage: 'en',
+                  includedLanguages: 'ar,ur,id,ms,fr,tr,bn,fa,sw,ha,so,de,es,pt,ru,zh-CN,hi,ja,ko,th',
+                  layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+                  autoDisplay: false,
+                  gaTrack: false,
+                }, 'google_translate_element');
+              }
+            `,
+          }}
+        />
+        <script
+          src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+          async
+        />
       </head>
       <body className="antialiased">
         <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--cream)]/90 backdrop-blur-md border-b border-[var(--sand)]">
@@ -58,6 +77,7 @@ export default function RootLayout({
               <Link href="/find-your-school" className="hover:text-[var(--gold-dark)] transition-colors no-underline text-[var(--gold)]">
                 🧭
               </Link>
+              <div id="google_translate_element" className="translate-widget" />
             </div>
           </div>
         </nav>
