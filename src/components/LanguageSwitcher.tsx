@@ -1,48 +1,57 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 export function LanguageSwitcher() {
+  const selectRef = useRef<HTMLSelectElement>(null);
+
+  // On mount, sync our dropdown with any active translation
+  useEffect(() => {
+    const checkCookie = () => {
+      const match = document.cookie.match(/googtrans=\/en\/([a-z-]+)/i);
+      if (match && selectRef.current) {
+        selectRef.current.value = match[1];
+      }
+    };
+    // Check after Google Translate initializes
+    const timer = setTimeout(checkCookie, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleChange = (lang: string) => {
+    if (lang === "") {
+      // Revert to English: nuke all googtrans cookies and do a clean reload
+      const hostname = window.location.hostname;
+      const paths = ["/"];
+      const domains = ["", hostname, "." + hostname];
+      for (const p of paths) {
+        for (const d of domains) {
+          const dm = d ? `; domain=${d}` : "";
+          document.cookie = `googtrans=; path=${p}${dm}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
+          document.cookie = `googtrans=; path=${p}${dm}; max-age=0`;
+        }
+      }
+      // Force a hard reload bypassing cache
+      window.location.href = window.location.pathname;
+      return;
+    }
+
+    const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
+    if (combo) {
+      combo.value = lang;
+      combo.dispatchEvent(new Event("change"));
+    }
+  };
+
   return (
     <>
       <div id="google_translate_element" style={{ display: "none" }} />
       <select
-        id="lang-switcher"
+        ref={selectRef}
         aria-label="Translate page"
         className="translate-select"
         defaultValue=""
-        onChange={(e) => {
-          const combo = document.querySelector<HTMLSelectElement>(
-            ".goog-te-combo"
-          );
-          if (e.target.value === "") {
-            // Revert to English
-            if (combo) {
-              combo.value = "en";
-              combo.dispatchEvent(new Event("change"));
-              // Give Google Translate a moment to process, then clean up
-              setTimeout(() => {
-                const hostname = window.location.hostname;
-                ["", hostname, "." + hostname].forEach((d) => {
-                  const dm = d ? "; domain=" + d : "";
-                  document.cookie = "googtrans=; path=/" + dm + "; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-                });
-                window.location.reload();
-              }, 500);
-            } else {
-              // Combo not loaded yet — just clear cookies and reload
-              const hostname = window.location.hostname;
-              ["", hostname, "." + hostname].forEach((d) => {
-                const dm = d ? "; domain=" + d : "";
-                document.cookie = "googtrans=; path=/" + dm + "; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-              });
-              window.location.reload();
-            }
-            return;
-          }
-          if (combo) {
-            combo.value = e.target.value;
-            combo.dispatchEvent(new Event("change"));
-          }
-        }}
+        onChange={(e) => handleChange(e.target.value)}
       >
         <option value="">🌐 English</option>
         <option value="ar">العربية</option>
