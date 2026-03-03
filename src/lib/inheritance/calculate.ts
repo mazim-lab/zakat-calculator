@@ -418,12 +418,21 @@ export function calculateInheritance(
   } else if (heirs.father){
       residuaries.push('father');
   } else if(heirs.paternalGrandfather){
-      // Complex logic for grandfather vs siblings in non-Hanafi schools
-      // Simplified for now: grandfather takes remainder
-      if(madhab !== 'hanafi' && ((heirs.fullBrother ?? 0) > 0 || (heirs.paternalHalfBrother ?? 0) > 0)) {
-           // TODO: Implement complex Maliki/Shafii/Hanbali calculation
-           reasons.paternalGrandfather = "Shares remainder with siblings (complex calculation not yet implemented).";
+      // Grandfather vs siblings rules differ by school
+      const hasSiblings = ((heirs.fullBrother ?? 0) > 0 || (heirs.fullSister ?? 0) > 0 ||
+                           (heirs.paternalHalfBrother ?? 0) > 0 || (heirs.paternalHalfSister ?? 0) > 0);
+      if(madhab !== 'hanafi' && hasSiblings) {
+           // Mālikī/Shāfiʿī/Ḥanbalī: Grandfather gets the best of three options
+           // (Rules of Zayd ibn Thābit):
+           //   Option A: 1/6 of the total estate
+           //   Option B: 1/3 of the remainder (after fixed shares)
+           //   Option C: Share as if he were a brother (muqāsama)
+           // We calculate all three after fixed shares are determined, then pick the best.
+           // For now, mark grandfather as a special residuary and calculate below.
+           residuaries.push('paternalGrandfather');
+           reasons.paternalGrandfather = "Grandfather shares with siblings (Zayd ibn Thābit rules): gets the best of 1/6 of estate, 1/3 of remainder, or equal share with brothers.";
       } else {
+           // Ḥanafī: grandfather blocks siblings entirely, or no siblings present
            residuaries.push('paternalGrandfather');
       }
   }
@@ -465,7 +474,58 @@ export function calculateInheritance(
           shares.father = (shares.father ?? new SimpleFraction(0, 1)).add(remainder);
           reasons.father = `Receives 1/6 fixed share + the remainder as residuary (ʿaṣabah).`;
       } else if (residuaries.includes('paternalGrandfather')){
-          shares.paternalGrandfather = (shares.paternalGrandfather ?? new SimpleFraction(0, 1)).add(remainder);
+          const hasSiblingsForSharing = madhab !== 'hanafi' && (
+            (heirs.fullBrother ?? 0) > 0 || (heirs.fullSister ?? 0) > 0 ||
+            (heirs.paternalHalfBrother ?? 0) > 0 || (heirs.paternalHalfSister ?? 0) > 0
+          );
+
+          if (hasSiblingsForSharing) {
+            // Zayd ibn Thābit rules: grandfather gets the BEST of three options
+            const oneSixth = new SimpleFraction(1, 6);
+            const oneThirdRemainder = remainder.mul(new SimpleFraction(1, 3));
+
+            // Option C (muqāsama): share as if grandfather is a brother
+            const brothers = (heirs.fullBrother ?? 0) + (heirs.paternalHalfBrother ?? 0);
+            const sisters = (heirs.fullSister ?? 0) + (heirs.paternalHalfSister ?? 0);
+            const totalParts = (brothers + 1) * 2 + sisters; // +1 for grandfather as "brother"
+            const muqasamaShare = remainder.mul(2).div(totalParts);
+
+            // Pick the best option
+            const optionA = oneSixth;
+            const optionB = oneThirdRemainder;
+            const optionC = muqasamaShare;
+
+            let bestShare = optionA;
+            let chosenOption = "1/6 of estate";
+            if (optionB.valueOf() > bestShare.valueOf()) { bestShare = optionB; chosenOption = "1/3 of remainder"; }
+            if (optionC.valueOf() > bestShare.valueOf()) { bestShare = optionC; chosenOption = "sharing as a brother (muqāsama)"; }
+
+            shares.paternalGrandfather = (shares.paternalGrandfather ?? new SimpleFraction(0, 1)).add(bestShare);
+            reasons.paternalGrandfather = `Grandfather with siblings (Zayd ibn Thābit): best of three options was ${chosenOption}.`;
+
+            // Distribute what remains after grandfather's share to siblings
+            const siblingRemainder = remainder.sub(bestShare);
+            if (siblingRemainder.numerator > 0) {
+              const sibParts = brothers * 2 + sisters;
+              if (sibParts > 0) {
+                if ((heirs.fullBrother ?? 0) > 0) {
+                  shares.fullBrother = (shares.fullBrother ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul((heirs.fullBrother ?? 0) * 2).div(sibParts));
+                }
+                if ((heirs.fullSister ?? 0) > 0) {
+                  shares.fullSister = (shares.fullSister ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul(heirs.fullSister ?? 0).div(sibParts));
+                }
+                if ((heirs.paternalHalfBrother ?? 0) > 0) {
+                  shares.paternalHalfBrother = (shares.paternalHalfBrother ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul((heirs.paternalHalfBrother ?? 0) * 2).div(sibParts));
+                }
+                if ((heirs.paternalHalfSister ?? 0) > 0) {
+                  shares.paternalHalfSister = (shares.paternalHalfSister ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul(heirs.paternalHalfSister ?? 0).div(sibParts));
+                }
+              }
+            }
+          } else {
+            // No siblings or Hanafi (grandfather blocks siblings): takes full remainder
+            shares.paternalGrandfather = (shares.paternalGrandfather ?? new SimpleFraction(0, 1)).add(remainder);
+          }
       }
   }
 
@@ -491,10 +551,11 @@ export function calculateInheritance(
     const surplus = new SimpleFraction(1, 1).sub(finalTotal);
     let raddRecipients = Object.keys(shares) as (keyof Heirs)[];
     
-    // Hanbali allows radd to spouse, others do not.
-    if(madhab !== 'hanbali'){
-        raddRecipients = raddRecipients.filter(h => h !== 'husband' && h !== 'wife');
-    }
+    // Classical position of ALL four Sunni schools (including Ḥanbalī relied-upon):
+    // Spouses do NOT receive Radd. The minority position allowing Radd to spouses
+    // is attributed to ʿUthmān ibn ʿAffān and adopted in some modern personal status
+    // laws, but is NOT the classical Ḥanbalī muʿtamad.
+    raddRecipients = raddRecipients.filter(h => h !== 'husband' && h !== 'wife');
     
     const raddTotal = raddRecipients.reduce((sum, h) => sum.add(shares[h]!), new SimpleFraction(0, 1));
     
