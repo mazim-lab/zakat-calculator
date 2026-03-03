@@ -52,7 +52,7 @@ export interface Share {
   amount: number;
 }
 
-export type Madhab = 'hanafi' | 'maliki' | 'shafii' | 'hanbali';
+export type Madhab = 'hanafi' | 'maliki' | 'shafii' | 'hanbali' | 'jafari';
 
 export interface CalculationResult {
   shares: Share[];

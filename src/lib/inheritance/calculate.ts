@@ -59,12 +59,248 @@ class SimpleFraction {
 }
 
 
+// --- Ja'fari Calculation (class-based, no 'asabah, no 'awl) ---
+function calculateJafari(
+  estate: number,
+  heirs: Heirs
+): CalculationResult {
+  const shares: Partial<Record<keyof Heirs, SimpleFraction>> = {};
+  const reasons: Partial<Record<keyof Heirs, string>> = {};
+  const blockedHeirs: (keyof Heirs)[] = [];
+  const initialHeirs = { ...heirs };
+
+  // Ja'fari uses a class system:
+  // Class 1: Parents + Children (+ grandchildren via representation)
+  // Class 2: Grandparents + Siblings (+ their descendants)
+  // Class 3: Uncles + Aunts (+ their descendants)
+  // A higher class completely blocks all lower classes.
+  // Spouse always inherits regardless of class.
+
+  const hasClass1 =
+    heirs.father || heirs.mother ||
+    (heirs.son ?? 0) > 0 || (heirs.daughter ?? 0) > 0 ||
+    (heirs.sonsSon ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0;
+
+  const hasClass2 =
+    heirs.paternalGrandfather || heirs.paternalGrandmother || heirs.maternalGrandmother ||
+    (heirs.fullBrother ?? 0) > 0 || (heirs.fullSister ?? 0) > 0 ||
+    (heirs.paternalHalfBrother ?? 0) > 0 || (heirs.paternalHalfSister ?? 0) > 0 ||
+    (heirs.maternalHalfBrother ?? 0) > 0 || (heirs.maternalHalfSister ?? 0) > 0;
+
+  // Block lower classes
+  if (hasClass1) {
+    const class2Heirs: (keyof Heirs)[] = [
+      'paternalGrandfather', 'paternalGrandmother', 'maternalGrandmother',
+      'fullBrother', 'fullSister', 'paternalHalfBrother', 'paternalHalfSister',
+      'maternalHalfBrother', 'maternalHalfSister',
+    ];
+    for (const h of class2Heirs) {
+      if (heirs[h]) {
+        blockedHeirs.push(h);
+        reasons[h] = "Blocked: Class 2 heirs are excluded when Class 1 heirs (parents/children) exist (Jaʿfarī class system).";
+        delete heirs[h];
+      }
+    }
+  }
+
+  // In Ja'fari, children block grandchildren (no representation when children alive)
+  if ((heirs.son ?? 0) > 0 || (heirs.daughter ?? 0) > 0) {
+    if (heirs.sonsSon) { blockedHeirs.push('sonsSon'); reasons.sonsSon = "Blocked by the presence of sons/daughters."; delete heirs.sonsSon; }
+    if (heirs.sonsDaughter) { blockedHeirs.push('sonsDaughter'); reasons.sonsDaughter = "Blocked by the presence of sons/daughters."; delete heirs.sonsDaughter; }
+  }
+
+  // Mother blocks grandmothers
+  if (heirs.mother) {
+    if (heirs.paternalGrandmother) { blockedHeirs.push('paternalGrandmother'); reasons.paternalGrandmother = "Blocked by the mother."; delete heirs.paternalGrandmother; }
+    if (heirs.maternalGrandmother) { blockedHeirs.push('maternalGrandmother'); reasons.maternalGrandmother = "Blocked by the mother."; delete heirs.maternalGrandmother; }
+  }
+  // Father blocks paternal grandfather
+  if (heirs.father && heirs.paternalGrandfather) {
+    blockedHeirs.push('paternalGrandfather'); reasons.paternalGrandfather = "Blocked by the father."; delete heirs.paternalGrandfather;
+  }
+
+  const hasDescendants = (heirs.son ?? 0) > 0 || (heirs.daughter ?? 0) > 0 || (heirs.sonsSon ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0;
+
+  // --- Spouse shares (always inherit) ---
+  if (heirs.husband) {
+    shares.husband = hasDescendants ? new SimpleFraction(1, 4) : new SimpleFraction(1, 2);
+    reasons.husband = `Receives ${shares.husband.toFractionString()}` + (hasDescendants ? " (descendants present)." : " (no descendants).");
+  }
+  if (heirs.wife) {
+    shares.wife = hasDescendants ? new SimpleFraction(1, 8) : new SimpleFraction(1, 4);
+    reasons.wife = `Receives ${shares.wife.toFractionString()}` + (hasDescendants ? " (descendants present)." : " (no descendants).");
+  }
+
+  // --- Parents ---
+  if (heirs.father) {
+    if (hasDescendants) {
+      shares.father = new SimpleFraction(1, 6);
+      reasons.father = "Receives 1/6 (descendants present).";
+    } else {
+      // Father gets remainder in Ja'fari too (but via radd, not 'asabah)
+      shares.father = new SimpleFraction(1, 6);
+      reasons.father = "Receives 1/6 fixed share; remainder distributed via radd.";
+    }
+  }
+  if (heirs.mother) {
+    const siblingCount = (heirs.fullBrother ?? 0) + (heirs.fullSister ?? 0) +
+      (heirs.paternalHalfBrother ?? 0) + (heirs.paternalHalfSister ?? 0) +
+      (heirs.maternalHalfBrother ?? 0) + (heirs.maternalHalfSister ?? 0);
+    if (hasDescendants || siblingCount >= 2) {
+      shares.mother = new SimpleFraction(1, 6);
+      reasons.mother = "Receives 1/6" + (hasDescendants ? " (descendants present)." : " (two or more siblings present).");
+    } else {
+      shares.mother = new SimpleFraction(1, 3);
+      reasons.mother = "Receives 1/3 (no descendants, fewer than two siblings).";
+    }
+  }
+
+  // --- Children distribution (Ja'fari: no 'asabah — sons/daughters share remainder) ---
+  const sons = heirs.son ?? 0;
+  const daughters = heirs.daughter ?? 0;
+  const sonsSons = heirs.sonsSon ?? 0;
+  const sonsDaughters = heirs.sonsDaughter ?? 0;
+
+  // Calculate remaining after spouse & parents
+  let fixedTotal = new SimpleFraction(0, 1);
+  Object.values(shares).forEach(s => fixedTotal = fixedTotal.add(s!));
+  let remainder = new SimpleFraction(1, 1).sub(fixedTotal);
+
+  if (sons > 0 || daughters > 0) {
+    const parts = sons * 2 + daughters;
+    if (parts > 0 && remainder.numerator > 0) {
+      if (sons > 0) {
+        shares.son = remainder.mul(sons * 2).div(parts);
+        reasons.son = `Receives share of remainder with 2:1 male-to-female ratio.`;
+      }
+      if (daughters > 0) {
+        shares.daughter = remainder.mul(daughters).div(parts);
+        reasons.daughter = `Receives share of remainder with 2:1 male-to-female ratio.`;
+      }
+    } else if (daughters > 0 && sons === 0) {
+      // Only daughters — get 2/3 (multiple) or 1/2 (single), remainder goes to parents via radd
+      if (daughters === 1) {
+        shares.daughter = new SimpleFraction(1, 2);
+        reasons.daughter = "Single daughter receives 1/2 as fixed share.";
+      } else {
+        shares.daughter = new SimpleFraction(2, 3);
+        reasons.daughter = "Multiple daughters share 2/3 as fixed share.";
+      }
+    }
+  } else if (sonsSons > 0 || sonsDaughters > 0) {
+    // Grandchildren via representation (only when no sons/daughters)
+    const gParts = sonsSons * 2 + sonsDaughters;
+    if (gParts > 0 && remainder.numerator > 0) {
+      if (sonsSons > 0) {
+        shares.sonsSon = remainder.mul(sonsSons * 2).div(gParts);
+        reasons.sonsSon = "Son's son inherits via representation with 2:1 ratio.";
+      }
+      if (sonsDaughters > 0) {
+        shares.sonsDaughter = remainder.mul(sonsDaughters).div(gParts);
+        reasons.sonsDaughter = "Son's daughter inherits via representation with 2:1 ratio.";
+      }
+    }
+  }
+
+  // --- Siblings (only if Class 1 absent) ---
+  if (!hasClass1 && hasClass2) {
+    // Simplified: full siblings share remainder after spouse
+    const fb = heirs.fullBrother ?? 0;
+    const fs = heirs.fullSister ?? 0;
+    const sibParts = fb * 2 + fs;
+    if (sibParts > 0 && remainder.numerator > 0) {
+      if (fb > 0) {
+        shares.fullBrother = remainder.mul(fb * 2).div(sibParts);
+        reasons.fullBrother = "Full brother shares remainder with 2:1 ratio.";
+      }
+      if (fs > 0) {
+        shares.fullSister = remainder.mul(fs).div(sibParts);
+        reasons.fullSister = "Full sister shares remainder with 2:1 ratio.";
+      }
+    }
+  }
+
+  // --- Radd (Ja'fari always applies radd, including to spouse in some cases) ---
+  let finalTotal = new SimpleFraction(0, 1);
+  Object.values(shares).forEach(s => finalTotal = finalTotal.add(s!));
+
+  let wasRaddApplied = false;
+  let raddExplanation: string | undefined;
+
+  if (finalTotal.valueOf() < 1 && finalTotal.numerator > 0) {
+    wasRaddApplied = true;
+    const surplus = new SimpleFraction(1, 1).sub(finalTotal);
+    // In Ja'fari, radd goes to all heirs EXCEPT spouse (unless no other heirs)
+    let raddRecipients: string[] = Object.keys(shares).filter(h => h !== 'husband' && h !== 'wife');
+    if (raddRecipients.length === 0) {
+      // Only spouse — radd goes to spouse
+      raddRecipients = Object.keys(shares);
+    }
+    const raddTotal = raddRecipients.reduce((sum, h) => sum.add(shares[h as keyof Heirs]!), new SimpleFraction(0, 1));
+    if (raddTotal.numerator > 0) {
+      raddExplanation = `The shares totaled ${finalTotal.toFractionString()}, leaving a surplus of ${surplus.toFractionString()}. In the Jaʿfarī school, surplus is redistributed (radd) proportionally to non-spouse heirs (no ʿaṣabah concept).`;
+      for (const heir of raddRecipients) {
+        const k = heir as keyof Heirs;
+        shares[k] = shares[k]!.add(surplus.mul(shares[k]!).div(raddTotal));
+      }
+    }
+  }
+
+  // --- Format ---
+  const result: CalculationResult = {
+    shares: [],
+    blocked: [],
+    totalShares: 0,
+    wasAwlApplied: false, // Ja'fari does not use 'awl
+    awlExplanation: undefined,
+    wasRaddApplied,
+    raddExplanation,
+    notes: [
+      "Jaʿfarī inheritance uses a class-based system: Class 1 (parents/children) blocks Class 2 (grandparents/siblings), which blocks Class 3 (uncles/aunts).",
+      "The Jaʿfarī school rejects ʿaṣabah (residuary heirs). Surplus always returns to fixed-share heirs via radd.",
+      "ʿAwl (proportional reduction) is not applied in Jaʿfarī fiqh.",
+    ],
+  };
+
+  for (const key in shares) {
+    const heirKey = key as keyof Heirs;
+    result.shares.push({
+      heir: heirKey as any,
+      label: heirKey.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()),
+      count: (typeof initialHeirs[heirKey] === 'number' ? initialHeirs[heirKey] : 1) as number,
+      share: shares[heirKey]?.valueOf() ?? 0,
+      reason: reasons[heirKey] ?? '',
+      amount: (shares[heirKey]?.valueOf() ?? 0) * estate,
+    });
+  }
+  for (const heirKey of [...new Set(blockedHeirs)]) {
+    if (initialHeirs[heirKey]) {
+      result.blocked.push({
+        heir: heirKey as any,
+        label: heirKey.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()),
+        count: (typeof initialHeirs[heirKey] === 'number' ? initialHeirs[heirKey] : 1) as number,
+        share: null,
+        reason: reasons[heirKey] ?? 'Blocked by a closer heir.',
+        amount: 0,
+      });
+    }
+  }
+  result.totalShares = Object.values(shares).reduce((sum, s) => sum + (s?.valueOf() ?? 0), 0);
+  return result;
+}
+
+
 // --- Main Calculation Function ---
 export function calculateInheritance(
   estate: number,
   heirs: Heirs,
   madhab: Madhab
 ): CalculationResult {
+  // Ja'fari uses a completely different system
+  if (madhab === 'jafari') {
+    return calculateJafari(estate, { ...heirs });
+  }
+
   let shares: Partial<Record<keyof Heirs, SimpleFraction>> = {};
   let reasons: Partial<Record<keyof Heirs, string>> = {};
   let blockedHeirs: (keyof Heirs)[] = [];

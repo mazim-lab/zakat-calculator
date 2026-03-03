@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heirs, CalculationResult, Heir, Madhab } from '@/lib/inheritance/types';
 import { calculateInheritance } from '@/lib/inheritance/calculate';
-import { awlInfo, raddInfo, hajbInfo, grandfatherSiblingsInfo, umariyyatanInfo } from '@/lib/inheritance/scholarly-info';
+import { awlInfo, raddInfo, hajbInfo, grandfatherSiblingsInfo, umariyyatanInfo, jafariSystemInfo } from '@/lib/inheritance/scholarly-info';
 
 // Simple GCD and number to fraction converter
 function gcd(a: number, b: number): number {
@@ -149,14 +149,23 @@ export default function InheritanceCalculatorPage() {
              <motion.div key="step3" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}>
                 <h2 className="heading-display mb-4">Step 3: Choose School of Law (Madhab)</h2>
                 <p className="mb-4 text-center">Different schools have minor variations in some complex cases. Choose the one you wish to follow.</p>
-                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                     {(['hanafi', 'maliki', 'shafii', 'hanbali'] as Madhab[]).map(m => (
-                         <OptionCard key={m} title={m.charAt(0).toUpperCase() + m.slice(1)} selected={madhab === m} onClick={() => setMadhab(m)} />
+                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                     {([
+                       { value: 'hanafi' as Madhab, label: 'Ḥanafī' },
+                       { value: 'maliki' as Madhab, label: 'Mālikī' },
+                       { value: 'shafii' as Madhab, label: 'Shāfiʿī' },
+                       { value: 'hanbali' as Madhab, label: 'Ḥanbalī' },
+                       { value: 'jafari' as Madhab, label: 'Jaʿfarī' },
+                     ]).map(m => (
+                         <OptionCard key={m.value} title={m.label} selected={madhab === m.value} onClick={() => setMadhab(m.value)}
+                           description={m.value === 'jafari' ? 'Class-based system. No ʿaṣabah (residuary heirs). No ʿawl.' : ''}
+                         />
                      ))}
                  </div>
                  <div className="mt-8 space-y-4">
                     <InfoAccordion info={grandfatherSiblingsInfo} />
                     <InfoAccordion info={raddInfo} />
+                    {madhab === 'jafari' && <InfoAccordion info={jafariSystemInfo} />}
                  </div>
             </motion.div>
         )}

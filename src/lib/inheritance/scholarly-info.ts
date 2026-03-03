@@ -78,6 +78,34 @@ export const grandfatherSiblingsInfo: InfoPanel = {
   note: 'This calculator implements the specified madhab for this calculation.',
 };
 
+export const jafariSystemInfo: InfoPanel = {
+  title: "Jaʿfarī (Shīʿa Twelver) Inheritance System",
+  description: "The Jaʿfarī school uses a fundamentally different structure from the Sunni schools. It rejects the concept of ʿaṣabah (residuary/agnatic heirs) and instead uses a strict class-based system where closer classes completely exclude more distant ones.",
+  positions: [
+    {
+      school: "Class System (Jaʿfarī)",
+      position: "Heirs are divided into three classes: Class 1 (parents and children/grandchildren), Class 2 (grandparents and siblings/their descendants), Class 3 (uncles, aunts, and their descendants). A higher class blocks all lower classes entirely.",
+      reasoning: "Based on the Quranic principle of priority by degree of closeness (al-aqrab fa-l-aqrab). Unlike the Sunni system which uses a more complex interplay of sharers and residuaries, the Jaʿfarī system applies a cleaner hierarchy.",
+    },
+    {
+      school: "No ʿAṣabah (Jaʿfarī)",
+      position: "There are no 'residuary' heirs. When fixed shares don't exhaust the estate, the surplus returns to the fixed-share heirs via radd — it does NOT pass to male agnatic relatives.",
+      reasoning: "The Jaʿfarī school argues that the Sunni concept of ʿaṣabah contradicts the Quranic inheritance verses, which they interpret as giving specific shares to all heirs. Surplus should return proportionally to those same heirs.",
+    },
+    {
+      school: "No ʿAwl (Jaʿfarī)",
+      position: "Shares are never proportionally reduced. If shares would exceed 100%, the shortfall is borne by daughters or sisters, not distributed across all heirs.",
+      reasoning: "The Jaʿfarī jurists (following Ibn ʿAbbās) argue that God would not prescribe shares that exceed the total estate. The Sunni mechanism of ʿawl (attributed to Caliph ʿUmar) is rejected.",
+    },
+    {
+      school: "Daughters Block Siblings (Jaʿfarī)",
+      position: "Daughters (Class 1) completely block brothers and sisters (Class 2) from inheriting.",
+      reasoning: "In the Sunni system, brothers can inherit alongside daughters as residuaries (ʿaṣabah). Since Jaʿfarī rejects ʿaṣabah and uses the class system, daughters (Class 1) block siblings (Class 2) entirely.",
+    },
+  ],
+  note: "These differences can lead to dramatically different distributions. For example, if someone dies leaving a daughter and a brother: in Sunni schools, the daughter gets 1/2 and the brother gets 1/2 as residuary. In Jaʿfarī, the daughter gets the entire estate (brother is blocked as Class 2).",
+};
+
 export const umariyyatanInfo: InfoPanel = {
     title: 'The "Umariyyatān" (Two Cases of ʿUmar)',
     description: 'These are two specific inheritance scenarios where the mother\'s share is calculated differently to prevent her from inheriting more than or equal to the father, which would contradict the general principle of the male receiving double the female\'s share when they are of the same class.',
