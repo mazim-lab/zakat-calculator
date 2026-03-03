@@ -13,7 +13,7 @@ export function LanguageSwitcher() {
           {
             pageLanguage: "en",
             includedLanguages:
-              "ar,ur,id,ms,fr,tr,bn,fa,sw,ha,so,de,es,hi,zh-CN,ru",
+              "en,ar,ur,id,ms,fr,tr,bn,fa,sw,ha,so,de,es,hi,zh-CN,ru",
             autoDisplay: false,
           },
           "google_translate_element"
@@ -40,24 +40,6 @@ export function LanguageSwitcher() {
   }, []);
 
   const handleChange = (lang: string) => {
-    if (lang === "") {
-      // Revert to English: use Google's own restore mechanism
-      // The most reliable way is to set the cookie to /en/en and reload
-      const hostname = window.location.hostname;
-      const cookieStr = "googtrans=/en/en; path=/";
-      document.cookie = cookieStr;
-      document.cookie = cookieStr + "; domain=" + hostname;
-      document.cookie = cookieStr + "; domain=." + hostname;
-      // Also try clearing it entirely
-      const clearStr = "googtrans=; path=/; max-age=0";
-      document.cookie = clearStr;
-      document.cookie = clearStr + "; domain=" + hostname;
-      document.cookie = clearStr + "; domain=." + hostname;
-      // Hard reload with cache bust
-      window.location.href = window.location.pathname + "?_=" + Date.now();
-      return;
-    }
-
     const combo = document.querySelector<HTMLSelectElement>(".goog-te-combo");
     if (combo) {
       combo.value = lang;
@@ -75,10 +57,10 @@ export function LanguageSwitcher() {
         ref={selectRef}
         aria-label="Translate page"
         className="translate-select"
-        defaultValue=""
+        defaultValue="en"
         onChange={(e) => handleChange(e.target.value)}
       >
-        <option value="">🌐 English</option>
+        <option value="en">🌐 English</option>
         <option value="ar">العربية</option>
         <option value="ur">اردو</option>
         <option value="id">Bahasa Indonesia</option>
