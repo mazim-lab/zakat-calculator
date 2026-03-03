@@ -30,6 +30,7 @@ export default function FidyaCalculator() {
   const [costPerMeal, setCostPerMeal] = useState(10);
   const [useWeight, setUseWeight] = useState(false);
   const [pricePerKg, setPricePerKg] = useState(2);
+  const [foodType, setFoodType] = useState<"wheat" | "barley" | "dates" | "raisins" | "rice">("wheat");
 
   const currentStep = STEPS[step];
 
@@ -40,8 +41,9 @@ export default function FidyaCalculator() {
     let unitDescription: string;
 
     if (useWeight) {
-      perDay = weight.weightKg * pricePerKg;
-      unitDescription = `${weight.weightKg} kg × $${pricePerKg}/kg`;
+      const kg = weight.getWeightKg(foodType);
+      perDay = kg * pricePerKg;
+      unitDescription = `${kg} kg of ${foodType} × $${pricePerKg}/kg`;
     } else {
       perDay = costPerMeal;
       unitDescription = `$${costPerMeal} per meal (local cost)`;
@@ -54,7 +56,7 @@ export default function FidyaCalculator() {
       unitDescription,
       weightInfo: weight,
     };
-  }, [madhab, missedDays, costPerMeal, useWeight, pricePerKg]);
+  }, [madhab, missedDays, costPerMeal, useWeight, pricePerKg, foodType]);
 
   const canProceed = () => {
     if (currentStep === "days") return missedDays > 0;
@@ -232,12 +234,36 @@ export default function FidyaCalculator() {
                       hint="The average cost to feed one poor person one meal (e.g., $10–15 in North America, $3–5 in South Asia)"
                     />
                   ) : (
-                    <CurrencyInput
-                      label="Price Per Kilogram of Staple Food"
-                      value={pricePerKg}
-                      onChange={setPricePerKg}
-                      hint={`You need ${FIDYA_WEIGHTS[madhab].weightKg} kg per day (${FIDYA_WEIGHTS[madhab].measure})`}
-                    />
+                    <div className="space-y-3">
+                      {/* Food type selector — matters for Hanafi & Hanbali where weight varies */}
+                      <div>
+                        <label className="block text-sm font-semibold text-[var(--ink)] mb-1">
+                          Type of Staple Food
+                        </label>
+                        <select
+                          value={foodType}
+                          onChange={(e) => setFoodType(e.target.value as typeof foodType)}
+                          className="w-full p-3 rounded-xl border-2 border-[var(--sand)] bg-[var(--cream-light)] text-[var(--ink)] font-['Amiri',serif]"
+                        >
+                          <option value="wheat">Wheat / Flour</option>
+                          <option value="barley">Barley</option>
+                          <option value="dates">Dates</option>
+                          <option value="raisins">Raisins</option>
+                          <option value="rice">Rice</option>
+                        </select>
+                        {(madhab === "hanafi" || madhab === "hanbali") && foodType !== "wheat" && (
+                          <p className="text-xs text-[var(--gold-dark)] mt-1">
+                            ⚠️ {madhab === "hanafi" ? "Ḥanafī" : "Ḥanbalī"}: non-wheat staples require a larger amount ({FIDYA_WEIGHTS[madhab].getWeightKg(foodType)} kg vs {FIDYA_WEIGHTS[madhab].getWeightKg("wheat")} kg for wheat)
+                          </p>
+                        )}
+                      </div>
+                      <CurrencyInput
+                        label={`Price Per Kilogram of ${foodType.charAt(0).toUpperCase() + foodType.slice(1)}`}
+                        value={pricePerKg}
+                        onChange={setPricePerKg}
+                        hint={`You need ${FIDYA_WEIGHTS[madhab].getWeightKg(foodType)} kg per day (${FIDYA_WEIGHTS[madhab].measure})`}
+                      />
+                    </div>
                   )}
                 </div>
               )}
