@@ -283,7 +283,9 @@ body {
 /* Style the dropdown to match our design */
 .goog-te-gadget {
   font-family: "Cormorant Garamond", Georgia, serif !important;
-  font-size: 0 !important; /* hide "Powered by" text */
+  font-size: 0.8rem !important;
+  color: transparent !important; /* hide "Powered by" text but keep layout */
+  line-height: 0 !important;
 }
 
 .goog-te-gadget .goog-te-combo {
@@ -318,7 +320,11 @@ body {
   display: none !important;
 }
 
-/* Fix Google Translate injecting inline styles */
-.skiptranslate {
+/* Hide only the Google Translate top banner iframe, not the widget */
+body > .skiptranslate {
+  display: none !important;
+}
+
+iframe.skiptranslate {
   display: none !important;
 }
