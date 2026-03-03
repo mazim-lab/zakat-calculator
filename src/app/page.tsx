@@ -20,7 +20,7 @@ const calculators = [
     titleAr: "مِيرَاث",
     description: "Islamic inheritance division (Farāʾiḍ) — calculate each heir's share according to Quranic rules.",
     detail: "Handles complex cases including ʿawl (proportional reduction), radd (redistribution), and ḥajb (exclusion of heirs).",
-    status: "coming" as const,
+    status: "live" as const,
   },
   {
     href: "/fidya",
