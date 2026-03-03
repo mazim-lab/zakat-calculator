@@ -82,11 +82,12 @@ export default function Home() {
             بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
           </p>
           <h1 className="heading-display text-5xl md:text-6xl text-[var(--ink)] mb-3">
-            Ḥisāb
+            Islamic Ḥisāb
           </h1>
-          <p className="font-['Noto_Naskh_Arabic',serif] text-2xl text-[var(--gold)] mb-6">
-            حساب
+          <p className="font-['Noto_Naskh_Arabic',serif] text-2xl text-[var(--gold)] mb-2">
+            حساب إسلامي
           </p>
+          <p className="text-sm text-[var(--ink-faint)] mb-6">islamichisab.com</p>
           <p className="text-xl text-[var(--ink-light)] max-w-2xl mx-auto leading-relaxed">
             A comprehensive suite of Islamic calculators — built with scholarly rigor,
             supporting all major schools of jurisprudence, and designed to make

@@ -3,9 +3,10 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ḥisāb — Islamic Encyclopedic Calculator",
+  title: "Islamic Ḥisāb — islamichisab.com",
   description:
-    "A comprehensive suite of Islamic calculators: Zakat, Inheritance (Mīrāth), Fidya, Kaffārah, and more. Multi-school support across all major schools of Islamic jurisprudence.",
+    "A comprehensive suite of Islamic calculators: Zakat, Zakat al-Fitr, Inheritance (Mīrāth), Fidya, Kaffārah, and more. Multi-school support across all major schools of Islamic jurisprudence.",
+  metadataBase: new URL("https://islamichisab.com"),
 };
 
 export default function RootLayout({
@@ -35,7 +36,7 @@ export default function RootLayout({
                 حساب
               </span>
               <span className="font-['Amiri',serif] font-bold text-lg text-[var(--ink)]">
-                Ḥisāb
+                Islamic Ḥisāb
               </span>
             </Link>
             <div className="flex items-center gap-4 text-sm font-medium text-[var(--ink-muted)]">
@@ -45,20 +46,30 @@ export default function RootLayout({
               <Link href="/zakat-fitr" className="hover:text-[var(--emerald)] transition-colors no-underline">
                 Fiṭr
               </Link>
-              <Link href="/inheritance" className="hover:text-[var(--emerald)] transition-colors no-underline">
-                Inheritance
-              </Link>
               <Link href="/fidya" className="hover:text-[var(--emerald)] transition-colors no-underline">
                 Fidya
               </Link>
               <Link href="/kaffarah" className="hover:text-[var(--emerald)] transition-colors no-underline">
                 Kaffārah
               </Link>
+              <Link href="/inheritance" className="hover:text-[var(--emerald)] transition-colors no-underline">
+                Inheritance
+              </Link>
             </div>
           </div>
         </nav>
         <div className="pt-14">
           {children}
+          <footer className="relative z-10 pb-6 pr-6 text-right">
+            <a
+              href="https://saleel.ca"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[var(--ink-faint)] hover:text-[var(--gold-dark)] transition-colors no-underline"
+            >
+              Created by Saleel
+            </a>
+          </footer>
         </div>
       </body>
     </html>
