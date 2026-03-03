@@ -10,19 +10,34 @@ export function LanguageSwitcher() {
         className="translate-select"
         defaultValue=""
         onChange={(e) => {
-          if (e.target.value === "") {
-            document.cookie =
-              "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-            document.cookie =
-              "googtrans=; path=/; domain=" +
-              window.location.hostname +
-              "; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-            window.location.reload();
-            return;
-          }
           const combo = document.querySelector<HTMLSelectElement>(
             ".goog-te-combo"
           );
+          if (e.target.value === "") {
+            // Revert to English
+            if (combo) {
+              combo.value = "en";
+              combo.dispatchEvent(new Event("change"));
+              // Give Google Translate a moment to process, then clean up
+              setTimeout(() => {
+                const hostname = window.location.hostname;
+                ["", hostname, "." + hostname].forEach((d) => {
+                  const dm = d ? "; domain=" + d : "";
+                  document.cookie = "googtrans=; path=/" + dm + "; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+                });
+                window.location.reload();
+              }, 500);
+            } else {
+              // Combo not loaded yet — just clear cookies and reload
+              const hostname = window.location.hostname;
+              ["", hostname, "." + hostname].forEach((d) => {
+                const dm = d ? "; domain=" + d : "";
+                document.cookie = "googtrans=; path=/" + dm + "; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+              });
+              window.location.reload();
+            }
+            return;
+          }
           if (combo) {
             combo.value = e.target.value;
             combo.dispatchEvent(new Event("change"));
