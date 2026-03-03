@@ -207,6 +207,22 @@ export default function KaffarahCalculator() {
                     Your Kaffārah Obligation
                   </h2>
 
+                  {/* Shafi'i / Hanbali eating/drinking notice */}
+                  {kaffarahType === "broken_fast" && (madhab === "shafii" || madhab === "hanbali") && (
+                    <div className="info-panel border-l-4 border-[var(--gold)]">
+                      <p className="text-sm font-bold text-[var(--gold-dark)] mb-1">
+                        ⚠️ Important: Did you break your fast by eating or drinking?
+                      </p>
+                      <p className="text-sm text-[var(--info-text)]">
+                        In the {madhab === "shafii" ? "Shāfiʿī" : "Ḥanbalī"} school, kaffārah is only
+                        required for breaking a fast by <strong>sexual intercourse</strong>. If you
+                        deliberately ate or drank, you owe only <strong>qaḍāʾ</strong> (making up
+                        the day) and sincere repentance — <strong>not</strong> kaffārah. The amounts
+                        below only apply if the fast was broken by sexual intercourse.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Feeding cost estimate */}
                   <div className="text-center py-4">
                     <p className="text-sm text-[var(--ink-faint)] mb-1">

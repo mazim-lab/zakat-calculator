@@ -134,6 +134,24 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
 
   // ===== ACCIDENTAL KILLING =====
   if (type === "accidental_killing") {
+    if (madhab === "jafari") {
+      // Jaʿfarī: sequential (murattaba) — free slave, then fast, then feed
+      return {
+        type, madhab, isSequential: true,
+        options: [
+          { order: 1, action: "Free a believing slave", detail: "Historical — no longer applicable.", isFallback: false },
+          { order: 2, action: "Fast 60 consecutive days", detail: "Must be strictly consecutive. Required if freeing a slave is not possible.", isFallback: true },
+          { order: 3, action: "Feed 60 poor people", detail: "Approximately 750g of food per person (one Jaʿfarī mudd). Only if unable to fast.", isFallback: true },
+        ],
+        notes: [
+          "Based on Quran 4:92. This kaffārah is in ADDITION to blood money (diyah) paid to the victim's family.",
+          "In Jaʿfarī fiqh, the kaffārah for accidental killing is sequential (murattaba): free a slave first, then fast if unable, then feed if unable to fast.",
+          "Note: Unlike the kaffārah for a broken Ramadan fast (which is a free choice), accidental killing kaffārah follows a strict order.",
+          "The blood money (diyah) amount is a separate calculation and is borne by the killer's ʿāqilah (extended family/clan).",
+        ],
+      };
+    }
+    // Sunni schools: only two options (no feeding)
     return {
       type, madhab, isSequential: true,
       options: [
@@ -142,10 +160,7 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       ],
       notes: [
         "Based on Quran 4:92. This kaffārah is in ADDITION to blood money (diyah) paid to the victim's family.",
-        "There is no option to feed the poor for this type — only freeing a slave or fasting.",
-        madhab === "jafari"
-          ? "In Jaʿfarī fiqh, the three options (free a slave, fast 60 days, feed 60 poor) apply here as well, and are alternatives."
-          : "Most Sunni schools agree there is no feeding option for accidental killing — only freeing a slave or fasting.",
+        "Most Sunni schools agree there is no feeding option for accidental killing — only freeing a slave or fasting. This is based on the Quranic text which mentions only these two options.",
         "The blood money (diyah) amount is a separate calculation and is borne by the killer's ʿāqilah (extended family/clan) in most schools.",
       ],
     };
