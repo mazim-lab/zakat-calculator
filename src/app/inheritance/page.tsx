@@ -148,7 +148,12 @@ export default function InheritanceCalculatorPage() {
         {step === 3 && (
              <motion.div key="step3" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}>
                 <h2 className="heading-display mb-4">Step 3: Choose School of Law (Madhab)</h2>
-                <p className="mb-4 text-center">Different schools have minor variations in some complex cases. Choose the one you wish to follow.</p>
+                <p className="mb-4 text-center">
+                  Different schools have minor variations in some complex cases. Choose the one you wish to follow.
+                  <a href="/find-your-school" className="block mt-2 text-sm text-[var(--gold-dark)] hover:text-[var(--emerald)] transition-colors">
+                    🧭 Not sure which school you follow? Take our short quiz →
+                  </a>
+                </p>
                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                      {([
                        { value: 'hanafi' as Madhab, label: 'Ḥanafī' },

@@ -221,6 +221,9 @@ export default function Home() {
                   <p className="text-[var(--ink-light)] leading-relaxed mb-4">
                     Select a school of Islamic jurisprudence to pre-configure your calculation,
                     or choose Custom to make each decision yourself.
+                    <a href="/find-your-school" className="block mt-2 text-sm text-[var(--gold-dark)] hover:text-[var(--emerald)] transition-colors">
+                      🧭 Not sure which school you follow? Take our short quiz →
+                    </a>
                   </p>
                   <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-4 mb-4 text-sm text-[var(--ink-muted)]">
                     <strong>How it works:</strong> Selecting a school will automatically configure the recommended positions for every step of the calculator — nisab standard, jewelry treatment, stock method, debt deduction, and more. You can still override any individual choice in the next step if you follow different guidance on a specific question.

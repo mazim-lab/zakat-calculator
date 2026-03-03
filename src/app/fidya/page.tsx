@@ -146,6 +146,9 @@ export default function FidyaCalculator() {
                   </h2>
                   <p className="text-base text-[var(--ink-light)]">
                     The amount of food (and therefore cost) varies between schools.
+                    <a href="/find-your-school" className="block mt-2 text-sm text-[var(--gold-dark)] hover:text-[var(--emerald)] transition-colors">
+                      🧭 Not sure which school you follow? Take our short quiz →
+                    </a>
                   </p>
                   <div className="space-y-2">
                     {madhabOptions.map((opt) => (

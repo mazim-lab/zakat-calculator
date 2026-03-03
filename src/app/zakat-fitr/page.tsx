@@ -158,6 +158,9 @@ export default function ZakatFitrCalculator() {
                   <p className="text-base text-[var(--ink-light)]">
                     Schools differ on the amount of food required and whether cash payment is
                     acceptable.
+                    <a href="/find-your-school" className="block mt-2 text-sm text-[var(--gold-dark)] hover:text-[var(--emerald)] transition-colors">
+                      🧭 Not sure which school you follow? Take our short quiz →
+                    </a>
                   </p>
                   <div className="space-y-2">
                     {madhabOptions.map((opt) => (

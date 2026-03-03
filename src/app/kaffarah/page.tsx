@@ -151,6 +151,9 @@ export default function KaffarahCalculator() {
                   <p className="text-base text-[var(--ink-light)]">
                     Requirements for kaffārah vary significantly between schools —
                     especially for broken fasts.
+                    <a href="/find-your-school" className="block mt-2 text-sm text-[var(--gold-dark)] hover:text-[var(--emerald)] transition-colors">
+                      🧭 Not sure which school you follow? Take our short quiz →
+                    </a>
                   </p>
                   <div className="space-y-2">
                     {madhabOptions.map((opt) => (
