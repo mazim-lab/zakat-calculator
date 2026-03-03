@@ -238,9 +238,13 @@ export default function ZakatFitrCalculator() {
                     Choose how you&apos;d like to calculate the per-person amount.
                     {!fitrInfo.cashPermitted && (
                       <span className="block mt-2 text-sm text-[var(--gold-dark)]">
-                        Note: The {madhabOptions.find((m) => m.value === madhab)?.label} school
-                        classically requires giving actual food, not cash. Many modern scholars
-                        permit cash if it better serves the poor.
+                        ⚠️ The {madhabOptions.find((m) => m.value === madhab)?.label} school
+                        classically requires giving actual food, not cash.
+                        {fitrInfo.modernCashNote && (
+                          <span className="block mt-1 text-[var(--ink-faint)]">
+                            {fitrInfo.modernCashNote}
+                          </span>
+                        )}
                       </span>
                     )}
                   </p>
@@ -334,10 +338,10 @@ export default function ZakatFitrCalculator() {
                       <span className="text-[var(--ink-light)]">Cash Permitted?</span>
                       <span className="font-semibold">
                         {fitrInfo.cashPermitted ? (
-                          <span className="text-[var(--emerald)]">Yes</span>
+                          <span className="text-[var(--emerald)]">Yes ✓</span>
                         ) : (
                           <span className="text-[var(--gold-dark)]">
-                            Classically no (food only)
+                            Classically no — but widely accepted via charities
                           </span>
                         )}
                       </span>

@@ -5,6 +5,8 @@ export interface FitrAmountInfo {
   measure: string;
   description: string;
   cashPermitted: boolean;
+  /** Present when cashPermitted is false but modern scholars/charities commonly accept cash */
+  modernCashNote?: string;
 }
 
 // Zakat al-Fitr amounts by school
@@ -23,6 +25,8 @@ export const FITR_AMOUNTS: Record<Madhab, FitrAmountInfo> = {
     description:
       "The Mālikī school requires one ṣāʿ of the predominant staple food in your area (wheat, rice, corn, barley, dates, etc.). The classical position is that it must be given as actual food, not cash. However, many contemporary Mālikī scholars permit cash if it better serves the poor.",
     cashPermitted: false,
+    modernCashNote:
+      "Many contemporary Mālikī scholars and most Islamic charities accept cash payments, especially in Western countries where food distribution is impractical. If paying through an organization like Islamic Relief or ISNA, cash is the standard method.",
   },
   shafii: {
     weightKg: 2.5,
@@ -30,6 +34,8 @@ export const FITR_AMOUNTS: Record<Madhab, FitrAmountInfo> = {
     description:
       "The Shāfiʿī school requires one ṣāʿ of the predominant local staple. Like the Mālikī school, the classical position requires actual food. Cash is not permitted in the relied-upon (muʿtamad) Shāfiʿī opinion, though some modern scholars allow it.",
     cashPermitted: false,
+    modernCashNote:
+      "While the classical Shāfiʿī position requires food, most Islamic organizations worldwide accept cash on your behalf and purchase food for distribution. Scholars like Dr. Yusuf al-Qaradawi (though not strictly Shāfiʿī) and others argue cash is permissible when it better serves the poor.",
   },
   hanbali: {
     weightKg: 2.5,
@@ -37,6 +43,8 @@ export const FITR_AMOUNTS: Record<Madhab, FitrAmountInfo> = {
     description:
       "The Ḥanbalī school requires one ṣāʿ of staple food. Like the Shāfiʿī and Mālikī schools, the classical position requires giving food, not cash. The five traditional food types are: wheat, barley, dates, raisins, and dried cottage cheese (aqiṭ).",
     cashPermitted: false,
+    modernCashNote:
+      "In practice, most Ḥanbalī-majority countries (Saudi Arabia, Qatar) have official Zakat al-Fiṭr amounts published in their local currency, and charities accept cash. Paying cash through a trusted organization that distributes food on your behalf is widely accepted.",
   },
   jafari: {
     weightKg: 3.0, // Ja'fari ṣāʿ is slightly larger
