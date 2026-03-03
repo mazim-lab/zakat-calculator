@@ -63,8 +63,13 @@ export const NISAB_INFO: InfoPanel = {
       position: "595 grams of silver",
       reasoning: "The more cautious (conservative) approach — more people meet the threshold, meaning more Zakat reaches those in need. Some scholars argue this was the original standard established by the Prophet ﷺ.",
     },
+    {
+      school: "Ja'farī School",
+      position: "20 sharʿī mithqals of gold (~69.12g) or 105 mithqals of silver (~483.88g)",
+      reasoning: "The Ja'farī nisab for gold coins is 20 sharʿī mithqals (one mithqal = 3.456g), slightly lower than the Sunni 85g standard. For silver, 105 common mithqals (~483.88g), also lower than the Sunni 595g. However, these apply only to minted gold/silver coins — not to cash, jewelry, or bullion.",
+    },
   ],
-  note: "The practical difference is enormous. In 2026, the gold nisab is approximately $7,500–8,500 while the silver nisab is approximately $450–625.",
+  note: "The practical difference is enormous. In 2026, the gold nisab is approximately $7,500–8,500 while the silver nisab is approximately $450–625. The Ja'farī nisab thresholds are slightly lower but apply only to coined gold and silver.",
 };
 
 export const JEWELRY_INFO: InfoPanel = {
@@ -80,6 +85,11 @@ export const JEWELRY_INFO: InfoPanel = {
       school: "Mālikī, Shāfiʿī, and Ḥanbalī Schools",
       position: "Zakat is NOT due on jewelry worn as personal adornment",
       reasoning: "Personal-use items are exempt from Zakat (like one's home and clothing). If the jewelry is worn regularly and not hoarded or held as investment, it falls under personal use. The hadith used by Ḥanafī scholars is debated in its grading.",
+    },
+    {
+      school: "Ja'farī School",
+      position: "No obligatory Zakat on jewelry of any kind",
+      reasoning: "In Ja'farī fiqh, Zakat is only obligatory on minted gold and silver coins (dinars and dirhams), not on jewelry, bullion, or ornaments regardless of whether they are worn. However, lending jewelry to fellow believers for temporary use is considered a recommended (mustaḥab) form of Zakat.",
     },
   ],
   note: "NZF Canada recommends paying Zakat on jewelry as the more cautious position. Jewelry not worn or held as investment is zakatable according to all schools.",
@@ -109,6 +119,11 @@ export const STOCK_INFO: InfoPanel = {
       position: "2.5% on approximately 30% of market value",
       reasoning: "A practical shortcut for index fund/ETF holders where individual company analysis is impractical. Approximates the zakatable assets as ~30% of total value. Used by some contemporary American scholars.",
     },
+    {
+      school: "Ja'farī School",
+      position: "No obligatory Zakat on stocks or investments",
+      reasoning: "Stocks and financial instruments are not among the 9 items on which Zakat is obligatory in Ja'farī fiqh. However, surplus income from investment gains is subject to Khums (20%) after deducting annual living expenses. Business merchandise has recommended (mustaḥab) Zakat, with Ayatollah Sistani considering it obligatory precaution (iḥtiyāṭ wājib).",
+    },
   ],
 };
 
@@ -130,6 +145,11 @@ export const RETIREMENT_INFO: InfoPanel = {
       school: "Reduced Rate",
       position: "Pay on estimated accessible amount (~75% after penalties/taxes)",
       reasoning: "A middle position that acknowledges the wealth exists but accounts for the reduced value if accessed early. Practical compromise.",
+    },
+    {
+      school: "Ja'farī School",
+      position: "No obligatory Zakat on retirement accounts",
+      reasoning: "Retirement accounts are not among the 9 zakatable items in Ja'farī fiqh. Any surplus savings — including retirement contributions — are subject to Khums (20%) on your annual Khums date. Contributions from income already assessed for Khums are not taxed again.",
     },
   ],
 };
@@ -158,6 +178,11 @@ export const DEBT_INFO: InfoPanel = {
       position: "Only currently-due payments are deductible (not total mortgage/student loan balance)",
       reasoning: "Long-term debts like mortgages and student loans are repaid gradually. Only the payment currently owed at your Zakat Due Date should be deducted, not the entire remaining balance.",
     },
+    {
+      school: "Ja'farī School",
+      position: "Debts do not affect obligatory Zakat calculation",
+      reasoning: "Since Ja'farī Zakat is only on the 9 specific items (crops, livestock, gold/silver coins), personal debts are not deducted from these categories. For Khums, legitimate debts and living expenses are deducted from income before calculating the 20% surplus — so debt relief is built into the Khums system instead.",
+    },
   ],
   note: "This is especially relevant for people with large mortgages or student loans. Under full deduction, a person with $100,000 in savings but $300,000 in mortgage debt would owe no Zakat. Under currently-due-only, they would deduct only the current monthly payment.",
 };
@@ -181,6 +206,11 @@ export const CRYPTO_INFO: InfoPanel = {
       position: "Excluded from Zakat",
       reasoning: "Some scholars who consider cryptocurrency impermissible (ḥarām) do not consider it subject to Zakat rules. However, even impermissible wealth carries Zakat obligations according to many scholars.",
     },
+    {
+      school: "Ja'farī School",
+      position: "No obligatory Zakat on cryptocurrency",
+      reasoning: "Cryptocurrency is not among the 9 items subject to obligatory Zakat in Ja'farī fiqh. However, any surplus income from crypto gains would be subject to Khums (20%) at your annual Khums date.",
+    },
   ],
 };
 
@@ -197,6 +227,11 @@ export const AGRICULTURE_INFO: InfoPanel = {
       school: "Majority (Mālikī, Shāfiʿī, Ḥanbalī)",
       position: "Minimum threshold of 5 wasqs (~653 kg / 1,439 lb)",
       reasoning: "Based on the hadith: \"No ṣadaqah is obligatory on anything less than five wasqs.\" The majority holds this hadith directly sets the nisab for agricultural produce.",
+    },
+    {
+      school: "Ja'farī School",
+      position: "Minimum threshold of ~847 kg, on 4 specific crops only",
+      reasoning: "Agricultural Zakat is obligatory only on wheat, barley, dates, and dried grapes/raisins — not on rice, vegetables, or other crops. The nisab is approximately 847 kg (based on 288 Tabrizi mounds minus 40 mithqals). Rate is 10% for rain-fed and 5% for artificially irrigated, same as the Sunni schools.",
     },
   ],
   note: "Rate is 10% for rain-fed/natural irrigation, 5% for artificially irrigated crops, and 7.5% for mixed irrigation. Due immediately upon harvest.",

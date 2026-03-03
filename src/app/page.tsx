@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Madhab,
@@ -9,7 +9,14 @@ import {
   MADHAB_PRESETS,
   STEPS,
 } from "@/lib/types";
-import { calculateZakat, } from "@/lib/calculate";
+import { calculateZakat } from "@/lib/calculate";
+import {
+  CURRENCIES,
+  fetchExchangeRates,
+  getGoldPricePerGram,
+  getSilverPricePerGram,
+  formatCurrency,
+} from "@/lib/currency";
 import {
   MADHAB_INFO,
   NISAB_INFO,
@@ -67,6 +74,19 @@ export default function Home() {
   const [step, setStep] = useState(0);
   const [choices, setChoices] = useState<MethodologyChoices>(defaultChoices);
   const [assets, setAssets] = useState<AssetInputs>(defaultAssets);
+  const [currency, setCurrency] = useState("USD");
+  const [exchangeRates, setExchangeRates] = useState<Record<string, number> | null>(null);
+
+  useEffect(() => {
+    fetchExchangeRates().then((data) => {
+      if (data) setExchangeRates(data.rates);
+    });
+  }, []);
+
+  const goldPrice = getGoldPricePerGram(currency, exchangeRates);
+  const silverPrice = getSilverPricePerGram(currency, exchangeRates);
+  const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol || "$";
+  const fmt = (amount: number) => formatCurrency(amount, currency);
 
   const updateChoice = <K extends keyof MethodologyChoices>(
     key: K,
@@ -103,7 +123,7 @@ export default function Home() {
     }
   };
 
-  const result = useMemo(() => calculateZakat(choices, assets), [choices, assets]);
+  const result = useMemo(() => calculateZakat(choices, assets, goldPrice, silverPrice), [choices, assets, goldPrice, silverPrice]);
 
   const progress = ((step + 1) / STEPS.length) * 100;
   const currentStep = STEPS[step];
@@ -195,6 +215,29 @@ export default function Home() {
                   </p>
                   <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-4 mb-4 text-sm text-[var(--ink-muted)]">
                     <strong>How it works:</strong> Selecting a school will automatically configure the recommended positions for every step of the calculator — nisab standard, jewelry treatment, stock method, debt deduction, and more. You can still override any individual choice in the next step if you follow different guidance on a specific question.
+                  </div>
+
+                  {/* Currency selector */}
+                  <div className="mb-6">
+                    <label className="block font-['Amiri',serif] font-bold text-lg mb-2">
+                      Currency
+                    </label>
+                    <select
+                      value={currency}
+                      onChange={(e) => setCurrency(e.target.value)}
+                      className="w-full p-3 rounded-xl border-2 border-[var(--sand)] bg-[var(--cream-light)] text-[var(--ink)] font-medium focus:border-[var(--emerald)] focus:outline-none transition-colors"
+                    >
+                      {CURRENCIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.symbol} — {c.name} ({c.code})
+                        </option>
+                      ))}
+                    </select>
+                    {exchangeRates && currency !== "USD" && (
+                      <p className="text-xs text-[var(--ink-faint)] mt-1.5">
+                        Exchange rate: 1 USD = {exchangeRates[currency]?.toFixed(4)} {currency}. Gold/silver prices auto-converted.
+                      </p>
+                    )}
                   </div>
                   {(["hanafi", "maliki", "shafii", "hanbali", "jafari", "custom"] as Madhab[]).map(
                     (m) => (
@@ -805,14 +848,14 @@ export default function Home() {
                       {assets.annualIncome > assets.annualExpenses && (
                         <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-4 mt-4">
                           <p className="text-[var(--emerald-deep)] font-medium">
-                            Surplus: ${(assets.annualIncome - assets.annualExpenses).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            Surplus: {fmt((assets.annualIncome - assets.annualExpenses))}
                           </p>
                           <p className="text-[var(--emerald)] font-['Amiri',serif] font-bold text-xl mt-1">
-                            Khums Due: ${((assets.annualIncome - assets.annualExpenses) * 0.2).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            Khums Due: {fmt(((assets.annualIncome - assets.annualExpenses) * 0.2))}
                           </p>
                           <div className="flex gap-6 mt-2 text-sm text-[var(--ink-muted)]">
-                            <span>Sahm al-Imam: ${((assets.annualIncome - assets.annualExpenses) * 0.1).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                            <span>Sahm al-Sadat: ${((assets.annualIncome - assets.annualExpenses) * 0.1).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span>Sahm al-Imam: {fmt(((assets.annualIncome - assets.annualExpenses) * 0.1))}</span>
+                            <span>Sahm al-Sadat: {fmt(((assets.annualIncome - assets.annualExpenses) * 0.1))}</span>
                           </div>
                         </div>
                       )}
@@ -849,7 +892,7 @@ export default function Home() {
                           Your wealth meets the nisab threshold
                         </p>
                         <p className="text-[var(--ink-muted)] text-sm">
-                          Nisab: ${result.nisabThreshold.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (
+                          Nisab: {fmt(result.nisabThreshold)} (
                           {choices.nisabStandard} standard)
                         </p>
                       </>
@@ -859,8 +902,7 @@ export default function Home() {
                           Your wealth is below the nisab threshold
                         </p>
                         <p className="text-[var(--ink-muted)] text-sm">
-                          Zakat is not obligatory. Nisab: $
-                          {result.nisabThreshold.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (
+                          Zakat is not obligatory. Nisab: {fmt(result.nisabThreshold)} (
                           {choices.nisabStandard} standard)
                         </p>
                       </>
@@ -878,7 +920,7 @@ export default function Home() {
                       transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
                       className="heading-display text-5xl sm:text-6xl text-[var(--emerald)]"
                     >
-                      ${result.totalZakatDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {fmt(result.totalZakatDue)}
                     </motion.p>
                     <p className="text-[var(--ink-faint)] text-sm mt-2">
                       Based on {result.methodology} •{" "}
@@ -914,8 +956,7 @@ export default function Home() {
                             </div>
                             <div className="text-right ml-4">
                               <p className="text-[var(--ink)] font-medium">
-                                {item.amount < 0 ? "-" : ""}$
-                                {Math.abs(item.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {item.amount < 0 ? "-" : ""}{fmt(Math.abs(item.amount))}
                               </p>
                               <p
                                 className={`text-sm font-semibold ${
@@ -925,7 +966,7 @@ export default function Home() {
                                 }`}
                               >
                                 {item.zakatDue > 0
-                                  ? `→ $${item.zakatDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                  ? `→ ${fmt(item.zakatDue)}`
                                   : item.rate === 0
                                   ? "Exempt"
                                   : "$0.00"}
@@ -941,13 +982,13 @@ export default function Home() {
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-[var(--ink-light)]">Total Zakatable Wealth</span>
                       <span className="font-semibold">
-                        ${result.totalZakatableWealth.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {fmt(result.totalZakatableWealth)}
                       </span>
                     </div>
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-[var(--ink-light)]">Nisab Threshold</span>
                       <span className="font-semibold">
-                        ${result.nisabThreshold.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {fmt(result.nisabThreshold)}
                       </span>
                     </div>
                     <div className="gold-line my-3" />
@@ -956,7 +997,7 @@ export default function Home() {
                         Total Zakat Due
                       </span>
                       <span className="font-['Amiri',serif] font-bold text-xl text-[var(--emerald)]">
-                        ${result.totalZakatDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {fmt(result.totalZakatDue)}
                       </span>
                     </div>
                   </div>
@@ -972,28 +1013,28 @@ export default function Home() {
                         <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-2xl p-5">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-[var(--ink-light)]">Annual Income</span>
-                            <span className="font-semibold">${result.khums.annualIncome.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className="font-semibold">{fmt(result.khums.annualIncome)}</span>
                           </div>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-[var(--ink-light)]">Annual Expenses</span>
-                            <span className="font-semibold">-${result.khums.annualExpenses.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className="font-semibold">-{fmt(result.khums.annualExpenses)}</span>
                           </div>
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-[var(--ink-light)]">Surplus</span>
-                            <span className="font-semibold">${result.khums.surplus.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className="font-semibold">{fmt(result.khums.surplus)}</span>
                           </div>
                           <div className="gold-line my-3" />
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-['Amiri',serif] font-bold text-lg text-[var(--gold-dark)]">Khums Due (20%)</span>
-                            <span className="font-['Amiri',serif] font-bold text-xl text-[var(--gold-dark)]">${result.khums.khumsDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className="font-['Amiri',serif] font-bold text-xl text-[var(--gold-dark)]">{fmt(result.khums.khumsDue)}</span>
                           </div>
                           <div className="flex justify-between text-sm text-[var(--ink-muted)] mt-1">
                             <span>Sahm al-Imam</span>
-                            <span>${result.khums.sahmImam.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span>{fmt(result.khums.sahmImam)}</span>
                           </div>
                           <div className="flex justify-between text-sm text-[var(--ink-muted)]">
                             <span>Sahm al-Sadat</span>
-                            <span>${result.khums.sahmSadat.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span>{fmt(result.khums.sahmSadat)}</span>
                           </div>
                         </div>
                       </div>
@@ -1002,7 +1043,7 @@ export default function Home() {
                       <div className="bg-[var(--emerald-deep)] text-white rounded-2xl p-5 text-center">
                         <p className="text-sm uppercase tracking-widest opacity-80 mb-1">Combined Obligation</p>
                         <p className="font-['Amiri',serif] font-bold text-3xl">
-                          ${(result.totalZakatDue + result.khums.khumsDue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {fmt((result.totalZakatDue + result.khums.khumsDue))}
                         </p>
                         <p className="text-sm opacity-70 mt-1">Zakat + Khums</p>
                       </div>
@@ -1052,7 +1093,7 @@ export default function Home() {
             <div className="text-center">
               <p className="text-xs text-[var(--ink-faint)]">Running Total</p>
               <p className="font-['Amiri',serif] font-bold text-lg text-[var(--emerald)]">
-                ${result.totalZakatDue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {fmt(result.totalZakatDue)}
               </p>
             </div>
           )}
