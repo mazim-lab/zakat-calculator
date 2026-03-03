@@ -63,7 +63,10 @@ function calculateLivestockZakat(
     });
   }
 
-  // Camels (simplified)
+  // Camels (simplified — uses sheep equivalents as a value proxy)
+  // Note: Classical fiqh switches from sheep to actual camels at 25+ head
+  // (e.g., bint makhāḍ at 25, bint labūn at 36, etc.). Current implementation
+  // uses sheep-equivalent valuation as a functional approximation for MVP.
   if (camels >= 5) {
     let zakatAnimals = 0;
     if (camels <= 9) zakatAnimals = 1;
@@ -97,7 +100,8 @@ export function calculateZakat(
       ? GOLD_NISAB_GRAMS * goldPrice
       : SILVER_NISAB_GRAMS * silverPrice;
 
-  const yearMultiplier = choices.yearType === "solar" ? 1.03 : 1.0;
+  // AAOIFI standard: 365.25 solar days / 354.36 lunar days ≈ 1.0307
+  const yearMultiplier = choices.yearType === "solar" ? 1.0307 : 1.0;
   let totalWealth = 0;
   const isJafari = choices.madhab === "jafari";
 
@@ -516,9 +520,19 @@ export function calculateZakat(
   // "no_deduction" (Shāfiʿī / Jaʿfarī) — debtDeduction stays 0
 
   totalWealth -= debtDeduction;
+  totalWealth = Math.max(0, totalWealth);
 
-  const totalZakatDue = breakdown.reduce((sum, b) => sum + b.zakatDue, 0);
   const meetsNisab = totalWealth >= nisab;
+  const totalZakatDue = meetsNisab
+    ? breakdown.reduce((sum, b) => sum + b.zakatDue, 0)
+    : 0;
+
+  // Zero out individual breakdown items if nisab isn't met
+  if (!meetsNisab) {
+    for (const item of breakdown) {
+      item.zakatDue = 0;
+    }
+  }
 
   const madhabLabel = choices.madhab === "jafari" ? "Ja'farī" :
     choices.madhab === "custom" ? "Custom Configuration" :
@@ -526,7 +540,7 @@ export function calculateZakat(
 
   return {
     totalZakatableWealth: totalWealth,
-    totalZakatDue: meetsNisab ? totalZakatDue : 0,
+    totalZakatDue,
     nisabThreshold: nisab,
     meetsNisab,
     breakdown,
