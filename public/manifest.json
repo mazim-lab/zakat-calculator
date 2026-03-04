@@ -1,24 +1,39 @@
 {
+  "id": "/",
   "name": "Islamic Ḥisāb",
   "short_name": "Ḥisāb",
   "description": "Islamic calculators: Zakat, Zakat al-Fitr, Inheritance, Fidya, Kaffārah. All 5 schools of jurisprudence.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#FDF8F0",
   "theme_color": "#1B6B4A",
   "orientation": "portrait-primary",
+  "categories": ["education", "lifestyle"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
