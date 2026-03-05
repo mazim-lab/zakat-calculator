@@ -37,7 +37,7 @@ const calculators = [
     title: "Fidya",
     titleAr: "فِدْيَة",
     description: "Compensation for missed fasts — for those unable to fast due to chronic illness, old age, or permanent medical conditions.",
-    detail: "Calculate the amount owed per missed day based on your school of thought and local food costs.",
+    detail: "Calculate the amount owed per missed day based on your school of jurisprudence and local food costs.",
     status: "live" as const,
   },
   {
@@ -133,7 +133,7 @@ export default function Home() {
           <div className="gold-line mb-8" />
           <p className="text-sm text-[var(--ink-faint)] leading-relaxed max-w-lg mx-auto">
             This tool is for educational and reference purposes. For personal rulings,
-            always consult a qualified scholar of your school of thought.
+            always consult a qualified scholar of your school of jurisprudence.
           </p>
         </motion.div>
       </div>

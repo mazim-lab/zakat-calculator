@@ -199,7 +199,7 @@ export const STEPS: StepConfig[] = [
   {
     id: "welcome",
     title: "Begin Your Calculation",
-    subtitle: "Choose your school of thought",
+    subtitle: "Choose your school of jurisprudence",
     icon: "☪",
   },
   {

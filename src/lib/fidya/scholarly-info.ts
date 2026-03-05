@@ -15,7 +15,7 @@ export const FIDYA_OVERVIEW_INFO: InfoPanel = {
 
 export const FIDYA_AMOUNT_INFO: InfoPanel = {
   title: "How Much is Fidya Per Day?",
-  description: "The amount of fidya per day varies by school of thought. All schools agree it involves feeding one poor person, but they differ on the quantity of food.",
+  description: "The amount of fidya per day varies by school of jurisprudence. All schools agree it involves feeding one poor person, but they differ on the quantity of food.",
   positions: [
     {
       school: "Ḥanafī School",

@@ -146,7 +146,7 @@ export default function KaffarahCalculator() {
               {currentStep === "school" && (
                 <div className="space-y-5">
                   <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Select Your School of Thought
+                    Select Your School of Jurisprudence
                   </h2>
                   <p className="text-base text-[var(--ink-light)]">
                     Requirements for kaffārah vary significantly between schools —

@@ -142,7 +142,7 @@ export default function FidyaCalculator() {
               {currentStep === "school" && (
                 <div className="space-y-5">
                   <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Select Your School of Thought
+                    Select Your School of Jurisprudence
                   </h2>
                   <p className="text-base text-[var(--ink-light)]">
                     The amount of food (and therefore cost) varies between schools.
@@ -292,7 +292,7 @@ export default function FidyaCalculator() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">School of Thought</span>
+                      <span className="text-[var(--ink-light)]">School of Jurisprudence</span>
                       <span className="font-semibold">{madhabOptions.find(m => m.value === madhab)?.label}</span>
                     </div>
                     <div className="flex justify-between text-base">

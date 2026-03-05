@@ -153,7 +153,7 @@ export default function ZakatFitrCalculator() {
               {currentStep === "school" && (
                 <div className="space-y-5">
                   <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Select Your School of Thought
+                    Select Your School of Jurisprudence
                   </h2>
                   <p className="text-base text-[var(--ink-light)]">
                     Schools differ on the amount of food required and whether cash payment is
@@ -318,7 +318,7 @@ export default function ZakatFitrCalculator() {
 
                   <div className="space-y-3">
                     <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">School of Thought</span>
+                      <span className="text-[var(--ink-light)]">School of Jurisprudence</span>
                       <span className="font-semibold">
                         {madhabOptions.find((m) => m.value === madhab)?.label}
                       </span>

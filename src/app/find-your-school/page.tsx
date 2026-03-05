@@ -279,7 +279,7 @@ export default function FindYourSchool() {
             ما مذهبي؟
           </p>
           <h1 className="heading-display text-4xl text-[var(--ink)] mb-2">
-            Find Your School of Thought
+            Find Your School of Jurisprudence
           </h1>
           <p className="text-base text-[var(--ink-light)] max-w-lg mx-auto">
             Not sure which <em>madhab</em> (school of Islamic jurisprudence) you follow?
