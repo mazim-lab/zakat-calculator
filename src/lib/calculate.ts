@@ -522,6 +522,18 @@ export function calculateZakat(
   totalWealth -= debtDeduction;
   totalWealth = Math.max(0, totalWealth);
 
+  // Debt deduction must proportionally reduce Zakat on each asset category.
+  // Example: $100K assets - $90K debt = $10K net → Zakat is 2.5% of $10K, not $100K.
+  if (debtDeduction > 0) {
+    const grossWealth = totalWealth + debtDeduction;
+    const netRatio = grossWealth > 0 ? totalWealth / grossWealth : 0;
+    for (const item of breakdown) {
+      if (item.zakatDue > 0) {
+        item.zakatDue *= netRatio;
+      }
+    }
+  }
+
   const meetsNisab = totalWealth >= nisab;
   const totalZakatDue = meetsNisab
     ? breakdown.reduce((sum, b) => sum + b.zakatDue, 0)

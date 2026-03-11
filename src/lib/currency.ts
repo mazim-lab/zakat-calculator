@@ -32,14 +32,23 @@ export const CURRENCIES: CurrencyInfo[] = [
   { code: "JOD", name: "Jordanian Dinar", symbol: "د.ا" },
 ];
 
-// Gold/silver prices in USD per gram (updated periodically)
-const GOLD_PRICE_USD = 95;
-const SILVER_PRICE_USD = 1.05;
+// Fallback prices in USD per gram (used only if live API fails)
+const FALLBACK_GOLD_USD = 93;
+const FALLBACK_SILVER_USD = 1.03;
 
 export interface ExchangeRates {
   base: string;
   rates: Record<string, number>;
   lastUpdated: string;
+}
+
+export interface MetalPrices {
+  goldPerGram: number;
+  silverPerGram: number;
+  goldPerOz: number;
+  silverPerOz: number;
+  source: "live" | "fallback";
+  timestamp: number;
 }
 
 export async function fetchExchangeRates(): Promise<ExchangeRates | null> {
@@ -59,14 +68,41 @@ export async function fetchExchangeRates(): Promise<ExchangeRates | null> {
   }
 }
 
-export function getGoldPricePerGram(currency: string, rates: Record<string, number> | null): number {
-  if (!rates || !rates[currency]) return GOLD_PRICE_USD;
-  return GOLD_PRICE_USD * rates[currency];
+export async function fetchMetalPrices(): Promise<MetalPrices> {
+  try {
+    const res = await fetch("/api/metals");
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // fall through
+  }
+  return {
+    goldPerGram: FALLBACK_GOLD_USD,
+    silverPerGram: FALLBACK_SILVER_USD,
+    goldPerOz: FALLBACK_GOLD_USD * 31.1035,
+    silverPerOz: FALLBACK_SILVER_USD * 31.1035,
+    source: "fallback",
+    timestamp: 0,
+  };
 }
 
-export function getSilverPricePerGram(currency: string, rates: Record<string, number> | null): number {
-  if (!rates || !rates[currency]) return SILVER_PRICE_USD;
-  return SILVER_PRICE_USD * rates[currency];
+export function getGoldPricePerGram(
+  currency: string,
+  rates: Record<string, number> | null,
+  baseUsdPrice: number = FALLBACK_GOLD_USD
+): number {
+  if (!rates || !rates[currency]) return baseUsdPrice;
+  return baseUsdPrice * rates[currency];
+}
+
+export function getSilverPricePerGram(
+  currency: string,
+  rates: Record<string, number> | null,
+  baseUsdPrice: number = FALLBACK_SILVER_USD
+): number {
+  if (!rates || !rates[currency]) return baseUsdPrice;
+  return baseUsdPrice * rates[currency];
 }
 
 export function formatCurrency(amount: number, currencyCode: string): string {

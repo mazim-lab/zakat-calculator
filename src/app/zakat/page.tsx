@@ -13,9 +13,11 @@ import { calculateZakat } from "@/lib/calculate";
 import {
   CURRENCIES,
   fetchExchangeRates,
+  fetchMetalPrices,
   getGoldPricePerGram,
   getSilverPricePerGram,
   formatCurrency,
+  MetalPrices,
 } from "@/lib/currency";
 import {
   MADHAB_INFO,
@@ -85,15 +87,19 @@ export default function Home() {
   const [assets, setAssets] = useState<AssetInputs>(defaultAssets);
   const [currency, setCurrency] = useState("USD");
   const [exchangeRates, setExchangeRates] = useState<Record<string, number> | null>(null);
+  const [metalPrices, setMetalPrices] = useState<MetalPrices>({
+    goldPerGram: 93, silverPerGram: 1.03, goldPerOz: 2892, silverPerOz: 32, source: "fallback", timestamp: 0,
+  });
 
   useEffect(() => {
     fetchExchangeRates().then((data) => {
       if (data) setExchangeRates(data.rates);
     });
+    fetchMetalPrices().then(setMetalPrices);
   }, []);
 
-  const goldPrice = getGoldPricePerGram(currency, exchangeRates);
-  const silverPrice = getSilverPricePerGram(currency, exchangeRates);
+  const goldPrice = getGoldPricePerGram(currency, exchangeRates, metalPrices.goldPerGram);
+  const silverPrice = getSilverPricePerGram(currency, exchangeRates, metalPrices.silverPerGram);
   const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol || "$";
   const fmt = (amount: number) => formatCurrency(amount, currency);
 
@@ -406,6 +412,16 @@ export default function Home() {
                     Enter the weight of gold and silver you own. For jewelry, enter the weight
                     of the actual gold/silver content, not the total weight of the piece.
                   </p>
+                  <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-3 text-sm text-[var(--ink-muted)]">
+                    <span className="font-medium">Current prices:</span>{" "}
+                    Gold {fmt(goldPrice)}/g ({fmt(goldPrice * 31.1035)}/oz) · Silver {fmt(silverPrice)}/g
+                    {metalPrices.source === "live" && (
+                      <span className="ml-1 text-[var(--emerald)]">● Live</span>
+                    )}
+                    {metalPrices.source === "fallback" && (
+                      <span className="ml-1 text-[var(--gold-dark)]">● Estimated</span>
+                    )}
+                  </div>
                   <CurrencyInput
                     label="Gold (non-jewelry)"
                     value={assets.goldWeightGrams}
