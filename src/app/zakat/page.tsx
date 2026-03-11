@@ -88,7 +88,7 @@ export default function Home() {
   const [currency, setCurrency] = useState("USD");
   const [exchangeRates, setExchangeRates] = useState<Record<string, number> | null>(null);
   const [metalPrices, setMetalPrices] = useState<MetalPrices>({
-    goldPerGram: 93, silverPerGram: 1.03, goldPerOz: 2892, silverPerOz: 32, source: "fallback", timestamp: 0,
+    goldPerGram: 167, silverPerGram: 2.76, goldPerOz: 5194, silverPerOz: 85.85, source: "fallback", timestamp: 0,
   });
 
   useEffect(() => {
@@ -310,14 +310,14 @@ export default function Home() {
                         selected={choices.nisabStandard === "gold"}
                         onClick={() => updateChoice("nisabStandard", "gold")}
                         title="Gold Standard (85 grams)"
-                        subtitle="~$7,500–8,500 USD"
+                        subtitle={`~${fmt(85 * goldPrice)}`}
                         description="Used by the majority of modern scholars. More accurately represents actual wealth."
                       />
                       <OptionCard
                         selected={choices.nisabStandard === "silver"}
                         onClick={() => updateChoice("nisabStandard", "silver")}
                         title="Silver Standard (595 grams)"
-                        subtitle="~$450–625 USD"
+                        subtitle={`~${fmt(595 * silverPrice)}`}
                         description="More cautious approach — ensures more people fulfill their Zakat obligation."
                       />
                     </div>

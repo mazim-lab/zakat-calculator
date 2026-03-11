@@ -33,8 +33,9 @@ export const CURRENCIES: CurrencyInfo[] = [
 ];
 
 // Fallback prices in USD per gram (used only if live API fails)
-const FALLBACK_GOLD_USD = 93;
-const FALLBACK_SILVER_USD = 1.03;
+// Last updated: 2026-03-11 (gold ~$5,180/oz, silver ~$86/oz)
+const FALLBACK_GOLD_USD = 167;
+const FALLBACK_SILVER_USD = 2.76;
 
 export interface ExchangeRates {
   base: string;

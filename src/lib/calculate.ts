@@ -6,19 +6,13 @@ import {
   KhumsResult,
 } from "./types";
 
-// Current approximate prices — in production, fetch from API
-const GOLD_PRICE_PER_GRAM = 95; // USD — will be dynamic
-const SILVER_PRICE_PER_GRAM = 1.05; // USD — will be dynamic
+// Fallback prices — live prices fetched via /api/metals
+// Last updated: 2026-03-11 (gold ~$5,180/oz, silver ~$86/oz)
+const GOLD_PRICE_PER_GRAM = 167; // USD per gram
+const SILVER_PRICE_PER_GRAM = 2.76; // USD per gram
 const GOLD_NISAB_GRAMS = 85;
 const SILVER_NISAB_GRAMS = 595;
 const WASQ_KG = 653; // 5 wasqs in kg
-
-function getNisabThreshold(choices: MethodologyChoices): number {
-  if (choices.nisabStandard === "gold") {
-    return GOLD_NISAB_GRAMS * GOLD_PRICE_PER_GRAM;
-  }
-  return SILVER_NISAB_GRAMS * SILVER_PRICE_PER_GRAM;
-}
 
 function calculateLivestockZakat(
   sheepGoats: number,
@@ -42,7 +36,7 @@ function calculateLivestockZakat(
       amount: sheepGoats,
       rate: 0,
       zakatDue: zakatValue,
-      notes: `${sheepGoats} head → ${zakatAnimals} animal(s) in Zakat (~$${zakatValue})`,
+      notes: `${sheepGoats} head → ${zakatAnimals} animal(s) due in Zakat`,
     });
   }
 
@@ -59,7 +53,7 @@ function calculateLivestockZakat(
       amount: cattle,
       rate: 0,
       zakatDue: zakatValue,
-      notes: `${cattle} head → ~$${zakatValue} in Zakat (based on standard livestock rates)`,
+      notes: `${cattle} head (based on standard livestock rates)`,
     });
   }
 
@@ -81,7 +75,7 @@ function calculateLivestockZakat(
       amount: camels,
       rate: 0,
       zakatDue: zakatValue,
-      notes: `${camels} head → ${zakatAnimals} sheep equivalent(s) in Zakat (~$${zakatValue})`,
+      notes: `${camels} head → ${zakatAnimals} sheep equivalent(s) due in Zakat`,
     });
   }
 
@@ -158,7 +152,7 @@ export function calculateZakat(
         amount: goldValue,
         rate: 2.5,
         zakatDue: goldValue * 0.025 * yearMultiplier,
-        notes: `${inputs.goldWeightGrams}g gold at $${goldPrice.toFixed(2)}/g`,
+        notes: `${inputs.goldWeightGrams}g of gold (non-jewelry)`,
       });
     }
     totalWealth += goldValue;
@@ -194,7 +188,7 @@ export function calculateZakat(
       amount: silverValue,
       rate: 2.5,
       zakatDue: silverValue * 0.025 * yearMultiplier,
-      notes: `${inputs.silverWeightGrams}g silver at $${silverPrice.toFixed(2)}/g`,
+      notes: `${inputs.silverWeightGrams}g of silver (non-jewelry)`,
     });
     totalWealth += silverValue;
   }
@@ -292,7 +286,16 @@ export function calculateZakat(
     totalWealth += inputs.rentalIncome;
   }
 
-  if (inputs.propertyForSale > 0) {
+  if (inputs.propertyForSale > 0 && isJafari) {
+    breakdown.push({
+      category: "Property Held for Sale",
+      amount: inputs.propertyForSale,
+      rate: 2.5,
+      zakatDue: inputs.propertyForSale * 0.025 * yearMultiplier,
+      notes: "Recommended (mustaḥab) Zakat on trade property in Ja'farī fiqh. Surplus also subject to Khums.",
+    });
+    totalWealth += inputs.propertyForSale;
+  } else if (inputs.propertyForSale > 0) {
     breakdown.push({
       category: "Property Held for Sale",
       amount: inputs.propertyForSale,
