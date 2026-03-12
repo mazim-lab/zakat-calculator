@@ -327,48 +327,138 @@ export function calculateZakat(
     totalWealth += businessTotal;
   }
 
-  // 7. Retirement
-  if (inputs.retirementBalance > 0 && isJafari) {
+  // 7. Tax-Sheltered / Registered & Retirement Accounts
+
+  // 7a. TFSA / Roth IRA — always zakatable (full access, post-tax contributions)
+  if (inputs.tfsaRothBalance > 0) {
+    if (isJafari) {
+      breakdown.push({
+        category: "TFSA / Roth IRA",
+        amount: inputs.tfsaRothBalance,
+        rate: 0,
+        zakatDue: 0,
+        notes: "Not subject to obligatory Zakat in Ja'farī fiqh — covered by Khums",
+      });
+    } else {
+      breakdown.push({
+        category: "TFSA / Roth IRA",
+        amount: inputs.tfsaRothBalance,
+        rate: 2.5,
+        zakatDue: inputs.tfsaRothBalance * 0.025 * yearMultiplier,
+        notes: "Fully zakatable — unrestricted access, post-tax contributions, all scholars agree",
+      });
+      totalWealth += inputs.tfsaRothBalance;
+    }
+  }
+
+  // 7b. RRSP / 401(k) / Traditional IRA — depends on chosen approach
+  if (inputs.rrsp401kBalance > 0 && isJafari) {
     breakdown.push({
-      category: "Retirement Accounts",
-      amount: inputs.retirementBalance,
+      category: "RRSP / 401(k) / IRA",
+      amount: inputs.rrsp401kBalance,
       rate: 0,
       zakatDue: 0,
       notes: "Not subject to obligatory Zakat in Ja'farī fiqh — surplus covered by Khums",
     });
-  } else if (inputs.retirementBalance > 0) {
-    switch (choices.retirementApproach) {
-      case "include_annually":
+  } else if (inputs.rrsp401kBalance > 0) {
+    switch (choices.rrspApproach) {
+      case "full_balance":
         breakdown.push({
-          category: "Retirement Accounts",
-          amount: inputs.retirementBalance,
+          category: "RRSP / 401(k) / IRA",
+          amount: inputs.rrsp401kBalance,
           rate: 2.5,
-          zakatDue: inputs.retirementBalance * 0.025 * yearMultiplier,
+          zakatDue: inputs.rrsp401kBalance * 0.025 * yearMultiplier,
           notes: "Full balance zakatable annually (FCNA position)",
         });
-        totalWealth += inputs.retirementBalance;
+        totalWealth += inputs.rrsp401kBalance;
         break;
-      case "reduced_rate":
-        const afterPenalty = inputs.retirementBalance * 0.75; // ~25% for taxes + penalty
+      case "net_after_tax": {
+        const taxRate = Math.min(100, Math.max(0, inputs.rrspWithholdingTaxPercent)) / 100;
+        const netValue = inputs.rrsp401kBalance * (1 - taxRate);
         breakdown.push({
-          category: "Retirement Accounts (Reduced)",
-          amount: afterPenalty,
+          category: "RRSP / 401(k) / IRA (Net After Tax)",
+          amount: netValue,
           rate: 2.5,
-          zakatDue: afterPenalty * 0.025 * yearMultiplier,
-          notes: "2.5% on estimated accessible amount (~75% after penalties/taxes)",
+          zakatDue: netValue * 0.025 * yearMultiplier,
+          notes: `Balance minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax (NZF Canada position)`,
         });
-        totalWealth += afterPenalty;
+        totalWealth += netValue;
         break;
-      case "exclude_until_withdrawal":
+      }
+      case "defer_to_withdrawal":
         breakdown.push({
-          category: "Retirement Accounts",
-          amount: inputs.retirementBalance,
+          category: "RRSP / 401(k) / IRA (Deferred)",
+          amount: inputs.rrsp401kBalance,
           rate: 0,
           zakatDue: 0,
-          notes: "Excluded until withdrawal (no direct access without penalty)",
+          notes: "Zakat deferred until withdrawal — pay accumulated back-Zakat when funds are accessed (Dr. Monzer Kahf position)",
+        });
+        break;
+      case "exclude":
+        breakdown.push({
+          category: "RRSP / 401(k) / IRA",
+          amount: inputs.rrsp401kBalance,
+          rate: 0,
+          zakatDue: 0,
+          notes: "Excluded — restricted access means incomplete ownership",
         });
         break;
     }
+  }
+
+  // 7c. Employer-matched retirement (vested portion follows RRSP approach)
+  if (inputs.employerMatchVested > 0) {
+    if (isJafari || choices.rrspApproach === "exclude") {
+      breakdown.push({
+        category: "Employer Match (Vested)",
+        amount: inputs.employerMatchVested,
+        rate: 0,
+        zakatDue: 0,
+        notes: isJafari
+          ? "Not subject to obligatory Zakat in Ja'farī fiqh — covered by Khums"
+          : "Excluded per your retirement methodology",
+      });
+    } else if (choices.rrspApproach === "defer_to_withdrawal") {
+      breakdown.push({
+        category: "Employer Match (Vested, Deferred)",
+        amount: inputs.employerMatchVested,
+        rate: 0,
+        zakatDue: 0,
+        notes: "Zakat deferred until withdrawal — follows your RRSP treatment",
+      });
+    } else if (choices.rrspApproach === "net_after_tax") {
+      const taxRate = Math.min(100, Math.max(0, inputs.rrspWithholdingTaxPercent)) / 100;
+      const netVested = inputs.employerMatchVested * (1 - taxRate);
+      breakdown.push({
+        category: "Employer Match (Vested, Net After Tax)",
+        amount: netVested,
+        rate: 2.5,
+        zakatDue: netVested * 0.025 * yearMultiplier,
+        notes: `Vested employer match minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax`,
+      });
+      totalWealth += netVested;
+    } else {
+      // full_balance
+      breakdown.push({
+        category: "Employer Match (Vested)",
+        amount: inputs.employerMatchVested,
+        rate: 2.5,
+        zakatDue: inputs.employerMatchVested * 0.025 * yearMultiplier,
+        notes: "Vested employer contributions — fully owned (FCNA position)",
+      });
+      totalWealth += inputs.employerMatchVested;
+    }
+  }
+
+  // 7d. Unvested employer match — never zakatable
+  if (inputs.employerMatchUnvested > 0) {
+    breakdown.push({
+      category: "Employer Match (Unvested)",
+      amount: inputs.employerMatchUnvested,
+      rate: 0,
+      zakatDue: 0,
+      notes: "Not zakatable — unvested matching can be revoked by employer (FCNA)",
+    });
   }
 
   // 8. Crypto

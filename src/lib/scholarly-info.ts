@@ -69,7 +69,7 @@ export const NISAB_INFO: InfoPanel = {
       reasoning: "The Ja'farī nisab for gold coins is 20 sharʿī mithqals (one mithqal = 3.456g), slightly lower than the Sunni 85g standard. For silver, 105 common mithqals (~483.88g), also lower than the Sunni 595g. However, these apply only to minted gold/silver coins — not to cash, jewelry, or bullion.",
     },
   ],
-  note: "The practical difference is enormous. In 2026, the gold nisab is approximately $7,500–8,500 while the silver nisab is approximately $450–625. The Ja'farī nisab thresholds are slightly lower but apply only to coined gold and silver.",
+  note: "The practical difference is enormous. The gold nisab (85g) and silver nisab (595g) yield very different dollar amounts — check the current values shown above based on live metal prices. The Ja'farī nisab thresholds are slightly lower but apply only to coined gold and silver.",
 };
 
 export const JEWELRY_INFO: InfoPanel = {
@@ -127,31 +127,52 @@ export const STOCK_INFO: InfoPanel = {
   ],
 };
 
-export const RETIREMENT_INFO: InfoPanel = {
-  title: "Zakat on Retirement Accounts",
-  description: "A modern question with significant scholarly disagreement, as retirement accounts (401k, IRA, RRSP, pensions) didn't exist in classical Islamic jurisprudence.",
+export const TAX_SHELTERED_INFO: InfoPanel = {
+  title: "Zakat on Tax-Sheltered & Retirement Accounts",
+  description: "Modern tax-sheltered accounts have different ownership and access characteristics. Scholars distinguish between accounts you can freely access (TFSA, Roth IRA) and those with restrictions or tax consequences (RRSP, 401(k), Traditional IRA).",
   positions: [
     {
-      school: "Zakat IS Due Annually (FCNA)",
-      position: "Pay 2.5% on the full balance each year",
-      reasoning: "It is your wealth — you chose to place it there. The restriction on early withdrawal is voluntary. The Fiqh Council considers these accounts analogous to any other investment that grows over time.",
+      school: "TFSA / Roth IRA — All Scholars",
+      position: "Fully zakatable on the entire balance",
+      reasoning: "Contributions are post-tax, growth is tax-free, and funds are withdrawable at any time without penalty (TFSA) or after age 59½ (Roth). Full ownership (milkiyyah tāmmah) is established — virtually no scholarly dissent.",
     },
     {
-      school: "Exclude Until Withdrawal (Zakat Foundation, others)",
-      position: "No Zakat until funds are accessed",
-      reasoning: "You do not have full ownership/access without significant penalty. Similar to a debt owed to you that you cannot collect. Zakat is only on wealth you freely control.",
+      school: "RRSP / 401(k) — Full Balance Annually (FCNA)",
+      position: "2.5% on the total balance each year",
+      reasoning: "The Fiqh Council of North America (2024 fatwā) rules that retirement accounts are zakatable annually. Key arguments: contributions are voluntary; the account is named and belongs to the owner; funds are accessible (even if penalized); and in death, heirs inherit the balance. Penalties do not negate ownership. This is the strict Ḥanafī-leaning position.",
     },
     {
-      school: "Reduced Rate",
-      position: "Pay on estimated accessible amount (~75% after penalties/taxes)",
-      reasoning: "A middle position that acknowledges the wealth exists but accounts for the reduced value if accessed early. Practical compromise.",
+      school: "RRSP / 401(k) — Net After Tax (NZF Canada, Zakat.org)",
+      position: "2.5% on balance minus estimated withdrawal tax/penalties",
+      reasoning: "The National Zakat Foundation of Canada holds that since the government will take a portion upon withdrawal (30% withholding in Canada, 20%+ in the US), that portion is not truly yours. Formula: Balance − Penalties − Taxes = Zakatable Sum. Example: $100K RRSP × (1 − 30% tax) = $70K zakatable → Zakat = $1,750.",
+    },
+    {
+      school: "RRSP / 401(k) — Defer Until Withdrawal (Dr. Monzer Kahf)",
+      position: "No annual Zakat — pay accumulated Zakat on each withdrawal",
+      reasoning: "Prominent economist Dr. Monzer Kahf argues the restrictions on withdrawal provide acceptable grounds for delay. Zakat IS due in principle, but payment can be deferred until funds are accessed. Upon each withdrawal, accumulated back-Zakat for all past years must be paid. This is not sinful delay — the restriction is a Sharīʿah-acceptable reason per classical fiqh.",
+    },
+    {
+      school: "RRSP / 401(k) — Profits Only (Sheikh Ahmad Kutty)",
+      position: "Capital is exempt; pay Zakat on dividends/profits annually",
+      reasoning: "Sheikh Ahmad Kutty of the Islamic Institute of Toronto analogizes RRSP to capital investment. The base capital is locked and therefore exempt. However, one must pay Zakat on any dividends or profits accruing annually. If profits cannot be determined, pay on the total upon actual withdrawal, minus taxes.",
+    },
+    {
+      school: "Employer Match — FCNA",
+      position: "Only vested portions are zakatable; unvested matching is excluded",
+      reasoning: "Unvested employer contributions can be revoked — they are not truly owned. Only the vested (non-revocable) portion counts toward zakatable wealth. Once fully vested, it follows the same treatment as your own contributions.",
+    },
+    {
+      school: "Defined-Benefit Pensions (CPP, OAS, Public Pensions)",
+      position: "Not zakatable until received as income",
+      reasoning: "No individual account balance exists, funds are government-controlled, and there is no access before eligibility. This is analogized to 'lost wealth' or a 'debt from an uncertain debtor.' Once pension payments begin, they become part of your liquid assets and are subject to Zakat normally.",
     },
     {
       school: "Ja'farī School",
-      position: "No obligatory Zakat on retirement accounts",
-      reasoning: "Retirement accounts are not among the 9 zakatable items in Ja'farī fiqh. Any surplus savings — including retirement contributions — are subject to Khums (20%) on your annual Khums date. Contributions from income already assessed for Khums are not taxed again.",
+      position: "No obligatory Zakat — covered by Khums",
+      reasoning: "Retirement accounts are not among the 9 zakatable items. However, any surplus savings — including retirement contributions — are subject to Khums (20%) on your annual Khums date. Contributions from income already assessed for Khums are not taxed again.",
     },
   ],
+  note: "Sources: Fiqh Council of North America (2024 fatwā on retirement funds), National Zakat Foundation Canada, Dr. Monzer Kahf (Islamic economist), Sheikh Ahmad Kutty (Islamic Institute of Toronto), Zakat.org.",
 };
 
 export const DEBT_INFO: InfoPanel = {

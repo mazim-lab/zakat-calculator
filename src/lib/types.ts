@@ -8,10 +8,11 @@ export type StockMethod =
   | "dividends_only"
   | "cri_approximation";
 
-export type RetirementApproach =
-  | "include_annually"
-  | "exclude_until_withdrawal"
-  | "reduced_rate";
+export type RrspApproach =
+  | "full_balance"
+  | "net_after_tax"
+  | "defer_to_withdrawal"
+  | "exclude";
 
 export type DebtDeduction =
   | "twelve_months_principal"
@@ -29,7 +30,7 @@ export interface MethodologyChoices {
   jewelryZakatable: boolean;
   combineGoldSilver: boolean;
   stockMethod: StockMethod;
-  retirementApproach: RetirementApproach;
+  rrspApproach: RrspApproach;
   debtDeduction: DebtDeduction;
   cryptoTreatment: CryptoTreatment;
   yearType: YearType;
@@ -69,8 +70,12 @@ export interface AssetInputs {
   inventory: number;
   receivables: number;
 
-  // Retirement
-  retirementBalance: number;
+  // Tax-Sheltered / Retirement Accounts
+  tfsaRothBalance: number;
+  rrsp401kBalance: number;
+  rrspWithholdingTaxPercent: number;
+  employerMatchVested: number;
+  employerMatchUnvested: number;
 
   // Crypto
   cryptoValue: number;
@@ -143,7 +148,7 @@ export const MADHAB_PRESETS: Record<
     jewelryZakatable: false,
     combineGoldSilver: false,
     stockMethod: "full_market_value",
-    retirementApproach: "exclude_until_withdrawal",
+    rrspApproach: "exclude",
     debtDeduction: "no_deduction",
     cryptoTreatment: "not_zakatable",
     yearType: "lunar",
@@ -154,7 +159,7 @@ export const MADHAB_PRESETS: Record<
     jewelryZakatable: true,
     combineGoldSilver: true,
     stockMethod: "full_market_value",
-    retirementApproach: "include_annually",
+    rrspApproach: "full_balance",
     debtDeduction: "twelve_months_principal",
     cryptoTreatment: "like_cash",
     yearType: "lunar",
@@ -165,7 +170,7 @@ export const MADHAB_PRESETS: Record<
     jewelryZakatable: false,
     combineGoldSilver: false,
     stockMethod: "zakatable_assets",
-    retirementApproach: "exclude_until_withdrawal",
+    rrspApproach: "net_after_tax",
     debtDeduction: "hidden_wealth_only",
     cryptoTreatment: "like_cash",
     yearType: "lunar",
@@ -176,7 +181,7 @@ export const MADHAB_PRESETS: Record<
     jewelryZakatable: false,
     combineGoldSilver: false,
     stockMethod: "zakatable_assets",
-    retirementApproach: "exclude_until_withdrawal",
+    rrspApproach: "defer_to_withdrawal",
     debtDeduction: "no_deduction",
     cryptoTreatment: "like_cash",
     yearType: "lunar",
@@ -187,7 +192,7 @@ export const MADHAB_PRESETS: Record<
     jewelryZakatable: false,
     combineGoldSilver: false,
     stockMethod: "zakatable_assets",
-    retirementApproach: "exclude_until_withdrawal",
+    rrspApproach: "net_after_tax",
     debtDeduction: "twelve_months_principal",
     cryptoTreatment: "like_cash",
     yearType: "lunar",
@@ -239,9 +244,9 @@ export const STEPS: StepConfig[] = [
     icon: "🏢",
   },
   {
-    id: "retirement",
-    title: "Retirement Accounts",
-    subtitle: "401(k), IRA, RRSP, pensions",
+    id: "tax_sheltered",
+    title: "Registered & Retirement",
+    subtitle: "TFSA, RRSP, 401(k), IRA, pensions",
     icon: "🏦",
   },
   {

@@ -24,7 +24,7 @@ import {
   NISAB_INFO,
   JEWELRY_INFO,
   STOCK_INFO,
-  RETIREMENT_INFO,
+  TAX_SHELTERED_INFO,
   DEBT_INFO,
   CRYPTO_INFO,
   AGRICULTURE_INFO,
@@ -56,7 +56,11 @@ const defaultAssets: AssetInputs = {
   businessCash: 0,
   inventory: 0,
   receivables: 0,
-  retirementBalance: 0,
+  tfsaRothBalance: 0,
+  rrsp401kBalance: 0,
+  rrspWithholdingTaxPercent: 30,
+  employerMatchVested: 0,
+  employerMatchUnvested: 0,
   cryptoValue: 0,
   cropValueOrWeight: 0,
   isIrrigated: false,
@@ -608,57 +612,159 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Step 7: Retirement */}
+              {/* Step 7: Tax-Sheltered / Registered & Retirement Accounts */}
               {step === 7 && (
                 <div className="space-y-5">
+                  <p className="text-[var(--ink-light)] leading-relaxed">
+                    Different account types have different Zakat rulings based on access,
+                    tax treatment, and ownership characteristics.
+                  </p>
+
+                  {/* TFSA / Roth IRA — always zakatable */}
                   <div>
-                    <h3 className="font-['Amiri',serif] font-bold text-lg mb-3">
-                      How to Treat Retirement Accounts
+                    <h3 className="font-['Amiri',serif] font-bold text-lg mb-1">
+                      TFSA / Roth IRA
                     </h3>
-                    <div className="space-y-2">
-                      <OptionCard
-                        selected={choices.retirementApproach === "include_annually"}
-                        onClick={() =>
-                          updateChoice("retirementApproach", "include_annually")
-                        }
-                        title="Include Full Balance Annually"
-                        description="Pay 2.5% on the total balance each year."
-                        badge="Ḥanafī (strict)"
-                      />
-                      <OptionCard
-                        selected={
-                          choices.retirementApproach === "exclude_until_withdrawal"
-                        }
-                        onClick={() =>
-                          updateChoice(
-                            "retirementApproach",
-                            "exclude_until_withdrawal"
-                          )
-                        }
-                        title="Exclude Until Withdrawal"
-                        description="No Zakat until funds are actually accessed."
-                        badge="Mālikī / Shāfiʿī / Ḥanbalī"
-                      />
-                      <OptionCard
-                        selected={choices.retirementApproach === "reduced_rate"}
-                        onClick={() =>
-                          updateChoice("retirementApproach", "reduced_rate")
-                        }
-                        title="Reduced Rate (~75% of balance)"
-                        description="Account for penalties and taxes on early withdrawal."
-                      />
+                    <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-3 mb-3 text-sm text-[var(--ink-muted)]">
+                      <strong>Near-unanimous:</strong> Fully zakatable. You have unrestricted access,
+                      contributions are post-tax, and growth is tax-free. All scholars agree these
+                      accounts are subject to Zakat on the full balance.
                     </div>
-                    <InfoAccordion info={RETIREMENT_INFO} />
+                    <CurrencyInput
+                      label="TFSA / Roth IRA Balance"
+                      value={assets.tfsaRothBalance}
+                      onChange={(v) => updateAsset("tfsaRothBalance", v)}
+                      hint="Total across all TFSA and/or Roth IRA accounts"
+                    />
                   </div>
 
                   <div className="gold-line" />
 
-                  <CurrencyInput
-                    label="Retirement Account Balance"
-                    value={assets.retirementBalance}
-                    onChange={(v) => updateAsset("retirementBalance", v)}
-                    hint="401(k), IRA, RRSP, pension — total across all accounts"
-                  />
+                  {/* RRSP / 401(k) / Traditional IRA — scholarly disagreement */}
+                  <div>
+                    <h3 className="font-['Amiri',serif] font-bold text-lg mb-3">
+                      RRSP / 401(k) / Traditional IRA Treatment
+                    </h3>
+                    <div className="space-y-2">
+                      <OptionCard
+                        selected={choices.rrspApproach === "full_balance"}
+                        onClick={() => updateChoice("rrspApproach", "full_balance")}
+                        title="Full Balance Annually"
+                        description="Pay 2.5% on the total balance each year. You own it — voluntary contribution, named account, accessible even with penalty."
+                        badge="FCNA / Ḥanafī"
+                      />
+                      <OptionCard
+                        selected={choices.rrspApproach === "net_after_tax"}
+                        onClick={() => updateChoice("rrspApproach", "net_after_tax")}
+                        title="Net Value After Withdrawal Tax"
+                        description="Deduct estimated withholding tax before calculating Zakat. The government's share isn't truly yours."
+                        badge="NZF Canada / Ḥanbalī"
+                      />
+                      <OptionCard
+                        selected={choices.rrspApproach === "defer_to_withdrawal"}
+                        onClick={() => updateChoice("rrspApproach", "defer_to_withdrawal")}
+                        title="Defer Until Withdrawal"
+                        description="No annual Zakat — pay accumulated Zakat when funds are eventually withdrawn."
+                        badge="Dr. Monzer Kahf / Shāfiʿī"
+                      />
+                      <OptionCard
+                        selected={choices.rrspApproach === "exclude"}
+                        onClick={() => updateChoice("rrspApproach", "exclude")}
+                        title="Exclude Entirely"
+                        description="Not zakatable — restricted access means incomplete ownership. For Ja'farī: covered by Khums instead."
+                        badge="Ja'farī / Minority"
+                      />
+                    </div>
+                  </div>
+
+                  {choices.rrspApproach !== "exclude" && choices.rrspApproach !== "defer_to_withdrawal" && (
+                    <>
+                      <CurrencyInput
+                        label="RRSP / 401(k) / Traditional IRA Balance"
+                        value={assets.rrsp401kBalance}
+                        onChange={(v) => updateAsset("rrsp401kBalance", v)}
+                        hint="Total across all tax-deferred retirement accounts"
+                      />
+
+                      {choices.rrspApproach === "net_after_tax" && (
+                        <CurrencyInput
+                          label="Estimated Withdrawal Tax Rate"
+                          value={assets.rrspWithholdingTaxPercent}
+                          onChange={(v) => updateAsset("rrspWithholdingTaxPercent", v)}
+                          prefix=""
+                          suffix="%"
+                          hint="Canada RRSP: 10% (≤$5K), 20% ($5K–$15K), 30% (>$15K). US 401(k): ~20% federal + state. Enter your estimated effective rate."
+                        />
+                      )}
+                    </>
+                  )}
+
+                  {choices.rrspApproach === "defer_to_withdrawal" && (
+                    <div className="bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl p-4 text-sm text-[var(--ink-muted)]">
+                      <strong>Deferred approach:</strong> You may enter your balance for reference.
+                      No Zakat is calculated annually — but you must pay accumulated Zakat for all
+                      past years each time you make a withdrawal. Keep records of your annual balances.
+                      <div className="mt-3">
+                        <CurrencyInput
+                          label="RRSP / 401(k) Balance (for reference)"
+                          value={assets.rrsp401kBalance}
+                          onChange={(v) => updateAsset("rrsp401kBalance", v)}
+                          hint="Not included in this year's calculation"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="gold-line" />
+
+                  {/* Employer Match */}
+                  <div>
+                    <h3 className="font-['Amiri',serif] font-bold text-lg mb-1">
+                      Employer-Matched Retirement
+                    </h3>
+                    <p className="text-xs text-[var(--ink-faint)] mb-3">
+                      FCNA: Only <strong>vested</strong> employer contributions count — unvested
+                      matching can be revoked by the employer and is not truly owned by you.
+                    </p>
+                    {choices.rrspApproach !== "exclude" && (
+                      <div className="space-y-3">
+                        <CurrencyInput
+                          label="Vested Employer Match"
+                          value={assets.employerMatchVested}
+                          onChange={(v) => updateAsset("employerMatchVested", v)}
+                          hint="Employer contributions that are fully vested (cannot be taken back)"
+                        />
+                        <CurrencyInput
+                          label="Unvested Employer Match"
+                          value={assets.employerMatchUnvested}
+                          onChange={(v) => updateAsset("employerMatchUnvested", v)}
+                          hint="Not yet vested — shown for your records but NOT included in Zakat"
+                        />
+                      </div>
+                    )}
+                    {choices.rrspApproach === "exclude" && (
+                      <p className="text-sm text-[var(--ink-muted)]">
+                        Excluded per your methodology — employer match follows the same treatment as your retirement accounts.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="gold-line" />
+
+                  {/* Defined-Benefit Pension */}
+                  <div>
+                    <h3 className="font-['Amiri',serif] font-bold text-lg mb-1">
+                      Defined-Benefit Pension (CPP, OAS, Public Pension)
+                    </h3>
+                    <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-3 text-sm text-[var(--ink-muted)]">
+                      <strong>Generally not zakatable</strong> until received as income. You have no
+                      individual account balance, no access before retirement age, and the government
+                      controls the funds. Once you begin receiving pension payments, include them
+                      under <strong>Cash &amp; Savings</strong> as part of your liquid assets.
+                    </div>
+                  </div>
+
+                  <InfoAccordion info={TAX_SHELTERED_INFO} />
                 </div>
               )}
 
