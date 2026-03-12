@@ -252,16 +252,18 @@ export function calculateZakat(
           notes: "10% on dividends received (Qaradawi method)",
         });
         break;
-      case "cri_approximation":
-        investmentZakat = totalStockValue * 0.3 * 0.025;
+      case "cri_approximation": {
+        const criPercent = (inputs.stocksZakatablePercent || 30) / 100;
+        investmentZakat = totalStockValue * criPercent * 0.025;
         breakdown.push({
-          category: "Investments (CRI ~30% Approximation)",
-          amount: totalStockValue * 0.3,
+          category: `Investments (CRI ~${(criPercent * 100).toFixed(0)}% Approximation)`,
+          amount: totalStockValue * criPercent,
           rate: 2.5,
           zakatDue: investmentZakat * yearMultiplier,
-          notes: "2.5% on ~30% of market value (CRI approximation for index funds)",
+          notes: `2.5% on ~${(criPercent * 100).toFixed(0)}% of market value (CRI approximation for index funds)`,
         });
         break;
+      }
     }
     totalWealth += totalStockValue;
   }

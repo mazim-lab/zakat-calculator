@@ -523,14 +523,17 @@ export default function Home() {
                     hint="Current market value of all stock holdings"
                   />
 
-                  {choices.stockMethod === "zakatable_assets" && (
+                  {(choices.stockMethod === "zakatable_assets" || choices.stockMethod === "cri_approximation") && (
                     <CurrencyInput
                       label="Zakatable Assets Percentage"
                       value={assets.stocksZakatablePercent}
                       onChange={(v) => updateAsset("stocksZakatablePercent", v)}
                       prefix=""
                       suffix="%"
-                      hint="Percentage of your holdings' companies that are zakatable (cash + receivables + inventory). Default: 30%"
+                      hint={choices.stockMethod === "cri_approximation"
+                        ? "CRI approximation defaults to ~30% for broad index funds. Adjust if you have specific data for your holdings."
+                        : "Percentage of your holdings' companies that are zakatable (cash + receivables + inventory). Default: 30%"
+                      }
                     />
                   )}
 
