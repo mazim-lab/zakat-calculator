@@ -51,6 +51,7 @@ export interface AssetInputs {
   goldWeightGrams: number;
   silverWeightGrams: number;
   goldJewelryWeightGrams: number;
+  goldJewelryKarat: number; // 24, 22, 21, 18, 14, 10, 9
   silverJewelryWeightGrams: number;
 
   // Investments

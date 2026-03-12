@@ -36,6 +36,11 @@ function getRetirementZakatableFraction(
   return eqPct * stockFraction + (1 - eqPct) * 1.0;
 }
 
+// Gold purity by karat
+const KARAT_PURITY: Record<number, number> = {
+  24: 0.999, 22: 0.916, 21: 0.875, 18: 0.750, 14: 0.585, 10: 0.417, 9: 0.375,
+};
+
 function calculateLivestockZakat(
   sheepGoats: number,
   cattle: number,
@@ -180,26 +185,32 @@ export function calculateZakat(
     totalWealth += goldValue;
   }
 
-  // Gold jewelry
-  if (inputs.goldJewelryWeightGrams > 0 && choices.jewelryZakatable) {
-    const jewelryGoldValue = inputs.goldJewelryWeightGrams * goldPrice;
-    breakdown.push({
-      category: "Gold Jewelry (worn)",
-      amount: jewelryGoldValue,
-      rate: 2.5,
-      zakatDue: jewelryGoldValue * 0.025 * yearMultiplier,
-      notes: `${inputs.goldJewelryWeightGrams}g — Zakatable per your methodology`,
-    });
-    totalWealth += jewelryGoldValue;
-  } else if (inputs.goldJewelryWeightGrams > 0) {
-    const jewelryGoldValue = inputs.goldJewelryWeightGrams * goldPrice;
-    breakdown.push({
-      category: "Gold Jewelry (worn)",
-      amount: jewelryGoldValue,
-      rate: 0,
-      zakatDue: 0,
-      notes: "Exempt — worn jewelry not zakatable per your methodology",
-    });
+  // Gold jewelry — purity-adjusted by karat
+  if (inputs.goldJewelryWeightGrams > 0) {
+    const karat = inputs.goldJewelryKarat || 22;
+    const purity = KARAT_PURITY[karat] ?? 0.916;
+    const jewelryGoldPrice = goldPrice * purity;
+    const jewelryGoldValue = inputs.goldJewelryWeightGrams * jewelryGoldPrice;
+    const karatLabel = karat < 24 ? ` at ${karat}kt (${(purity * 100).toFixed(1)}% pure)` : "";
+
+    if (choices.jewelryZakatable) {
+      breakdown.push({
+        category: `Gold Jewelry (worn, ${karat}kt)`,
+        amount: jewelryGoldValue,
+        rate: 2.5,
+        zakatDue: jewelryGoldValue * 0.025 * yearMultiplier,
+        notes: `${inputs.goldJewelryWeightGrams}g${karatLabel} — Zakatable per your methodology`,
+      });
+      totalWealth += jewelryGoldValue;
+    } else {
+      breakdown.push({
+        category: `Gold Jewelry (worn, ${karat}kt)`,
+        amount: jewelryGoldValue,
+        rate: 0,
+        zakatDue: 0,
+        notes: `Exempt — worn jewelry not zakatable per your methodology`,
+      });
+    }
   }
 
   // 3. Silver

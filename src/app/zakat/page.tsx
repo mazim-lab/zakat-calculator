@@ -44,6 +44,7 @@ const defaultAssets: AssetInputs = {
   goldWeightGrams: 0,
   silverWeightGrams: 0,
   goldJewelryWeightGrams: 0,
+  goldJewelryKarat: 22,
   silverJewelryWeightGrams: 0,
   stocksMarketValue: 0,
   stocksZakatablePercent: 30,
@@ -108,6 +109,13 @@ export default function Home() {
 
   const goldPrice = getGoldPricePerGram(currency, exchangeRates, metalPrices.goldPerGram);
   const silverPrice = getSilverPricePerGram(currency, exchangeRates, metalPrices.silverPerGram);
+
+  // Gold purity by karat (fraction of pure gold)
+  const KARAT_PURITY: Record<number, number> = {
+    24: 0.999, 22: 0.916, 21: 0.875, 18: 0.750, 14: 0.585, 10: 0.417, 9: 0.375,
+  };
+  const jewelryPurity = KARAT_PURITY[assets.goldJewelryKarat] ?? 0.916;
+  const jewelryGoldPrice = goldPrice * jewelryPurity;
   const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol || "$";
   const fmt = (amount: number) => formatCurrency(amount, currency);
 
@@ -417,8 +425,8 @@ export default function Home() {
               {step === 3 && (
                 <div className="space-y-5">
                   <p className="text-[var(--ink-light)] leading-relaxed">
-                    Enter the weight of gold and silver you own. For jewelry, enter the weight
-                    of the actual gold/silver content, not the total weight of the piece.
+                    Enter the weight of gold and silver you own. For bars and coins, use 24kt spot price.
+                    For jewelry, select the karat — the price adjusts for purity automatically.
                   </p>
                   <div className="bg-[var(--info-bg)] border border-[var(--info-border)] rounded-xl p-3 text-sm text-[var(--ink-muted)]">
                     <span className="font-medium">Current prices:</span>{" "}
@@ -447,22 +455,44 @@ export default function Home() {
                     )}
                   </div>
                   <div>
-                    <CurrencyInput
-                      label="Gold Jewelry (worn)"
-                      value={assets.goldJewelryWeightGrams}
-                      onChange={(v) => updateAsset("goldJewelryWeightGrams", v)}
-                      prefix=""
-                      suffix="grams"
-                      placeholder="0"
-                      hint={
-                        choices.jewelryZakatable
-                          ? "✓ Included in your Zakat calculation"
-                          : "✗ Exempt per your methodology (worn personal jewelry)"
-                      }
-                    />
+                    <div className="flex items-end gap-3">
+                      <div className="flex-1">
+                        <CurrencyInput
+                          label="Gold Jewelry (worn)"
+                          value={assets.goldJewelryWeightGrams}
+                          onChange={(v) => updateAsset("goldJewelryWeightGrams", v)}
+                          prefix=""
+                          suffix="grams"
+                          placeholder="0"
+                          hint={
+                            choices.jewelryZakatable
+                              ? "✓ Included in your Zakat calculation"
+                              : "✗ Exempt per your methodology (worn personal jewelry)"
+                          }
+                        />
+                      </div>
+                      <div className="mb-[1.6rem]">
+                        <select
+                          value={assets.goldJewelryKarat}
+                          onChange={(e) => updateAsset("goldJewelryKarat", Number(e.target.value))}
+                          className="text-sm border border-[var(--sand-dark)] rounded-md px-2 py-2 bg-white cursor-pointer"
+                        >
+                          <option value={24}>24kt (99.9%)</option>
+                          <option value={22}>22kt (91.6%)</option>
+                          <option value={21}>21kt (87.5%)</option>
+                          <option value={18}>18kt (75.0%)</option>
+                          <option value={14}>14kt (58.5%)</option>
+                          <option value={10}>10kt (41.7%)</option>
+                          <option value={9}>9kt (37.5%)</option>
+                        </select>
+                      </div>
+                    </div>
                     {assets.goldJewelryWeightGrams > 0 && (
                       <p className="text-sm text-[var(--emerald)] font-medium mt-1 ml-1">
-                        = {fmt(assets.goldJewelryWeightGrams * goldPrice)}
+                        = {fmt(assets.goldJewelryWeightGrams * jewelryGoldPrice)}
+                        {assets.goldJewelryKarat < 24 && (
+                          <span className="text-[var(--ink-faint)] font-normal"> ({fmt(jewelryGoldPrice)}/g at {assets.goldJewelryKarat}kt)</span>
+                        )}
                         {!choices.jewelryZakatable && <span className="text-[var(--ink-faint)] font-normal"> (exempt)</span>}
                       </p>
                     )}
