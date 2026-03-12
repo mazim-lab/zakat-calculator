@@ -678,35 +678,33 @@ export function calculateZakat(
   }
   // "no_deduction" (Shāfiʿī / Jaʿfarī) — debtDeduction stays 0
 
+  // NZF approach: debts decrease your overall zakatable wealth directly.
+  // Sum zakatable amounts from breakdown, subtract debts, pay 2.5% on remainder.
+  const grossZakatableBase = breakdown
+    .filter((b) => b.amount > 0)
+    .reduce((sum, b) => sum + b.amount, 0);
+  const netZakatableWealth = Math.max(0, grossZakatableBase - debtDeduction);
+
+  // For nisab check, use gross wealth minus debts (includes non-zakatable portions)
   totalWealth -= debtDeduction;
   totalWealth = Math.max(0, totalWealth);
 
-  // Debt deduction must proportionally reduce Zakat on each asset category.
-  // Example: $100K assets - $90K debt = $10K net → Zakat is 2.5% of $10K, not $100K.
-  if (debtDeduction > 0) {
-    const grossWealth = totalWealth + debtDeduction;
-    const netRatio = grossWealth > 0 ? totalWealth / grossWealth : 0;
+  const meetsNisab = totalWealth >= nisab;
+
+  // Recalculate zakat: 2.5% on net zakatable wealth (after debt subtraction)
+  // Replace individual category zakat with simple flat calculation
+  if (debtDeduction > 0 && grossZakatableBase > 0) {
+    const reductionRatio = netZakatableWealth / grossZakatableBase;
     for (const item of breakdown) {
       if (item.zakatDue > 0) {
-        item.zakatDue *= netRatio;
+        item.zakatDue *= reductionRatio;
       }
     }
   }
 
-  const meetsNisab = totalWealth >= nisab;
   const totalZakatDue = meetsNisab
     ? breakdown.reduce((sum, b) => sum + b.zakatDue, 0)
     : 0;
-
-  // Effective zakatable base = sum of positive breakdown amounts (which already
-  // reflect zakatable fractions), reduced proportionally by debts.
-  const grossZakatableBase = breakdown
-    .filter((b) => b.amount > 0)
-    .reduce((sum, b) => sum + b.amount, 0);
-  const debtNetRatio = debtDeduction > 0 && (totalWealth + debtDeduction) > 0
-    ? totalWealth / (totalWealth + debtDeduction)
-    : 1;
-  const effectiveZakatableWealth = grossZakatableBase * debtNetRatio;
 
   // Zero out individual breakdown items if nisab isn't met
   if (!meetsNisab) {
@@ -720,7 +718,7 @@ export function calculateZakat(
     `${choices.madhab.charAt(0).toUpperCase() + choices.madhab.slice(1)}`;
 
   return {
-    totalZakatableWealth: effectiveZakatableWealth,
+    totalZakatableWealth: netZakatableWealth,
     totalNetWealth: totalWealth,
     totalZakatDue,
     nisabThreshold: nisab,
