@@ -426,45 +426,75 @@ export default function Home() {
                       <span className="ml-1 text-[var(--gold-dark)]">● Estimated</span>
                     )}
                   </div>
-                  <CurrencyInput
-                    label="Gold (non-jewelry)"
-                    value={assets.goldWeightGrams}
-                    onChange={(v) => updateAsset("goldWeightGrams", v)}
-                    prefix=""
-                    suffix="grams"
-                    placeholder="0"
-                    hint="Coins, bars, bullion"
-                  />
-                  <CurrencyInput
-                    label="Gold Jewelry (worn)"
-                    value={assets.goldJewelryWeightGrams}
-                    onChange={(v) => updateAsset("goldJewelryWeightGrams", v)}
-                    prefix=""
-                    suffix="grams"
-                    placeholder="0"
-                    hint={
-                      choices.jewelryZakatable
-                        ? "✓ Included in your Zakat calculation"
-                        : "✗ Exempt per your methodology (worn personal jewelry)"
-                    }
-                  />
-                  <CurrencyInput
-                    label="Silver (non-jewelry)"
-                    value={assets.silverWeightGrams}
-                    onChange={(v) => updateAsset("silverWeightGrams", v)}
-                    prefix=""
-                    suffix="grams"
-                    placeholder="0"
-                    hint="Coins, bars, silverware held as investment"
-                  />
-                  <CurrencyInput
-                    label="Silver Jewelry (worn)"
-                    value={assets.silverJewelryWeightGrams}
-                    onChange={(v) => updateAsset("silverJewelryWeightGrams", v)}
-                    prefix=""
-                    suffix="grams"
-                    placeholder="0"
-                  />
+                  <div>
+                    <CurrencyInput
+                      label="Gold (non-jewelry)"
+                      value={assets.goldWeightGrams}
+                      onChange={(v) => updateAsset("goldWeightGrams", v)}
+                      prefix=""
+                      suffix="grams"
+                      placeholder="0"
+                      hint="Coins, bars, bullion"
+                    />
+                    {assets.goldWeightGrams > 0 && (
+                      <p className="text-sm text-[var(--emerald)] font-medium mt-1 ml-1">
+                        = {fmt(assets.goldWeightGrams * goldPrice)}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <CurrencyInput
+                      label="Gold Jewelry (worn)"
+                      value={assets.goldJewelryWeightGrams}
+                      onChange={(v) => updateAsset("goldJewelryWeightGrams", v)}
+                      prefix=""
+                      suffix="grams"
+                      placeholder="0"
+                      hint={
+                        choices.jewelryZakatable
+                          ? "✓ Included in your Zakat calculation"
+                          : "✗ Exempt per your methodology (worn personal jewelry)"
+                      }
+                    />
+                    {assets.goldJewelryWeightGrams > 0 && (
+                      <p className="text-sm text-[var(--emerald)] font-medium mt-1 ml-1">
+                        = {fmt(assets.goldJewelryWeightGrams * goldPrice)}
+                        {!choices.jewelryZakatable && <span className="text-[var(--ink-faint)] font-normal"> (exempt)</span>}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <CurrencyInput
+                      label="Silver (non-jewelry)"
+                      value={assets.silverWeightGrams}
+                      onChange={(v) => updateAsset("silverWeightGrams", v)}
+                      prefix=""
+                      suffix="grams"
+                      placeholder="0"
+                      hint="Coins, bars, silverware held as investment"
+                    />
+                    {assets.silverWeightGrams > 0 && (
+                      <p className="text-sm text-[var(--emerald)] font-medium mt-1 ml-1">
+                        = {fmt(assets.silverWeightGrams * silverPrice)}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <CurrencyInput
+                      label="Silver Jewelry (worn)"
+                      value={assets.silverJewelryWeightGrams}
+                      onChange={(v) => updateAsset("silverJewelryWeightGrams", v)}
+                      prefix=""
+                      suffix="grams"
+                      placeholder="0"
+                    />
+                    {assets.silverJewelryWeightGrams > 0 && (
+                      <p className="text-sm text-[var(--emerald)] font-medium mt-1 ml-1">
+                        = {fmt(assets.silverJewelryWeightGrams * silverPrice)}
+                        {!choices.jewelryZakatable && <span className="text-[var(--ink-faint)] font-normal"> (exempt)</span>}
+                      </p>
+                    )}
+                  </div>
                   <InfoAccordion info={JEWELRY_INFO} />
                 </div>
               )}
