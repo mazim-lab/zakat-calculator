@@ -57,8 +57,10 @@ const defaultAssets: AssetInputs = {
   inventory: 0,
   receivables: 0,
   tfsaRothBalance: 0,
+  tfsaHoldsEquities: true,
   rrsp401kBalance: 0,
   rrspWithholdingTaxPercent: 30,
+  rrspHoldsEquities: true,
   employerMatchVested: 0,
   employerMatchUnvested: 0,
   cryptoValue: 0,
@@ -669,6 +671,17 @@ export default function Home() {
                       onChange={(v) => updateAsset("tfsaRothBalance", v)}
                       hint="Total across all TFSA and/or Roth IRA accounts"
                     />
+                    {assets.tfsaRothBalance > 0 && (choices.stockMethod === "zakatable_assets" || choices.stockMethod === "cri_approximation") && (
+                      <label className="flex items-center gap-2 text-sm text-[var(--ink-muted)] mt-2 ml-1 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={!!assets.tfsaHoldsEquities}
+                          onChange={(e) => updateAsset("tfsaHoldsEquities" as keyof AssetInputs, e.target.checked as never)}
+                          className="accent-[var(--emerald)]"
+                        />
+                        Account holds stocks/ETFs/mutual funds (apply {assets.stocksZakatablePercent}% zakatable assets method)
+                      </label>
+                    )}
                   </div>
 
                   <div className="gold-line" />
@@ -728,6 +741,18 @@ export default function Home() {
                           suffix="%"
                           hint="Canada RRSP: 10% (≤$5K), 20% ($5K–$15K), 30% (>$15K). US 401(k): ~20% federal + state. Enter your estimated effective rate."
                         />
+                      )}
+
+                      {assets.rrsp401kBalance > 0 && (choices.stockMethod === "zakatable_assets" || choices.stockMethod === "cri_approximation") && (
+                        <label className="flex items-center gap-2 text-sm text-[var(--ink-muted)] mt-2 ml-1 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={!!assets.rrspHoldsEquities}
+                            onChange={(e) => updateAsset("rrspHoldsEquities" as keyof AssetInputs, e.target.checked as never)}
+                            className="accent-[var(--emerald)]"
+                          />
+                          Account holds stocks/ETFs/mutual funds (apply {assets.stocksZakatablePercent}% zakatable assets method)
+                        </label>
                       )}
                     </>
                   )}

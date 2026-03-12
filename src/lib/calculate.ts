@@ -14,6 +14,25 @@ const GOLD_NISAB_GRAMS = 85;
 const SILVER_NISAB_GRAMS = 595;
 const WASQ_KG = 653; // 5 wasqs in kg
 
+/**
+ * Returns the zakatable fraction of an amount held in equities,
+ * based on the user's chosen stock method. For accounts holding
+ * stocks/ETFs/mutual funds, only the zakatable portion applies.
+ * For cash/GICs, returns 1.0 (full amount).
+ */
+function getEquityZakatableFraction(
+  holdsEquities: boolean,
+  stockMethod: string,
+  zakatablePercent: number
+): number {
+  if (!holdsEquities) return 1.0;
+  if (stockMethod === "zakatable_assets" || stockMethod === "cri_approximation") {
+    return Math.min(100, Math.max(0, zakatablePercent)) / 100;
+  }
+  // full_market_value or dividends_only → no reduction
+  return 1.0;
+}
+
 function calculateLivestockZakat(
   sheepGoats: number,
   cattle: number,
@@ -342,14 +361,21 @@ export function calculateZakat(
         notes: "Not subject to obligatory Zakat in Ja'farī fiqh — covered by Khums",
       });
     } else {
+      const tfsaFraction = getEquityZakatableFraction(
+        !!inputs.tfsaHoldsEquities, choices.stockMethod, inputs.stocksZakatablePercent
+      );
+      const tfsaZakatable = inputs.tfsaRothBalance * tfsaFraction;
+      const isReduced = tfsaFraction < 1;
       breakdown.push({
-        category: "TFSA / Roth IRA",
-        amount: inputs.tfsaRothBalance,
+        category: isReduced ? `TFSA / Roth IRA (~${(tfsaFraction * 100).toFixed(0)}% zakatable)` : "TFSA / Roth IRA",
+        amount: tfsaZakatable,
         rate: 2.5,
-        zakatDue: inputs.tfsaRothBalance * 0.025 * yearMultiplier,
-        notes: "Fully zakatable — unrestricted access, post-tax contributions, all scholars agree",
+        zakatDue: tfsaZakatable * 0.025 * yearMultiplier,
+        notes: isReduced
+          ? `Zakatable assets method applied — ${(tfsaFraction * 100).toFixed(0)}% of balance is zakatable (account holds equities)`
+          : "Fully zakatable — unrestricted access, post-tax contributions, all scholars agree",
       });
-      totalWealth += inputs.tfsaRothBalance;
+      totalWealth += inputs.tfsaRothBalance; // full balance counts toward nisab
     }
   }
 
@@ -364,27 +390,46 @@ export function calculateZakat(
     });
   } else if (inputs.rrsp401kBalance > 0) {
     switch (choices.rrspApproach) {
-      case "full_balance":
+      case "full_balance": {
+        const rrspFraction = getEquityZakatableFraction(
+          !!inputs.rrspHoldsEquities, choices.stockMethod, inputs.stocksZakatablePercent
+        );
+        const rrspZakatable = inputs.rrsp401kBalance * rrspFraction;
+        const rrspReduced = rrspFraction < 1;
         breakdown.push({
-          category: "RRSP / 401(k) / IRA",
-          amount: inputs.rrsp401kBalance,
+          category: rrspReduced
+            ? `RRSP / 401(k) / IRA (~${(rrspFraction * 100).toFixed(0)}% zakatable)`
+            : "RRSP / 401(k) / IRA",
+          amount: rrspZakatable,
           rate: 2.5,
-          zakatDue: inputs.rrsp401kBalance * 0.025 * yearMultiplier,
-          notes: "Full balance zakatable annually (FCNA position)",
+          zakatDue: rrspZakatable * 0.025 * yearMultiplier,
+          notes: rrspReduced
+            ? `Full balance × ${(rrspFraction * 100).toFixed(0)}% zakatable assets (FCNA — account holds equities)`
+            : "Full balance zakatable annually (FCNA position)",
         });
-        totalWealth += inputs.rrsp401kBalance;
+        totalWealth += inputs.rrsp401kBalance; // full balance counts toward nisab
         break;
+      }
       case "net_after_tax": {
         const taxRate = Math.min(100, Math.max(0, inputs.rrspWithholdingTaxPercent)) / 100;
         const netValue = inputs.rrsp401kBalance * (1 - taxRate);
+        const netFraction = getEquityZakatableFraction(
+          !!inputs.rrspHoldsEquities, choices.stockMethod, inputs.stocksZakatablePercent
+        );
+        const netZakatable = netValue * netFraction;
+        const netReduced = netFraction < 1;
         breakdown.push({
-          category: "RRSP / 401(k) / IRA (Net After Tax)",
-          amount: netValue,
+          category: netReduced
+            ? `RRSP / 401(k) / IRA (Net After Tax, ~${(netFraction * 100).toFixed(0)}% zakatable)`
+            : "RRSP / 401(k) / IRA (Net After Tax)",
+          amount: netZakatable,
           rate: 2.5,
-          zakatDue: netValue * 0.025 * yearMultiplier,
-          notes: `Balance minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax (NZF Canada position)`,
+          zakatDue: netZakatable * 0.025 * yearMultiplier,
+          notes: netReduced
+            ? `Balance minus ${(taxRate * 100).toFixed(0)}% tax, then ${(netFraction * 100).toFixed(0)}% zakatable assets (account holds equities)`
+            : `Balance minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax (NZF Canada position)`,
         });
-        totalWealth += netValue;
+        totalWealth += netValue; // net value counts toward nisab
         break;
       }
       case "defer_to_withdrawal":
@@ -431,22 +476,38 @@ export function calculateZakat(
     } else if (choices.rrspApproach === "net_after_tax") {
       const taxRate = Math.min(100, Math.max(0, inputs.rrspWithholdingTaxPercent)) / 100;
       const netVested = inputs.employerMatchVested * (1 - taxRate);
+      const empFraction = getEquityZakatableFraction(
+        !!inputs.rrspHoldsEquities, choices.stockMethod, inputs.stocksZakatablePercent
+      );
+      const empZakatable = netVested * empFraction;
       breakdown.push({
-        category: "Employer Match (Vested, Net After Tax)",
-        amount: netVested,
+        category: empFraction < 1
+          ? `Employer Match (Vested, Net, ~${(empFraction * 100).toFixed(0)}% zakatable)`
+          : "Employer Match (Vested, Net After Tax)",
+        amount: empZakatable,
         rate: 2.5,
-        zakatDue: netVested * 0.025 * yearMultiplier,
-        notes: `Vested employer match minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax`,
+        zakatDue: empZakatable * 0.025 * yearMultiplier,
+        notes: empFraction < 1
+          ? `Vested match minus ${(taxRate * 100).toFixed(0)}% tax, then ${(empFraction * 100).toFixed(0)}% zakatable assets`
+          : `Vested employer match minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax`,
       });
       totalWealth += netVested;
     } else {
       // full_balance
+      const empFraction = getEquityZakatableFraction(
+        !!inputs.rrspHoldsEquities, choices.stockMethod, inputs.stocksZakatablePercent
+      );
+      const empZakatable = inputs.employerMatchVested * empFraction;
       breakdown.push({
-        category: "Employer Match (Vested)",
-        amount: inputs.employerMatchVested,
+        category: empFraction < 1
+          ? `Employer Match (Vested, ~${(empFraction * 100).toFixed(0)}% zakatable)`
+          : "Employer Match (Vested)",
+        amount: empZakatable,
         rate: 2.5,
-        zakatDue: inputs.employerMatchVested * 0.025 * yearMultiplier,
-        notes: "Vested employer contributions — fully owned (FCNA position)",
+        zakatDue: empZakatable * 0.025 * yearMultiplier,
+        notes: empFraction < 1
+          ? `Vested match × ${(empFraction * 100).toFixed(0)}% zakatable assets (account holds equities)`
+          : "Vested employer contributions — fully owned (FCNA position)",
       });
       totalWealth += inputs.employerMatchVested;
     }
