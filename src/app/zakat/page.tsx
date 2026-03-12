@@ -550,13 +550,6 @@ export default function Home() {
 
                   <div className="gold-line" />
 
-                  <CurrencyInput
-                    label="Stocks / Shares"
-                    value={assets.stocksMarketValue}
-                    onChange={(v) => updateAsset("stocksMarketValue", v)}
-                    hint="Current market value of all stock holdings"
-                  />
-
                   {(choices.stockMethod === "zakatable_assets" || choices.stockMethod === "cri_approximation") && (
                     <CurrencyInput
                       label="Zakatable Assets Percentage"
@@ -570,6 +563,13 @@ export default function Home() {
                       }
                     />
                   )}
+
+                  <CurrencyInput
+                    label="Stocks / Shares"
+                    value={assets.stocksMarketValue}
+                    onChange={(v) => updateAsset("stocksMarketValue", v)}
+                    hint="Current market value of all stock holdings"
+                  />
 
                   {choices.stockMethod === "dividends_only" && (
                     <CurrencyInput
