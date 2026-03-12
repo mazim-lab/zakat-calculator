@@ -72,10 +72,10 @@ export interface AssetInputs {
 
   // Tax-Sheltered / Retirement Accounts
   tfsaRothBalance: number;
-  tfsaHoldsEquities: boolean;
+  tfsaEquityPercent: number; // 0 = all cash/GICs, 100 = all equities
   rrsp401kBalance: number;
   rrspWithholdingTaxPercent: number;
-  rrspHoldsEquities: boolean;
+  rrspEquityPercent: number; // 0 = all cash/GICs, 100 = all equities
   employerMatchVested: number;
   employerMatchUnvested: number;
 

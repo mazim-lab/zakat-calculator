@@ -57,10 +57,10 @@ const defaultAssets: AssetInputs = {
   inventory: 0,
   receivables: 0,
   tfsaRothBalance: 0,
-  tfsaHoldsEquities: true,
+  tfsaEquityPercent: 100,
   rrsp401kBalance: 0,
   rrspWithholdingTaxPercent: 30,
-  rrspHoldsEquities: true,
+  rrspEquityPercent: 100,
   employerMatchVested: 0,
   employerMatchUnvested: 0,
   cryptoValue: 0,
@@ -671,16 +671,39 @@ export default function Home() {
                       onChange={(v) => updateAsset("tfsaRothBalance", v)}
                       hint="Total across all TFSA and/or Roth IRA accounts"
                     />
-                    {assets.tfsaRothBalance > 0 && (choices.stockMethod === "zakatable_assets" || choices.stockMethod === "cri_approximation") && (
-                      <label className="flex items-center gap-2 text-sm text-[var(--ink-muted)] mt-2 ml-1 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={!!assets.tfsaHoldsEquities}
-                          onChange={(e) => updateAsset("tfsaHoldsEquities" as keyof AssetInputs, e.target.checked as never)}
-                          className="accent-[var(--emerald)]"
-                        />
-                        Account holds stocks/ETFs/mutual funds (apply {assets.stocksZakatablePercent}% zakatable assets method)
-                      </label>
+                    {assets.tfsaRothBalance > 0 && (
+                      <div className="mt-3 space-y-2">
+                        <div className="flex items-center gap-3">
+                          <label className="text-sm text-[var(--ink-muted)] whitespace-nowrap">What does this account hold?</label>
+                          <select
+                            value={assets.tfsaEquityPercent === 0 ? "cash" : assets.tfsaEquityPercent === 100 ? "equities" : "mixed"}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              updateAsset("tfsaEquityPercent", v === "cash" ? 0 : v === "equities" ? 100 : 70);
+                            }}
+                            className="text-sm border border-[var(--sand-dark)] rounded-md px-2 py-1 bg-white cursor-pointer"
+                          >
+                            <option value="equities">Stocks / ETFs / Mutual Funds</option>
+                            <option value="mixed">Mix of equities &amp; cash</option>
+                            <option value="cash">Cash / GICs / Bonds only</option>
+                          </select>
+                        </div>
+                        {assets.tfsaEquityPercent > 0 && assets.tfsaEquityPercent < 100 && (
+                          <CurrencyInput
+                            label="Estimated equity portion"
+                            value={assets.tfsaEquityPercent}
+                            onChange={(v) => updateAsset("tfsaEquityPercent", v)}
+                            prefix=""
+                            suffix="%"
+                            hint="What percentage of this account is in stocks/ETFs/mutual funds?"
+                          />
+                        )}
+                        {assets.tfsaEquityPercent > 0 && (
+                          <p className="text-xs text-[var(--ink-muted)] ml-1">
+                            📊 Only the equity portion ({assets.tfsaEquityPercent}%) is subject to the zakatable assets method — cash/GIC portions are zakatable at full value.
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -743,16 +766,39 @@ export default function Home() {
                         />
                       )}
 
-                      {assets.rrsp401kBalance > 0 && (choices.stockMethod === "zakatable_assets" || choices.stockMethod === "cri_approximation") && (
-                        <label className="flex items-center gap-2 text-sm text-[var(--ink-muted)] mt-2 ml-1 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={!!assets.rrspHoldsEquities}
-                            onChange={(e) => updateAsset("rrspHoldsEquities" as keyof AssetInputs, e.target.checked as never)}
-                            className="accent-[var(--emerald)]"
-                          />
-                          Account holds stocks/ETFs/mutual funds (apply {assets.stocksZakatablePercent}% zakatable assets method)
-                        </label>
+                      {assets.rrsp401kBalance > 0 && (
+                        <div className="mt-3 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <label className="text-sm text-[var(--ink-muted)] whitespace-nowrap">What does this account hold?</label>
+                            <select
+                              value={assets.rrspEquityPercent === 0 ? "cash" : assets.rrspEquityPercent === 100 ? "equities" : "mixed"}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                updateAsset("rrspEquityPercent", v === "cash" ? 0 : v === "equities" ? 100 : 70);
+                              }}
+                              className="text-sm border border-[var(--sand-dark)] rounded-md px-2 py-1 bg-white cursor-pointer"
+                            >
+                              <option value="equities">Stocks / ETFs / Mutual Funds</option>
+                              <option value="mixed">Mix of equities &amp; cash</option>
+                              <option value="cash">Cash / GICs / Bonds only</option>
+                            </select>
+                          </div>
+                          {assets.rrspEquityPercent > 0 && assets.rrspEquityPercent < 100 && (
+                            <CurrencyInput
+                              label="Estimated equity portion"
+                              value={assets.rrspEquityPercent}
+                              onChange={(v) => updateAsset("rrspEquityPercent", v)}
+                              prefix=""
+                              suffix="%"
+                              hint="What percentage of this account is in stocks/ETFs/mutual funds?"
+                            />
+                          )}
+                          {assets.rrspEquityPercent > 0 && (
+                            <p className="text-xs text-[var(--ink-muted)] ml-1">
+                              📊 Only the equity portion ({assets.rrspEquityPercent}%) is subject to the zakatable assets method — cash/GIC portions are zakatable at full value.
+                            </p>
+                          )}
+                        </div>
                       )}
                     </>
                   )}
