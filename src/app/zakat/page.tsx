@@ -110,12 +110,12 @@ export default function Home() {
   const goldPrice = getGoldPricePerGram(currency, exchangeRates, metalPrices.goldPerGram);
   const silverPrice = getSilverPricePerGram(currency, exchangeRates, metalPrices.silverPerGram);
 
-  // Gold purity by karat (fraction of pure gold)
-  const KARAT_PURITY: Record<number, number> = {
-    24: 0.999, 22: 0.916, 21: 0.875, 18: 0.750, 14: 0.585, 10: 0.417, 9: 0.375,
+  // Gold jewelry liquidation value as fraction of spot (based on dealer buyback data)
+  const KARAT_LIQUIDATION: Record<number, number> = {
+    24: 0.780, 22: 0.699, 21: 0.666, 18: 0.569, 14: 0.439, 10: 0.309, 9: 0.276,
   };
-  const jewelryPurity = KARAT_PURITY[assets.goldJewelryKarat] ?? 0.916;
-  const jewelryGoldPrice = goldPrice * jewelryPurity;
+  const jewelryLiquidation = KARAT_LIQUIDATION[assets.goldJewelryKarat] ?? 0.699;
+  const jewelryGoldPrice = goldPrice * jewelryLiquidation;
   const currencySymbol = CURRENCIES.find((c) => c.code === currency)?.symbol || "$";
   const fmt = (amount: number) => formatCurrency(amount, currency);
 
@@ -477,22 +477,20 @@ export default function Home() {
                           onChange={(e) => updateAsset("goldJewelryKarat", Number(e.target.value))}
                           className="text-sm border border-[var(--sand-dark)] rounded-md px-2 py-2 bg-white cursor-pointer"
                         >
-                          <option value={24}>24kt (99.9%)</option>
-                          <option value={22}>22kt (91.6%)</option>
-                          <option value={21}>21kt (87.5%)</option>
-                          <option value={18}>18kt (75.0%)</option>
-                          <option value={14}>14kt (58.5%)</option>
-                          <option value={10}>10kt (41.7%)</option>
-                          <option value={9}>9kt (37.5%)</option>
+                          <option value={24}>24kt</option>
+                          <option value={22}>22kt</option>
+                          <option value={21}>21kt</option>
+                          <option value={18}>18kt</option>
+                          <option value={14}>14kt</option>
+                          <option value={10}>10kt</option>
+                          <option value={9}>9kt</option>
                         </select>
                       </div>
                     </div>
                     {assets.goldJewelryWeightGrams > 0 && (
                       <p className="text-sm text-[var(--emerald)] font-medium mt-1 ml-1">
-                        = {fmt(assets.goldJewelryWeightGrams * jewelryGoldPrice)}
-                        {assets.goldJewelryKarat < 24 && (
-                          <span className="text-[var(--ink-faint)] font-normal"> ({fmt(jewelryGoldPrice)}/g at {assets.goldJewelryKarat}kt)</span>
-                        )}
+                        ≈ {fmt(assets.goldJewelryWeightGrams * jewelryGoldPrice)}
+                        <span className="text-[var(--ink-faint)] font-normal"> ({fmt(jewelryGoldPrice)}/g — {assets.goldJewelryKarat}kt liquidation value)</span>
                         {!choices.jewelryZakatable && <span className="text-[var(--ink-faint)] font-normal"> (exempt)</span>}
                       </p>
                     )}

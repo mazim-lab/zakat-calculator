@@ -36,9 +36,11 @@ function getRetirementZakatableFraction(
   return eqPct * stockFraction + (1 - eqPct) * 1.0;
 }
 
-// Gold purity by karat
-const KARAT_PURITY: Record<number, number> = {
-  24: 0.999, 22: 0.916, 21: 0.875, 18: 0.750, 14: 0.585, 10: 0.417, 9: 0.375,
+// Gold jewelry liquidation value as fraction of spot price.
+// Based on real dealer buyback data (canadagold.ca, 2026-03-12).
+// These are lower than pure purity fractions because of dealer margins.
+const KARAT_LIQUIDATION: Record<number, number> = {
+  24: 0.780, 22: 0.699, 21: 0.666, 18: 0.569, 14: 0.439, 10: 0.309, 9: 0.276,
 };
 
 function calculateLivestockZakat(
@@ -188,10 +190,10 @@ export function calculateZakat(
   // Gold jewelry — purity-adjusted by karat
   if (inputs.goldJewelryWeightGrams > 0) {
     const karat = inputs.goldJewelryKarat || 22;
-    const purity = KARAT_PURITY[karat] ?? 0.916;
-    const jewelryGoldPrice = goldPrice * purity;
+    const liquidation = KARAT_LIQUIDATION[karat] ?? 0.699;
+    const jewelryGoldPrice = goldPrice * liquidation;
     const jewelryGoldValue = inputs.goldJewelryWeightGrams * jewelryGoldPrice;
-    const karatLabel = karat < 24 ? ` at ${karat}kt (${(purity * 100).toFixed(1)}% pure)` : "";
+    const karatLabel = ` at ${karat}kt (${(liquidation * 100).toFixed(0)}% of spot)`;
 
     if (choices.jewelryZakatable) {
       breakdown.push({
