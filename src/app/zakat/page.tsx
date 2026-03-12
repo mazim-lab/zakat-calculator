@@ -1110,24 +1110,19 @@ export default function Home() {
                           Long-Term Debts
                         </h3>
                         <p className="text-xs text-[var(--ink-faint)] mb-3">
-                          Mortgage, student loans, car loans, etc. Only the <strong>principal portion</strong> of
-                          your monthly payment is deductible — interest (ribā) is not a legitimate Islamic liability.
+                          Enter your <strong>monthly</strong> amounts below — the calculator will automatically multiply
+                          by 12 to determine your annual deductible debt. Only the <strong>principal portion</strong> is
+                          deductible — interest (ribā) is not a legitimate Islamic liability.
                         </p>
                         <div className="space-y-4">
                           {/* Mortgage */}
                           <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
                             <p className="text-sm font-medium text-[var(--ink)]">🏠 Mortgage</p>
                             <CurrencyInput
-                              label="Monthly Mortgage Payment (total)"
-                              value={assets.monthlyMortgagePayment}
-                              onChange={(v) => updateAsset("monthlyMortgagePayment", v)}
-                              hint="Your full monthly mortgage payment including principal + interest"
-                            />
-                            <CurrencyInput
                               label="Monthly Principal Portion"
                               value={assets.monthlyMortgagePrincipal}
                               onChange={(v) => updateAsset("monthlyMortgagePrincipal", v)}
-                              hint="The principal-only portion (check your mortgage statement or amortization schedule)"
+                              hint="Principal-only portion of one month's payment — check your statement or amortization schedule. The calculator multiplies by 12 for the annual deduction."
                             />
                           </div>
 
@@ -1135,16 +1130,10 @@ export default function Home() {
                           <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
                             <p className="text-sm font-medium text-[var(--ink)]">🎓 Student Loans</p>
                             <CurrencyInput
-                              label="Monthly Student Loan Payment (total)"
-                              value={assets.monthlyStudentLoanPayment}
-                              onChange={(v) => updateAsset("monthlyStudentLoanPayment", v)}
-                              hint="Total monthly payment across all student loans"
-                            />
-                            <CurrencyInput
                               label="Monthly Principal Portion"
                               value={assets.monthlyStudentLoanPrincipal}
                               onChange={(v) => updateAsset("monthlyStudentLoanPrincipal", v)}
-                              hint="Principal-only portion (check your loan servicer statement)"
+                              hint="Principal-only portion of one month's payment. The calculator multiplies by 12 for the annual deduction."
                             />
                           </div>
 
@@ -1152,14 +1141,10 @@ export default function Home() {
                           <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
                             <p className="text-sm font-medium text-[var(--ink)]">🚗 Car Loan</p>
                             <CurrencyInput
-                              label="Monthly Car Loan Payment (total)"
-                              value={assets.monthlyCarLoanPayment}
-                              onChange={(v) => updateAsset("monthlyCarLoanPayment", v)}
-                            />
-                            <CurrencyInput
                               label="Monthly Principal Portion"
                               value={assets.monthlyCarLoanPrincipal}
                               onChange={(v) => updateAsset("monthlyCarLoanPrincipal", v)}
+                              hint="Principal-only portion of one month's payment. The calculator multiplies by 12."
                             />
                           </div>
 
@@ -1167,15 +1152,10 @@ export default function Home() {
                           <div className="p-3 rounded-lg bg-[var(--cream)]/30 space-y-3">
                             <p className="text-sm font-medium text-[var(--ink)]">📋 Other Long-Term Debt</p>
                             <CurrencyInput
-                              label="Monthly Payment (total)"
-                              value={assets.monthlyOtherLongTermPayment}
-                              onChange={(v) => updateAsset("monthlyOtherLongTermPayment", v)}
-                              hint="Any other installment debt (personal line of credit, business loan, etc.)"
-                            />
-                            <CurrencyInput
                               label="Monthly Principal Portion"
                               value={assets.monthlyOtherLongTermPrincipal}
                               onChange={(v) => updateAsset("monthlyOtherLongTermPrincipal", v)}
+                              hint="Any other installment debt (line of credit, business loan, etc.). The calculator multiplies by 12."
                             />
                           </div>
                         </div>
