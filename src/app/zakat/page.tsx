@@ -58,9 +58,11 @@ const defaultAssets: AssetInputs = {
   receivables: 0,
   tfsaRothBalance: 0,
   tfsaEquityPercent: 100,
+  tfsaZakatableAssetsPercent: 30,
   rrsp401kBalance: 0,
   rrspWithholdingTaxPercent: 30,
   rrspEquityPercent: 100,
+  rrspZakatableAssetsPercent: 30,
   employerMatchVested: 0,
   employerMatchUnvested: 0,
   cryptoValue: 0,
@@ -699,9 +701,19 @@ export default function Home() {
                           />
                         )}
                         {assets.tfsaEquityPercent > 0 && (
-                          <p className="text-xs text-[var(--ink-muted)] ml-1">
-                            📊 Only the equity portion ({assets.tfsaEquityPercent}%) is subject to the zakatable assets method — cash/GIC portions are zakatable at full value.
-                          </p>
+                          <>
+                            <CurrencyInput
+                              label="Zakatable assets rate"
+                              value={assets.tfsaZakatableAssetsPercent}
+                              onChange={(v) => updateAsset("tfsaZakatableAssetsPercent", v)}
+                              prefix=""
+                              suffix="%"
+                              hint="~30% is the CRI approximation for broad index funds. Use your fund's actual zakatable % if known."
+                            />
+                            <p className="text-xs text-[var(--ink-muted)] ml-1">
+                              📊 {assets.tfsaEquityPercent}% equities × {assets.tfsaZakatableAssetsPercent}% zakatable + {100 - assets.tfsaEquityPercent}% cash at full value
+                            </p>
+                          </>
                         )}
                       </div>
                     )}
@@ -794,9 +806,19 @@ export default function Home() {
                             />
                           )}
                           {assets.rrspEquityPercent > 0 && (
-                            <p className="text-xs text-[var(--ink-muted)] ml-1">
-                              📊 Only the equity portion ({assets.rrspEquityPercent}%) is subject to the zakatable assets method — cash/GIC portions are zakatable at full value.
-                            </p>
+                            <>
+                              <CurrencyInput
+                                label="Zakatable assets rate"
+                                value={assets.rrspZakatableAssetsPercent}
+                                onChange={(v) => updateAsset("rrspZakatableAssetsPercent", v)}
+                                prefix=""
+                                suffix="%"
+                                hint="~30% is the CRI approximation for broad index funds. Use your fund's actual zakatable % if known."
+                              />
+                              <p className="text-xs text-[var(--ink-muted)] ml-1">
+                                📊 {assets.rrspEquityPercent}% equities × {assets.rrspZakatableAssetsPercent}% zakatable + {100 - assets.rrspEquityPercent}% cash at full value
+                              </p>
+                            </>
                           )}
                         </div>
                       )}

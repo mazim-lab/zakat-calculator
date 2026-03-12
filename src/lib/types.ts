@@ -73,9 +73,11 @@ export interface AssetInputs {
   // Tax-Sheltered / Retirement Accounts
   tfsaRothBalance: number;
   tfsaEquityPercent: number; // 0 = all cash/GICs, 100 = all equities
+  tfsaZakatableAssetsPercent: number; // zakatable assets rate for equity portion
   rrsp401kBalance: number;
   rrspWithholdingTaxPercent: number;
   rrspEquityPercent: number; // 0 = all cash/GICs, 100 = all equities
+  rrspZakatableAssetsPercent: number; // zakatable assets rate for equity portion
   employerMatchVested: number;
   employerMatchUnvested: number;
 

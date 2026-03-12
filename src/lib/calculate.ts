@@ -365,7 +365,7 @@ export function calculateZakat(
       });
     } else {
       const tfsaFraction = getRetirementZakatableFraction(
-        inputs.tfsaEquityPercent, inputs.stocksZakatablePercent
+        inputs.tfsaEquityPercent, inputs.tfsaZakatableAssetsPercent
       );
       const tfsaZakatable = inputs.tfsaRothBalance * tfsaFraction;
       const isReduced = tfsaFraction < 1;
@@ -375,7 +375,7 @@ export function calculateZakat(
         rate: 2.5,
         zakatDue: tfsaZakatable * 0.025 * yearMultiplier,
         notes: isReduced
-          ? `${inputs.tfsaEquityPercent}% equities × ${inputs.stocksZakatablePercent}% zakatable assets + ${100 - inputs.tfsaEquityPercent}% cash at full value`
+          ? `${inputs.tfsaEquityPercent}% equities × ${inputs.tfsaZakatableAssetsPercent}% zakatable assets + ${100 - inputs.tfsaEquityPercent}% cash at full value`
           : "Fully zakatable — unrestricted access, post-tax contributions, all scholars agree",
       });
       totalWealth += inputs.tfsaRothBalance;
@@ -395,7 +395,7 @@ export function calculateZakat(
     switch (choices.rrspApproach) {
       case "full_balance": {
         const rrspFraction = getRetirementZakatableFraction(
-          inputs.rrspEquityPercent, inputs.stocksZakatablePercent
+          inputs.rrspEquityPercent, inputs.rrspZakatableAssetsPercent
         );
         const rrspZakatable = inputs.rrsp401kBalance * rrspFraction;
         const rrspReduced = rrspFraction < 1;
@@ -407,7 +407,7 @@ export function calculateZakat(
           rate: 2.5,
           zakatDue: rrspZakatable * 0.025 * yearMultiplier,
           notes: rrspReduced
-            ? `${inputs.rrspEquityPercent}% equities × ${inputs.stocksZakatablePercent}% zakatable assets + ${100 - inputs.rrspEquityPercent}% cash at full value (FCNA)`
+            ? `${inputs.rrspEquityPercent}% equities × ${inputs.rrspZakatableAssetsPercent}% zakatable assets + ${100 - inputs.rrspEquityPercent}% cash at full value (FCNA)`
             : "Full balance zakatable annually (FCNA position)",
         });
         totalWealth += inputs.rrsp401kBalance;
@@ -417,7 +417,7 @@ export function calculateZakat(
         const taxRate = Math.min(100, Math.max(0, inputs.rrspWithholdingTaxPercent)) / 100;
         const netValue = inputs.rrsp401kBalance * (1 - taxRate);
         const netFraction = getRetirementZakatableFraction(
-          inputs.rrspEquityPercent, inputs.stocksZakatablePercent
+          inputs.rrspEquityPercent, inputs.rrspZakatableAssetsPercent
         );
         const netZakatable = netValue * netFraction;
         const netReduced = netFraction < 1;
@@ -429,7 +429,7 @@ export function calculateZakat(
           rate: 2.5,
           zakatDue: netZakatable * 0.025 * yearMultiplier,
           notes: netReduced
-            ? `Net after ${(taxRate * 100).toFixed(0)}% tax → ${inputs.rrspEquityPercent}% equities × ${inputs.stocksZakatablePercent}% zakatable + ${100 - inputs.rrspEquityPercent}% cash`
+            ? `Net after ${(taxRate * 100).toFixed(0)}% tax → ${inputs.rrspEquityPercent}% equities × ${inputs.rrspZakatableAssetsPercent}% zakatable + ${100 - inputs.rrspEquityPercent}% cash`
             : `Balance minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax (NZF Canada position)`,
         });
         totalWealth += netValue;
@@ -480,7 +480,7 @@ export function calculateZakat(
       const taxRate = Math.min(100, Math.max(0, inputs.rrspWithholdingTaxPercent)) / 100;
       const netVested = inputs.employerMatchVested * (1 - taxRate);
       const empFraction = getRetirementZakatableFraction(
-        inputs.rrspEquityPercent, inputs.stocksZakatablePercent
+        inputs.rrspEquityPercent, inputs.rrspZakatableAssetsPercent
       );
       const empZakatable = netVested * empFraction;
       breakdown.push({
@@ -491,14 +491,14 @@ export function calculateZakat(
         rate: 2.5,
         zakatDue: empZakatable * 0.025 * yearMultiplier,
         notes: empFraction < 1
-          ? `Vested match net of ${(taxRate * 100).toFixed(0)}% tax, ${inputs.rrspEquityPercent}% equities × ${inputs.stocksZakatablePercent}% zakatable`
+          ? `Vested match net of ${(taxRate * 100).toFixed(0)}% tax, ${inputs.rrspEquityPercent}% equities × ${inputs.rrspZakatableAssetsPercent}% zakatable`
           : `Vested employer match minus ${(taxRate * 100).toFixed(0)}% estimated withdrawal tax`,
       });
       totalWealth += netVested;
     } else {
       // full_balance
       const empFraction = getRetirementZakatableFraction(
-        inputs.rrspEquityPercent, inputs.stocksZakatablePercent
+        inputs.rrspEquityPercent, inputs.rrspZakatableAssetsPercent
       );
       const empZakatable = inputs.employerMatchVested * empFraction;
       breakdown.push({
@@ -509,7 +509,7 @@ export function calculateZakat(
         rate: 2.5,
         zakatDue: empZakatable * 0.025 * yearMultiplier,
         notes: empFraction < 1
-          ? `Vested match: ${inputs.rrspEquityPercent}% equities × ${inputs.stocksZakatablePercent}% zakatable + ${100 - inputs.rrspEquityPercent}% cash`
+          ? `Vested match: ${inputs.rrspEquityPercent}% equities × ${inputs.rrspZakatableAssetsPercent}% zakatable + ${100 - inputs.rrspEquityPercent}% cash`
           : "Vested employer contributions — fully owned (FCNA position)",
       });
       totalWealth += inputs.employerMatchVested;
