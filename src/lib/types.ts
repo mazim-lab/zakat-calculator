@@ -127,7 +127,8 @@ export interface KhumsResult {
 }
 
 export interface ZakatResult {
-  totalZakatableWealth: number;
+  totalZakatableWealth: number; // effective zakatable base (what 2.5% applies to)
+  totalNetWealth: number; // gross wealth minus debts (used for nisab check)
   totalZakatDue: number;
   nisabThreshold: number;
   meetsNisab: boolean;

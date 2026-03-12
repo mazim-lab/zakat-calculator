@@ -1324,11 +1324,19 @@ export default function Home() {
                   {/* Summary */}
                   <div className="bg-[var(--parchment)] rounded-2xl p-5">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-[var(--ink-light)]">Total Zakatable Wealth</span>
+                      <span className="text-[var(--ink-light)]">Zakatable Base</span>
                       <span className="font-semibold">
                         {fmt(result.totalZakatableWealth)}
                       </span>
                     </div>
+                    {result.totalNetWealth !== result.totalZakatableWealth && (
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-[var(--ink-faint)] text-sm">Net Wealth (for nisab)</span>
+                        <span className="text-[var(--ink-faint)] text-sm">
+                          {fmt(result.totalNetWealth)}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-[var(--ink-light)]">Nisab Threshold</span>
                       <span className="font-semibold">

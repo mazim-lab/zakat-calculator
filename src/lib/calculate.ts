@@ -698,6 +698,16 @@ export function calculateZakat(
     ? breakdown.reduce((sum, b) => sum + b.zakatDue, 0)
     : 0;
 
+  // Effective zakatable base = sum of positive breakdown amounts (which already
+  // reflect zakatable fractions), reduced proportionally by debts.
+  const grossZakatableBase = breakdown
+    .filter((b) => b.amount > 0)
+    .reduce((sum, b) => sum + b.amount, 0);
+  const debtNetRatio = debtDeduction > 0 && (totalWealth + debtDeduction) > 0
+    ? totalWealth / (totalWealth + debtDeduction)
+    : 1;
+  const effectiveZakatableWealth = grossZakatableBase * debtNetRatio;
+
   // Zero out individual breakdown items if nisab isn't met
   if (!meetsNisab) {
     for (const item of breakdown) {
@@ -710,7 +720,8 @@ export function calculateZakat(
     `${choices.madhab.charAt(0).toUpperCase() + choices.madhab.slice(1)}`;
 
   return {
-    totalZakatableWealth: totalWealth,
+    totalZakatableWealth: effectiveZakatableWealth,
+    totalNetWealth: totalWealth,
     totalZakatDue,
     nisabThreshold: nisab,
     meetsNisab,
