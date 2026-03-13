@@ -107,6 +107,15 @@ export default function InheritanceCalculatorPage() {
           <motion.div key="step1" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}>
             <h2 className="heading-display mb-4">Step 1: Select Heirs</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <OptionCard
+                title="No Heirs"
+                description="The deceased has no living inheritors."
+                selected={Object.keys(heirs).length === 0}
+                onClick={() => {
+                  setHeirs({});
+                  setStep(2);
+                }}
+              />
               {HEIR_OPTIONS.map(({ id, title, description, type }) => (
                 <OptionCard
                   key={id}
