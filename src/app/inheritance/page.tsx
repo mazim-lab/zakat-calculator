@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heirs, CalculationResult, Heir, Madhab } from '@/lib/inheritance/types';
 import { calculateInheritance } from '@/lib/inheritance/calculate';
-import { awlInfo, raddInfo, hajbInfo, grandfatherSiblingsInfo, umariyyatanInfo, jafariSystemInfo, baytAlMalInfo } from '@/lib/inheritance/scholarly-info';
+import { awlInfo, raddInfo, hajbInfo, grandfatherSiblingsInfo, umariyyatanInfo, jafariSystemInfo, getBaytAlMalInfo } from '@/lib/inheritance/scholarly-info';
 
 // Simple GCD and number to fraction converter
 function gcd(a: number, b: number): number {
@@ -280,7 +280,7 @@ export default function InheritanceCalculatorPage() {
                     <InfoAccordion info={hajbInfo} />
                     {result.wasAwlApplied && <InfoAccordion info={awlInfo} />}
                     {result.wasRaddApplied && <InfoAccordion info={raddInfo} />}
-                    {(result.baytAlMalAmount ?? 0) > 0 && <InfoAccordion info={baytAlMalInfo} />}
+                    {(result.baytAlMalAmount ?? 0) > 0 && <InfoAccordion info={getBaytAlMalInfo(result.shares.some(s => s.heir === 'husband' || s.heir === 'wife'))} />}
                     <InfoAccordion info={umariyyatanInfo} />
                  </div>
              </motion.div>
