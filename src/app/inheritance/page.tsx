@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Heirs, CalculationResult, Heir, Madhab } from '@/lib/inheritance/types';
 import { calculateInheritance } from '@/lib/inheritance/calculate';
 import { awlInfo, raddInfo, hajbInfo, grandfatherSiblingsInfo, umariyyatanInfo, jafariSystemInfo, getBaytAlMalInfo } from '@/lib/inheritance/scholarly-info';
@@ -191,36 +192,79 @@ export default function InheritanceCalculatorPage() {
                     <div>
                         <h3 className="text-2xl font-['Amiri',serif] mb-2">Estate Distribution</h3>
                         {result.shares.length === 0 && result.baytAlMalAmount === estateValue ? (
-                            <div className="w-full h-8 bg-emerald-200 rounded-full flex items-center justify-center border border-emerald-400">
-                                <span className="text-emerald-800 font-semibold text-sm">
+                            <div className="w-full py-8 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-300">
+                                <span className="text-emerald-800 font-semibold text-lg">
                                     100% → Bayt al-Māl (بيت المال)
                                 </span>
                             </div>
                         ) : (
-                            <div className="w-full h-8 bg-[var(--sand)] rounded-full flex overflow-hidden border border-[var(--gold)]">
-                                {result.shares.map((share, index) => (
-                                    <motion.div 
-                                        key={share.heir}
-                                        className="h-full"
-                                        style={{ backgroundColor: `hsl(${index * 40}, 60%, 70%)` }}
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${(share.share ?? 0) * 100}%` }}
-                                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    >
-                                     <span className="sr-only">{share.label}: {(share.share ?? 0) * 100}%</span>
-                                    </motion.div>
-                                ))}
-                                {result.baytAlMalAmount && result.baytAlMalAmount > 0 && (
-                                    <motion.div 
-                                        className="h-full bg-emerald-500"
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${(result.baytAlMalAmount / estateValue) * 100}%` }}
-                                        transition={{ duration: 0.5, delay: result.shares.length * 0.1 }}
-                                    >
-                                        <span className="sr-only">Bayt al-Māl: {((result.baytAlMalAmount / estateValue) * 100).toFixed(1)}%</span>
-                                    </motion.div>
-                                )}
-                            </div>
+                            (() => {
+                                const COLORS = [
+                                    'hsl(210, 60%, 55%)', 'hsl(340, 55%, 55%)', 'hsl(45, 70%, 50%)',
+                                    'hsl(160, 50%, 45%)', 'hsl(270, 50%, 55%)', 'hsl(20, 65%, 55%)',
+                                    'hsl(190, 55%, 45%)', 'hsl(310, 45%, 55%)', 'hsl(80, 50%, 45%)',
+                                    'hsl(0, 55%, 55%)',
+                                ];
+                                const pieData = result.shares
+                                    .filter(s => (s.share ?? 0) > 0)
+                                    .map((s, i) => ({
+                                        name: `${s.label}${s.count > 1 ? ` (×${s.count})` : ''}`,
+                                        value: s.amount,
+                                        share: s.share ?? 0,
+                                        fraction: numberToFraction(s.share ?? 0),
+                                        color: COLORS[i % COLORS.length],
+                                    }));
+                                if (result.baytAlMalAmount && result.baytAlMalAmount > 0) {
+                                    pieData.push({
+                                        name: 'Bayt al-Māl',
+                                        value: result.baytAlMalAmount,
+                                        share: result.baytAlMalAmount / estateValue,
+                                        fraction: numberToFraction(result.baytAlMalAmount / estateValue),
+                                        color: 'hsl(155, 45%, 40%)',
+                                    });
+                                }
+                                const renderLabel = (props: any) => {
+                                    const { name, share } = props;
+                                    if (share < 0.05) return null;
+                                    return `${name} ${(share * 100).toFixed(1)}%`;
+                                };
+                                const CustomTooltip = ({ active, payload }: any) => {
+                                    if (!active || !payload?.[0]) return null;
+                                    const d = payload[0].payload;
+                                    return (
+                                        <div className="bg-white/95 backdrop-blur border border-[var(--gold)] rounded-lg px-3 py-2 shadow-lg text-sm">
+                                            <p className="font-bold text-[var(--ink)]">{d.name}</p>
+                                            <p className="text-gray-600">Share: {d.fraction} ({(d.share * 100).toFixed(1)}%)</p>
+                                            <p className="font-semibold text-[var(--emerald)]">
+                                                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(d.value)}
+                                            </p>
+                                        </div>
+                                    );
+                                };
+                                return (
+                                    <ResponsiveContainer width="100%" height={320}>
+                                        <PieChart>
+                                            <Pie
+                                                data={pieData}
+                                                cx="50%"
+                                                cy="50%"
+                                                outerRadius={110}
+                                                innerRadius={45}
+                                                dataKey="value"
+                                                label={renderLabel}
+                                                labelLine={true}
+                                                animationBegin={0}
+                                                animationDuration={800}
+                                            >
+                                                {pieData.map((entry, index) => (
+                                                    <Cell key={index} fill={entry.color} stroke="white" strokeWidth={2} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip content={<CustomTooltip />} />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                );
+                            })()
                         )}
                     </div>
                     
