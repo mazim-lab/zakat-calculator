@@ -62,6 +62,8 @@ export interface CalculationResult {
   awlExplanation?: string;
   wasRaddApplied: boolean;
   raddExplanation?: string;
+  baytAlMalAmount?: number;
+  baytAlMalExplanation?: string;
   notes: string[];
 }
 

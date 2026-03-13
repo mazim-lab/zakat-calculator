@@ -1,6 +1,15 @@
 
 import { Heirs, CalculationResult, Share, Madhab } from './types';
 
+// --- Helper Functions ---
+function hasAnyHeirs(heirs: Heirs): boolean {
+  return Object.values(heirs).some(value => {
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value > 0;
+    return false;
+  });
+}
+
 // --- Simple Fraction Class ---
 class SimpleFraction {
   constructor(public numerator: number, public denominator: number) {
@@ -68,6 +77,24 @@ function calculateJafari(
   const reasons: Partial<Record<keyof Heirs, string>> = {};
   const blockedHeirs: (keyof Heirs)[] = [];
   const initialHeirs = { ...heirs };
+
+  // Check for no heirs at all
+  if (!hasAnyHeirs(heirs)) {
+    return {
+      shares: [],
+      blocked: [],
+      totalShares: 0,
+      wasAwlApplied: false,
+      wasRaddApplied: false,
+      baytAlMalAmount: estate,
+      baytAlMalExplanation: "No eligible heirs were selected. In Islamic law, when there are no heirs, the entire estate goes to Bayt al-Māl (بيت المال — the public treasury).",
+      notes: [
+        "Jaʿfarī inheritance uses a class-based system: Class 1 (parents/children) blocks Class 2 (grandparents/siblings), which blocks Class 3 (uncles/aunts).",
+        "The Jaʿfarī school rejects ʿaṣabah (residuary heirs). Surplus always returns to fixed-share heirs via radd.",
+        "ʿAwl (proportional reduction) is not applied in Jaʿfarī fiqh.",
+      ],
+    };
+  }
 
   // Ja'fari uses a class system:
   // Class 1: Parents + Children (+ grandchildren via representation)
@@ -202,20 +229,69 @@ function calculateJafari(
     }
   }
 
-  // --- Siblings (only if Class 1 absent) ---
+  // --- Class 2 heirs (only if Class 1 absent): Grandparents + Siblings ---
   if (!hasClass1 && hasClass2) {
-    // Simplified: full siblings share remainder after spouse
+    // Paternal grandfather in Ja'fari gets 1/6 if present
+    if (heirs.paternalGrandfather) {
+      shares.paternalGrandfather = new SimpleFraction(1, 6);
+      reasons.paternalGrandfather = "Paternal grandfather receives 1/6 (Class 2 heir).";
+    }
+    
+    // Grandmothers get 1/6 split between them
+    if (heirs.paternalGrandmother && heirs.maternalGrandmother) {
+      shares.paternalGrandmother = new SimpleFraction(1, 12);
+      shares.maternalGrandmother = new SimpleFraction(1, 12);
+      reasons.paternalGrandmother = "Paternal grandmother shares 1/6 with maternal grandmother.";
+      reasons.maternalGrandmother = "Maternal grandmother shares 1/6 with paternal grandmother.";
+    } else if (heirs.paternalGrandmother) {
+      shares.paternalGrandmother = new SimpleFraction(1, 6);
+      reasons.paternalGrandmother = "Paternal grandmother receives 1/6.";
+    } else if (heirs.maternalGrandmother) {
+      shares.maternalGrandmother = new SimpleFraction(1, 6);
+      reasons.maternalGrandmother = "Maternal grandmother receives 1/6.";
+    }
+
+    // Calculate new remainder after grandparents
+    let grandparentTotal = new SimpleFraction(0, 1);
+    if (shares.paternalGrandfather) grandparentTotal = grandparentTotal.add(shares.paternalGrandfather);
+    if (shares.paternalGrandmother) grandparentTotal = grandparentTotal.add(shares.paternalGrandmother);
+    if (shares.maternalGrandmother) grandparentTotal = grandparentTotal.add(shares.maternalGrandmother);
+    
+    const newRemainder = remainder.sub(grandparentTotal);
+    
+    // Siblings share the remainder after grandparents
     const fb = heirs.fullBrother ?? 0;
     const fs = heirs.fullSister ?? 0;
-    const sibParts = fb * 2 + fs;
-    if (sibParts > 0 && remainder.numerator > 0) {
+    const phb = heirs.paternalHalfBrother ?? 0;
+    const phs = heirs.paternalHalfSister ?? 0;
+    const mhb = heirs.maternalHalfBrother ?? 0;
+    const mhs = heirs.maternalHalfSister ?? 0;
+    
+    const sibParts = (fb + phb) * 2 + fs + phs + mhb + mhs;
+    if (sibParts > 0 && newRemainder.numerator > 0) {
       if (fb > 0) {
-        shares.fullBrother = remainder.mul(fb * 2).div(sibParts);
+        shares.fullBrother = newRemainder.mul(fb * 2).div(sibParts);
         reasons.fullBrother = "Full brother shares remainder with 2:1 ratio.";
       }
       if (fs > 0) {
-        shares.fullSister = remainder.mul(fs).div(sibParts);
+        shares.fullSister = newRemainder.mul(fs).div(sibParts);
         reasons.fullSister = "Full sister shares remainder with 2:1 ratio.";
+      }
+      if (phb > 0) {
+        shares.paternalHalfBrother = newRemainder.mul(phb * 2).div(sibParts);
+        reasons.paternalHalfBrother = "Paternal half brother shares remainder with 2:1 ratio.";
+      }
+      if (phs > 0) {
+        shares.paternalHalfSister = newRemainder.mul(phs).div(sibParts);
+        reasons.paternalHalfSister = "Paternal half sister shares remainder.";
+      }
+      if (mhb > 0) {
+        shares.maternalHalfBrother = newRemainder.mul(mhb).div(sibParts);
+        reasons.maternalHalfBrother = "Maternal half brother shares remainder equally.";
+      }
+      if (mhs > 0) {
+        shares.maternalHalfSister = newRemainder.mul(mhs).div(sibParts);
+        reasons.maternalHalfSister = "Maternal half sister shares remainder equally.";
       }
     }
   }
@@ -301,9 +377,25 @@ export function calculateInheritance(
     return calculateJafari(estate, { ...heirs });
   }
 
+  // Check for no heirs at all
+  if (!hasAnyHeirs(heirs)) {
+    return {
+      shares: [],
+      blocked: [],
+      totalShares: 0,
+      wasAwlApplied: false,
+      wasRaddApplied: false,
+      baytAlMalAmount: estate,
+      baytAlMalExplanation: "No eligible heirs were selected. In Islamic law, when there are no heirs, the entire estate goes to Bayt al-Māl (بيت المال — the public treasury).",
+      notes: [],
+    };
+  }
+
   let shares: Partial<Record<keyof Heirs, SimpleFraction>> = {};
   let reasons: Partial<Record<keyof Heirs, string>> = {};
   let blockedHeirs: (keyof Heirs)[] = [];
+  let baytAlMalAmount: number | undefined;
+  let baytAlMalExplanation: string | undefined;
 
   const initialHeirs = { ...heirs };
 
@@ -386,6 +478,42 @@ export function calculateInheritance(
           shares.mother = new SimpleFraction(1, 3);
           reasons.mother = `Receives 1/3 as there are no descendants or multiple siblings.`;
       }
+  }
+
+  // Daughters' fixed shares (when no sons)
+  if ((heirs.daughter ?? 0) > 0 && (heirs.son ?? 0) === 0) {
+    if (heirs.daughter === 1) {
+      shares.daughter = new SimpleFraction(1, 2);
+      reasons.daughter = "Single daughter receives 1/2 as fixed share.";
+    } else if ((heirs.daughter ?? 0) > 1) {
+      shares.daughter = new SimpleFraction(2, 3);
+      reasons.daughter = "Multiple daughters share 2/3 as fixed share.";
+    }
+  }
+
+  // Son's daughters' fixed shares (when no sons or daughters)
+  if ((heirs.sonsDaughter ?? 0) > 0 && (heirs.son ?? 0) === 0 && (heirs.daughter ?? 0) === 0 && (heirs.sonsSon ?? 0) === 0) {
+    if (heirs.sonsDaughter === 1) {
+      shares.sonsDaughter = new SimpleFraction(1, 2);
+      reasons.sonsDaughter = "Single son's daughter receives 1/2 as fixed share.";
+    } else if ((heirs.sonsDaughter ?? 0) > 1) {
+      shares.sonsDaughter = new SimpleFraction(2, 3);
+      reasons.sonsDaughter = "Multiple son's daughters share 2/3 as fixed share.";
+    }
+  }
+
+  // Sisters' fixed shares (when no sons, daughters, father, grandfather)
+  const hasDirectDescendants = (heirs.son ?? 0) > 0 || (heirs.daughter ?? 0) > 0 || (heirs.sonsSon ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0;
+  const hasMaleAncestors = heirs.father || heirs.paternalGrandfather;
+  
+  if ((heirs.fullSister ?? 0) > 0 && !hasDirectDescendants && !hasMaleAncestors) {
+    if (heirs.fullSister === 1) {
+      shares.fullSister = new SimpleFraction(1, 2);
+      reasons.fullSister = "Single full sister receives 1/2 as fixed share.";
+    } else if ((heirs.fullSister ?? 0) > 1) {
+      shares.fullSister = new SimpleFraction(2, 3);
+      reasons.fullSister = "Multiple full sisters share 2/3 as fixed share.";
+    }
   }
 
   // Grandparents
@@ -547,7 +675,6 @@ export function calculateInheritance(
         shares[heirKey] = shares[heirKey]!.div(awlFactor);
     }
   } else if (finalTotal.valueOf() < 1 && residuaries.length === 0) {
-    wasRaddApplied = true;
     const surplus = new SimpleFraction(1, 1).sub(finalTotal);
     let raddRecipients = Object.keys(shares) as (keyof Heirs)[];
     
@@ -560,9 +687,17 @@ export function calculateInheritance(
     const raddTotal = raddRecipients.reduce((sum, h) => sum.add(shares[h]!), new SimpleFraction(0, 1));
     
     if (raddTotal.numerator > 0) {
+        wasRaddApplied = true;
         raddExplanation = `The sum of shares was less than the total estate, so the surplus of ${surplus.toFractionString()} was redistributed (Radd).`;
         for(const heir of raddRecipients){
             shares[heir] = shares[heir]!.add(surplus.mul(shares[heir]!).div(raddTotal));
+        }
+    } else if (raddRecipients.length === 0 && surplus.numerator > 0) {
+        // Only spouse, no other heirs to receive radd
+        const isOnlySpouse = Object.keys(shares).every(h => h === 'husband' || h === 'wife');
+        if (isOnlySpouse) {
+            baytAlMalAmount = surplus.valueOf() * estate;
+            baytAlMalExplanation = `The spouse does not receive radd in the classical position of all four Sunni schools. The remainder of ${surplus.toFractionString()} goes to Bayt al-Māl (the public treasury).`;
         }
     }
   }
@@ -577,6 +712,8 @@ export function calculateInheritance(
     awlExplanation,
     wasRaddApplied,
     raddExplanation,
+    baytAlMalAmount,
+    baytAlMalExplanation,
     notes: [],
   };
 

@@ -181,20 +181,38 @@ export default function InheritanceCalculatorPage() {
                  <div className="card p-6 space-y-6">
                     <div>
                         <h3 className="text-2xl font-['Amiri',serif] mb-2">Estate Distribution</h3>
-                        <div className="w-full h-8 bg-[var(--sand)] rounded-full flex overflow-hidden border border-[var(--gold)]">
-                            {result.shares.map((share, index) => (
-                                <motion.div 
-                                    key={share.heir}
-                                    className="h-full"
-                                    style={{ backgroundColor: `hsl(${index * 40}, 60%, 70%)` }}
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${(share.share ?? 0) * 100}%` }}
-                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                >
-                                 <span className="sr-only">{share.label}: {(share.share ?? 0) * 100}%</span>
-                                </motion.div>
-                            ))}
-                        </div>
+                        {result.shares.length === 0 && result.baytAlMalAmount === estateValue ? (
+                            <div className="w-full h-8 bg-emerald-200 rounded-full flex items-center justify-center border border-emerald-400">
+                                <span className="text-emerald-800 font-semibold text-sm">
+                                    100% → Bayt al-Māl (بيت المال)
+                                </span>
+                            </div>
+                        ) : (
+                            <div className="w-full h-8 bg-[var(--sand)] rounded-full flex overflow-hidden border border-[var(--gold)]">
+                                {result.shares.map((share, index) => (
+                                    <motion.div 
+                                        key={share.heir}
+                                        className="h-full"
+                                        style={{ backgroundColor: `hsl(${index * 40}, 60%, 70%)` }}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(share.share ?? 0) * 100}%` }}
+                                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                                    >
+                                     <span className="sr-only">{share.label}: {(share.share ?? 0) * 100}%</span>
+                                    </motion.div>
+                                ))}
+                                {result.baytAlMalAmount && result.baytAlMalAmount > 0 && (
+                                    <motion.div 
+                                        className="h-full bg-emerald-500"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(result.baytAlMalAmount / estateValue) * 100}%` }}
+                                        transition={{ duration: 0.5, delay: result.shares.length * 0.1 }}
+                                    >
+                                        <span className="sr-only">Bayt al-Māl: {((result.baytAlMalAmount / estateValue) * 100).toFixed(1)}%</span>
+                                    </motion.div>
+                                )}
+                            </div>
+                        )}
                     </div>
                     
                     {result.wasAwlApplied && (
@@ -207,6 +225,21 @@ export default function InheritanceCalculatorPage() {
                         <div className="p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
                             <p className="font-bold">Radd (Redistribution) Applied</p>
                             <p>{result.raddExplanation}</p>
+                        </div>
+                    )}
+                    {result.baytAlMalAmount && result.baytAlMalAmount > 0 && (
+                        <div className="p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800">
+                            <p className="font-bold flex items-center">
+                                <span className="font-['Noto_Naskh_Arabic',serif] mr-2">بيت المال</span>
+                                Bayt al-Māl (Public Treasury)
+                            </p>
+                            <p className="mb-2">{result.baytAlMalExplanation}</p>
+                            <p className="font-semibold">
+                                Amount: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(result.baytAlMalAmount)}
+                                <span className="ml-2 text-sm">
+                                    ({((result.baytAlMalAmount / estateValue) * 100).toFixed(1)}%)
+                                </span>
+                            </p>
                         </div>
                     )}
 
