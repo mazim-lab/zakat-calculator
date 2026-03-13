@@ -106,6 +106,29 @@ export const jafariSystemInfo: InfoPanel = {
   note: "These differences can lead to dramatically different distributions. For example, if someone dies leaving a daughter and a brother: in Sunni schools, the daughter gets 1/2 and the brother gets 1/2 as residuary. In Jaʿfarī, the daughter gets the entire estate (brother is blocked as Class 2).",
 };
 
+export const baytAlMalInfo: InfoPanel = {
+    title: "Bayt al-Māl (بيت المال) — The Public Treasury",
+    description: "When there are no heirs, or when fixed shares do not exhaust the estate and there are no residuary heirs (ʿaṣabah) to receive the remainder, the surplus goes to Bayt al-Māl — the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done with this portion.",
+    positions: [
+        {
+            school: "Majority of Contemporary Scholars (Fiqh Council of North America, European Council for Fatwa and Research)",
+            position: "The Bayt al-Māl portion should be directed to Islamic charitable causes — mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
+            reasoning: "Since no legitimate Bayt al-Māl exists in Western nations, Islamic community institutions are the closest functional equivalent. They serve the same purpose of benefiting the Muslim public. This is the most widely recommended position for Muslims living in non-Muslim-majority countries."
+        },
+        {
+            school: "Some Contemporary Scholars (based on the position of ʿUthmān ibn ʿAffān)",
+            position: "In the absence of a functioning Bayt al-Māl, the surplus should be redistributed to the spouse via radd, rather than leaving it unallocated.",
+            reasoning: "ʿUthmān ibn ʿAffān (raḍiya Allāhu ʿanhu) held that radd applies to all fixed-share heirs, including the spouse. Several modern personal status codes (Egypt, Pakistan, some Gulf states) have adopted this view. Some scholars specifically recommend it for Western Muslims to prevent the estate from falling under non-Islamic intestacy laws."
+        },
+        {
+            school: "Minority View",
+            position: "The Western government functions as a de facto Bayt al-Māl, and the estate may escheat to the state under intestacy law.",
+            reasoning: "Since Western governments provide public services (infrastructure, welfare, security), they serve a similar function. Most scholars reject this view because Western governments do not distribute wealth according to Sharīʿah priorities."
+        },
+    ],
+    note: "Practical advice: The best approach is to write a waṣiyyah (Islamic will) that explicitly directs any Bayt al-Māl portion to specific Islamic charities. This prevents the estate from going through Western intestacy courts, which would distribute it according to non-Islamic rules. In many jurisdictions, dying without a will means the state decides how your estate is distributed — which almost certainly will not follow Islamic inheritance law."
+};
+
 export const umariyyatanInfo: InfoPanel = {
     title: 'The "Umariyyatān" (Two Cases of ʿUmar)',
     description: 'These are two specific inheritance scenarios where the mother\'s share is calculated differently to prevent her from inheriting more than or equal to the father, which would contradict the general principle of the male receiving double the female\'s share when they are of the same class.',
