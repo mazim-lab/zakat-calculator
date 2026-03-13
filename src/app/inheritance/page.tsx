@@ -228,18 +228,51 @@ export default function InheritanceCalculatorPage() {
                         </div>
                     )}
                     {result.baytAlMalAmount && result.baytAlMalAmount > 0 && (
-                        <div className="p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800">
-                            <p className="font-bold flex items-center">
-                                <span className="font-['Noto_Naskh_Arabic',serif] mr-2">بيت المال</span>
-                                Bayt al-Māl (Public Treasury)
-                            </p>
-                            <p className="mb-2">{result.baytAlMalExplanation}</p>
-                            <p className="font-semibold">
-                                Amount: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(result.baytAlMalAmount)}
-                                <span className="ml-2 text-sm">
-                                    ({((result.baytAlMalAmount / estateValue) * 100).toFixed(1)}%)
-                                </span>
-                            </p>
+                        <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-900 space-y-4">
+                            <div>
+                                <p className="font-bold text-lg flex items-center gap-2">
+                                    <span className="font-['Noto_Naskh_Arabic',serif] text-xl">بيت المال</span>
+                                    Bayt al-Māl (Public Treasury)
+                                </p>
+                                <p className="mt-1">{result.baytAlMalExplanation}</p>
+                                <p className="font-semibold mt-2">
+                                    Amount: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(result.baytAlMalAmount)}
+                                    <span className="ml-2 text-sm font-normal">
+                                        ({((result.baytAlMalAmount / estateValue) * 100).toFixed(1)}%)
+                                    </span>
+                                </p>
+                            </div>
+
+                            <hr className="border-emerald-200" />
+
+                            <div>
+                                <p className="font-semibold mb-2">In countries without a Bayt al-Māl:</p>
+                                <p className="text-sm mb-3">
+                                    Most Western nations do not have an Islamic public treasury. Scholars have outlined the following options for handling this portion:
+                                </p>
+                                <div className="space-y-3 text-sm">
+                                    <div className="bg-emerald-100/60 rounded-lg p-3">
+                                        <p className="font-semibold text-emerald-800">1. Direct to Islamic charitable causes (majority scholarly position)</p>
+                                        <p className="mt-1 text-emerald-700">
+                                            Mosques, Islamic schools, Muslim welfare organizations, and community institutions serve a similar function to Bayt al-Māl. This is the position of the Fiqh Council of North America and the European Council for Fatwa and Research.
+                                        </p>
+                                    </div>
+                                    {result.shares.some(s => s.heir === 'husband' || s.heir === 'wife') && (
+                                        <div className="bg-emerald-100/60 rounded-lg p-3">
+                                            <p className="font-semibold text-emerald-800">2. Redistribute to the spouse via radd (position of ʿUthmān ibn ʿAffān)</p>
+                                            <p className="mt-1 text-emerald-700">
+                                                Some scholars hold that when no Bayt al-Māl exists, the remainder should return to the spouse. This view is adopted in the personal status codes of Egypt, Pakistan, and some Gulf states, and is recommended by some scholars specifically for Western Muslims.
+                                            </p>
+                                        </div>
+                                    )}
+                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                        <p className="font-semibold text-yellow-800">⚠️ Write a Waṣiyyah (Islamic Will)</p>
+                                        <p className="mt-1 text-yellow-700">
+                                            The best practical step is to write a waṣiyyah that explicitly directs this portion to specific Islamic charities. Without a will, most Western jurisdictions will distribute your estate according to their own intestacy laws — which will not follow Islamic inheritance rules.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 
