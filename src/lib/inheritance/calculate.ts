@@ -23,8 +23,12 @@ class SimpleFraction {
   }
 
   simplify(): SimpleFraction {
-    const commonDivisor = SimpleFraction.gcd(this.numerator, this.denominator);
-    return new SimpleFraction(this.numerator / commonDivisor, this.denominator / commonDivisor);
+    const commonDivisor = SimpleFraction.gcd(Math.abs(this.numerator), Math.abs(this.denominator));
+    let num = this.numerator / commonDivisor;
+    let den = this.denominator / commonDivisor;
+    // Normalize: keep sign in the numerator, denominator always positive
+    if (den < 0) { num = -num; den = -den; }
+    return new SimpleFraction(num, den);
   }
 
   add(other: SimpleFraction): SimpleFraction {
