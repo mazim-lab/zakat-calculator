@@ -60,6 +60,13 @@ export function ZakatResults({
         )}
       </div>
 
+      {result.warnings?.map((w, i) => (
+        <div key={i} className="callout callout-warning" role="note">
+          <p className="font-semibold text-text">Part of this case is not supported</p>
+          <p className="text-text-2 mt-1 leading-relaxed">{w}</p>
+        </div>
+      ))}
+
       {/* Total */}
       <div className="text-center py-4">
         <p className="eyebrow">Your Zakat due</p>
@@ -91,7 +98,7 @@ export function ZakatResults({
                     {fmt(Math.abs(item.amount))}
                   </p>
                   <p className={`num text-sm font-semibold ${item.zakatDue > 0 ? "text-indigo-text" : "text-text-2"}`}>
-                    {item.zakatDue > 0 ? `Zakat ${fmt(item.zakatDue)}` : item.rate === 0 ? "Exempt" : fmt(0)}
+                    {item.status === "in_kind" ? "Due in kind" : item.status === "not_calculated" ? "Not calculated" : item.zakatDue > 0 ? `Zakat ${fmt(item.zakatDue)}` : item.rate === 0 ? "Exempt" : fmt(0)}
                   </p>
                 </div>
               </li>

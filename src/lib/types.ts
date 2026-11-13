@@ -119,6 +119,8 @@ export interface ZakatBreakdown {
   rate: number;
   zakatDue: number;
   notes: string;
+  /** "in_kind": due as animals, not priced. "not_calculated": the calculator declines this line. */
+  status?: "in_kind" | "not_calculated";
 }
 
 export interface KhumsResult {
@@ -139,6 +141,8 @@ export interface ZakatResult {
   breakdown: ZakatBreakdown[];
   methodology: string;
   khums?: KhumsResult;
+  /** Plain warnings the results page must show (cases the calculator does not fully support). */
+  warnings?: string[];
 }
 
 export interface StepConfig {

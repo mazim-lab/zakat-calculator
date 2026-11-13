@@ -821,6 +821,36 @@ export function calculateZakat(
     .reduce((sum, b) => sum + b.amount, 0);
   const netZakatableWealth = Math.max(0, grossZakatableBase - debtDeduction);
 
+  // How debts bear on crops and livestock differs by school (Dar al-Iftaa
+  // al-Misriyyah fatwa 15928; Kashshaf al-Qina'; Bada'i' al-Sana'i'). Malikis and
+  // Shafi'is: debts never reduce them. Hanafis: debts never reduce crops, and
+  // reach livestock only after money and trade goods are used up. Hanbalis (relied-
+  // upon view): debts reduce crops and livestock too. The calculator does not work
+  // out those splits; where they apply it declines the affected lines.
+  const warnings: string[] = [];
+  const dueVisible = (b: ZakatBreakdown) => isVisible(b) && (b.zakatDue > 0 || b.status === "in_kind");
+  const isLivestock = (b: ZakatBreakdown) => /^(Sheep & Goats|Cattle|Camels)$/.test(b.category);
+  let declineVisible: ((b: ZakatBreakdown) => boolean) | null = null;
+  if (debtDeduction > 0 && choices.madhab === "hanbali" && breakdown.some(dueVisible)) {
+    declineVisible = (b) => dueVisible(b);
+    warnings.push("In the relied-upon Hanbali view, debts also reduce Zakat on crops and livestock. This calculator does not yet work out how a debt is divided between money, crops and livestock, so the crop and livestock lines are not calculated, and the money figure assumes the whole debt is set against money. This case is not yet supported; please consult a scholar.");
+  } else if (choices.madhab === "hanafi" && debtDeduction > grossZakatableBase && breakdown.some((b) => dueVisible(b) && isLivestock(b))) {
+    declineVisible = (b) => dueVisible(b) && isLivestock(b);
+    warnings.push("In the Hanafi school, debts that are larger than your money and trade goods also reduce Zakat on livestock (crops are not reduced). This calculator does not yet work out that reduction, so the livestock lines are not calculated. This case is not yet supported; please consult a scholar.");
+  }
+  if (declineVisible) {
+    for (const b of breakdown) {
+      if (declineVisible(b)) {
+        b.zakatDue = 0;
+        b.status = "not_calculated";
+        b.notes = `Not calculated: your school counts debts against this too (see the warning above). ${b.notes}`;
+      }
+    }
+  }
+  if (debtDeduction > 0 && choices.madhab === "maliki") {
+    warnings.push("In the Maliki school a debt reduces Zakat on money only when you have no other assets to pay it from, such as crops, livestock or goods you own beyond your basic needs that would be sold to pay creditors. The figure assumes you have none. If you do, the debt is set against them first and your Zakat on money may be higher, up to the figure without any debt deduction. Please check with a scholar.");
+  }
+
   // For nisab check, use gross wealth minus debts (includes non-zakatable portions)
   totalWealth -= debtDeduction;
   totalWealth = Math.max(0, totalWealth);
@@ -860,5 +890,6 @@ export function calculateZakat(
     breakdown,
     methodology: choices.madhab === "custom" ? madhabLabel : `${madhabLabel} School`,
     khums,
+    ...(warnings.length ? { warnings } : {}),
   };
 }

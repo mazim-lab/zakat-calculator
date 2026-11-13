@@ -270,6 +270,9 @@ const SAME_DUE = new Set<string>([
   "18 Crops rain-fed, no minimum (Hanafi), 100",
   "20 Livestock at minimums (40/30/5)",
   "26 All defaults, calculate.ts default (fallback) prices",
+  // Senior review: the Maliki debt caveat (debts are first set against other
+  // assets) is now reported as a warning; the amount is unchanged.
+  "05 Maliki preset, zakatable-assets 40%, RRSP net 30% mixed 70%",
 ]);
 
 describe("calculateZakat: current vs frozen original (deep equal)", () => {
@@ -407,6 +410,40 @@ describe("hand-verified worked examples", () => {
 // ---------------------------------------------------------------------------
 // 4. Corrections made in November 2026 (each with its source in the commit)
 // ---------------------------------------------------------------------------
+describe("senior review: debts against crops and livestock by school", () => {
+  // Kashshaf al-Qina' (shamela.ws/book/622/1823): Hanbali debts reduce crops and
+  // livestock too. Bada'i' and Dar al-Iftaa 15928: Hanafi debts never reduce
+  // crops and reach livestock only after money and trade goods.
+  it("Hanbali: debt with crops due declines the crop line and warns", () => {
+    const r = calculateZakat(preset("hanbali"), assets({ cashOnHand: 20000, creditCardBalance: 5000, cropValueOrWeight: 2000, cropWeightKg: 900 }), 124.81, 1.58);
+    const crop = r.breakdown.find((b) => b.category === "Agricultural Produce")!;
+    expect(crop.status).toBe("not_calculated");
+    expect(crop.zakatDue).toBe(0);
+    expect(r.warnings?.[0]).toMatch(/Hanbali/);
+    expect(r.totalZakatDue).toBeCloseTo(375, 10);
+  });
+  it("Hanbali: no debt, crops are computed", () => {
+    const r = calculateZakat(preset("hanbali"), assets({ cashOnHand: 20000, cropValueOrWeight: 2000, cropWeightKg: 900 }), 124.81, 1.58);
+    expect(r.breakdown.find((b) => b.category === "Agricultural Produce")!.zakatDue).toBeCloseTo(200, 10);
+    expect(r.warnings).toBeUndefined();
+  });
+  it("Hanafi: debt smaller than money leaves livestock due", () => {
+    const r = calculateZakat(preset("hanafi"), assets({ cashOnHand: 20000, creditCardBalance: 5000, sheepGoats: 40 }), 124.81, 1.58);
+    expect(r.breakdown.find((b) => b.category === "Sheep & Goats")!.zakatDue).toBe(150);
+    expect(r.warnings).toBeUndefined();
+  });
+  it("Hanafi: debt larger than money declines livestock but not crops", () => {
+    const r = calculateZakat(preset("hanafi"), assets({ cashOnHand: 1000, creditCardBalance: 5000, sheepGoats: 40, cropValueOrWeight: 1000 }), 124.81, 1.58);
+    expect(r.breakdown.find((b) => b.category === "Sheep & Goats")!.status).toBe("not_calculated");
+    expect(r.breakdown.find((b) => b.category === "Agricultural Produce")!.zakatDue).toBeCloseTo(100, 10);
+    expect(r.warnings?.[0]).toMatch(/Hanafi/);
+  });
+  it("Maliki: a debt deduction carries the other-assets caveat", () => {
+    const r = calculateZakat(preset("maliki"), assets({ cashOnHand: 20000, creditCardBalance: 5000 }), 124.81, 1.58);
+    expect(r.warnings?.[0]).toMatch(/Maliki/);
+  });
+});
+
 describe("debt deduction base excludes exempt and non-money items", () => {
   it("20,000 cash, 5,000 debt, exempt worn jewellery: 375, not 412.97", () => {
     // (20,000 - 5,000) x 2.5% = 375. The exempt jewellery must not dilute the debt.

@@ -201,8 +201,12 @@ export default function ZakatPage() {
             <li>
               <strong>Debts.</strong> When debts are deductible, the calculator lowers every money line that is
               charged by the same proportion: your charged money total after debts divided by the same total before debts.
-              Exempt items (such as exempt jewelry or deferred retirement funds) are not part of that total, and debts do
-              not reduce crops or livestock.
+              Exempt items (such as exempt jewelry or deferred retirement funds) are not part of that total. In the Mālikī
+              and Shāfiʿī schools debts never reduce crops or livestock. In the Ḥanafī school they never reduce crops, but
+              debts larger than your money reach livestock; in the relied-upon Ḥanbalī view they reduce crops and livestock
+              too. The calculator does not work out those two cases: it marks the lines it cannot calculate and tells you
+              to ask a scholar. In the Mālikī school a debt reduces money only if you have no other assets to pay it from,
+              and the results page says so.
             </li>
             <li>
               <strong>Crops.</strong> 10% for rain-fed crops and 5% for irrigated crops, charged on the harvest value

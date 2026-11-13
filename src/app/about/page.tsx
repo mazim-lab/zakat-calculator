@@ -109,11 +109,11 @@ const CORRECTIONS: { title: string; text: string }[] = [
   },
   {
     title: "Zakat: debts",
-    text: "Debts were spread over exempt items, such as exempt jewellery or deferred retirement funds, which made the Zakat too high. With 20,000 in cash, 5,000 of debt and exempt jewellery, the calculator said 412.97 instead of 375. Debts now reduce only the money you are charged on.",
+    text: "Debts were spread over exempt items, such as exempt jewellery or deferred retirement funds, which made the Zakat too high. With 20,000 in cash, 5,000 of debt and exempt jewellery, the calculator said 412.97 instead of 375. Debts now reduce only the money you are charged on. In the Mālikī school a debt reduces money only if you have no other assets to pay it from, and the results now say so.",
   },
   {
     title: "Zakat: crops and livestock",
-    text: "Crops and livestock were set to zero when cash was below the niṣāb, although they have their own minimums. They now stay due on their own minimum, and debts no longer reduce them. Crop value and crop weight are now separate boxes, so the five-wasq minimum is checked against kilograms, not money.",
+    text: "Crops and livestock were set to zero when cash was below the niṣāb, although they have their own minimums. They now stay due on their own minimum. Debts do not reduce them in the Mālikī and Shāfiʿī schools. Where the Ḥanafī school (livestock, once money is used up) or the Ḥanbalī school (crops and livestock) lets debts reduce them, the calculator now marks those lines as not calculated and asks you to consult a scholar, rather than give a figure it cannot check. Crop value and crop weight are now separate boxes, so the five-wasq minimum is checked against kilograms, not money.",
   },
   {
     title: "Zakat: livestock tables",
@@ -297,8 +297,10 @@ export default function AboutPage() {
               Sistani&apos;s schedules for the Jaʿfarī school.
             </li>
             <li>
-              Debts, where your settings allow them, reduce the money you are charged on (not exempt items, crops or
-              livestock) before the 2.5% is applied. Only the principal of a loan counts, never the interest.
+              Debts, where your settings allow them, reduce the money you are charged on (not exempt items) before the
+              2.5% is applied. Only the principal of a loan counts, never the interest. Where your school also lets debts
+              reduce crops or livestock (Ḥanafī for livestock, Ḥanbalī for both), the calculator does not work out that
+              split and marks those lines as not calculated.
             </li>
             <li>
               The niṣāb test uses your money wealth after any allowed debts. Crops and livestock have their own
