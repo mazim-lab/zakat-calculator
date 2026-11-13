@@ -1,0 +1,42 @@
+## Routes
+original /                      200 text/html; charset=utf-8
+original /zakat                 200 text/html; charset=utf-8
+original /zakat-fitr            200 text/html; charset=utf-8
+original /fidya                 200 text/html; charset=utf-8
+original /kaffarah              200 text/html; charset=utf-8
+original /inheritance           200 text/html; charset=utf-8
+original /find-your-school      200 text/html; charset=utf-8
+original /api/metals            200 application/json
+original /manifest.json         200 application/json; charset=UTF-8
+original /sw.js                 200 application/javascript; charset=UTF-8
+original /favicon.ico           200 image/x-icon
+original /icons/icon-192.png    200 image/png
+original /icons/icon-512.png    200 image/png
+new      /glossary              200 text/html; charset=utf-8
+new      /about                 200 text/html; charset=utf-8
+new      /sitemap.xml           200 application/xml
+new      /robots.txt            200 text/plain
+new      /og.png                200 image/png
+new      /does-not-exist        404 text/html; charset=utf-8
+
+## SEO head + structure
+/ {"title":"Islamic Ḥisāb: Zakat, inheritance, fidya and kaffārah calculators","desc":195,"canonical":"https://www.islamichisab.com","og":true,"tw":true,"h1":1,"ld":"WebSite,ItemList","emdash":0,"overflowX":false}
+/zakat {"title":"Zakat Calculator | Islamic Ḥisāb","desc":150,"canonical":"https://www.islamichisab.com/zakat","og":true,"tw":true,"h1":1,"ld":"WebSite,,FAQPage","emdash":0,"overflowX":false}
+/zakat-fitr {"title":"Zakat al-Fiṭr Calculator | Islamic Ḥisāb","desc":147,"canonical":"https://www.islamichisab.com/zakat-fitr","og":true,"tw":true,"h1":1,"ld":"WebSite,,FAQPage","emdash":0,"overflowX":false}
+/fidya {"title":"Fidya Calculator for Missed Fasts | Islamic Ḥisāb","desc":143,"canonical":"https://www.islamichisab.com/fidya","og":true,"tw":true,"h1":1,"ld":"WebSite,,FAQPage","emdash":0,"overflowX":false}
+/kaffarah {"title":"Kaffārah Calculator | Islamic Ḥisāb","desc":153,"canonical":"https://www.islamichisab.com/kaffarah","og":true,"tw":true,"h1":1,"ld":"WebSite,,FAQPage","emdash":0,"overflowX":false}
+/inheritance {"title":"Islamic Inheritance Calculator (Mīrāth) | Islamic Ḥisāb","desc":145,"canonical":"https://www.islamichisab.com/inheritance","og":true,"tw":true,"h1":1,"ld":"WebSite,,FAQPage","emdash":0,"overflowX":false}
+/find-your-school {"title":"Which School of Islamic Law Do You Follow? | Islamic Ḥisāb","desc":185,"canonical":"https://www.islamichisab.com/find-your-school","og":true,"tw":true,"h1":1,"ld":"WebSite,,FAQPage","emdash":0,"overflowX":false}
+/glossary {"title":"Glossary of Islamic Finance Terms | Islamic Ḥisāb","desc":188,"canonical":"https://www.islamichisab.com/glossary","og":true,"tw":true,"h1":1,"ld":"WebSite,","emdash":0,"overflowX":false}
+/about {"title":"About and Methodology | Islamic Ḥisāb","desc":164,"canonical":"https://www.islamichisab.com/about","og":true,"tw":true,"h1":1,"ld":"WebSite,","emdash":0,"overflowX":false}
+
+## Mobile 360px horizontal overflow
+/ ok
+/zakat ok
+/zakat-fitr ok
+/fidya ok
+/kaffarah ok
+/inheritance ok
+/find-your-school ok
+/glossary ok
+/about ok
