@@ -311,6 +311,9 @@ label,
   line-height: 1.8;
   letter-spacing: 0;
   font-feature-settings: normal;
+  /* Only Amiri Regular is loaded; never fake a bold Arabic. */
+  font-weight: 400;
+  font-synthesis-weight: none;
 }
 .ar {
   unicode-bidi: isolate;
@@ -701,7 +704,7 @@ label,
 /* ---------- niche (arched frame) ---------- */
 .niche {
   position: relative;
-  max-width: 580px;
+  max-width: 540px;
   margin-inline: auto;
   --niche-line: var(--hue-border, var(--indigo-border));
   --niche-fill: var(--hue-bg, var(--indigo-bg));
@@ -710,13 +713,17 @@ label,
   position: relative;
   display: block;
   width: 100%;
-  height: 84px;
+  height: auto;
+  aspect-ratio: 200 / 70.72;
   margin-bottom: -1px;
   overflow: visible;
 }
-.niche-tall .niche-arch {
-  height: auto;
-  aspect-ratio: 100 / 46;
+/* The statement rises into the arch, so the head is a frame, not empty space. */
+.niche-content {
+  position: relative;
+}
+.niche:not(.niche-tall) .niche-content {
+  margin-top: -14%;
 }
 .niche-fill {
   fill: var(--niche-fill);

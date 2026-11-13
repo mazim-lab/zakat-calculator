@@ -82,6 +82,7 @@ export function ZakatResults({
         <h3 id="zk-breakdown-h" className="text-[24px] font-bold mb-4">
           Detailed breakdown
         </h3>
+        {result.breakdown.some((b) => b.amount !== 0) && (
         <ul className="ledger card px-5 sm:px-7 py-2">
           {result.breakdown
             .filter((b) => b.amount !== 0)
@@ -117,6 +118,7 @@ export function ZakatResults({
               </li>
             ))}
         </ul>
+        )}
         {result.breakdown.filter((b) => b.amount !== 0).length === 0 && (
           <p className="text-text-2">You have not entered any assets yet. Go back to any step to add them.</p>
         )}

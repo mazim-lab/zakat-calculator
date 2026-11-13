@@ -21,13 +21,13 @@ const alegreya = Alegreya({
 });
 const alegreyaSans = Alegreya_Sans({
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "700"],
+  weight: ["400", "700"],
   variable: "--font-alegreya-sans",
   display: "swap",
 });
 const amiri = Amiri({
   subsets: ["arabic"],
-  weight: ["400", "700"],
+  weight: ["400"],
   variable: "--font-amiri",
   display: "swap",
 });
@@ -84,7 +84,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 }
 
 function SiteFooter() {
-  const linkCls = "text-text-2 hover:text-indigo-text underline-offset-4 hover:underline inline-flex min-h-[32px] items-center";
+  const linkCls = "text-text-2 hover:text-indigo-text underline-offset-4 hover:underline inline-flex min-h-[44px] items-center";
   return (
     <footer className="site-footer mt-20">
       <div className="lattice h-10 border-t-[3px] border-double border-border-strong" aria-hidden="true" />
@@ -103,7 +103,7 @@ function SiteFooter() {
           </div>
           <nav aria-label="Calculators">
             <p className="eyebrow mb-2">Calculators</p>
-            <ul className="list-none p-0 m-0 grid gap-0.5 text-[16.5px] ui">
+            <ul className="list-none p-0 m-0 grid text-[16.5px] ui">
               {TOOLS.map((t) => (
                 <li key={t.href}>
                   <Link href={t.href} className={linkCls}>
@@ -115,7 +115,7 @@ function SiteFooter() {
           </nav>
           <nav aria-label="Reference">
             <p className="eyebrow mb-2">Reference</p>
-            <ul className="list-none p-0 m-0 grid gap-0.5 text-[16.5px] ui">
+            <ul className="list-none p-0 m-0 grid text-[16.5px] ui">
               <li>
                 <Link href={SCHOOL_FINDER.href} className={linkCls}>
                   Find your school
@@ -133,7 +133,7 @@ function SiteFooter() {
         </div>
         <div className="container pb-10 flex flex-wrap items-center justify-between gap-2 text-[15px] text-text-2 ui">
           <span>islamichisab.com</span>
-          <a href="https://saleel.ca" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-text hover:underline underline-offset-4">
+          <a href="https://saleel.ca" target="_blank" rel="noopener noreferrer" className="inline-flex items-center min-h-[44px] hover:text-indigo-text hover:underline underline-offset-4">
             Created by Saleel
           </a>
         </div>

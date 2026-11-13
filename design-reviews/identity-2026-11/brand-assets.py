@@ -5,23 +5,40 @@ from PIL import Image
 from playwright.sync_api import sync_playwright
 
 ROOT = Path("E:/business/islamichisab")
-STAR = "M32 1l9.08 9.08h12.84v12.84L63 32l-9.08 9.08v12.84H41.08L32 63l-9.08-9.08H10.08V41.08L1 32l9.08-9.08V10.08h12.84Z"
-KITE = "M32 32 22.92 10.08 32 1l9.08 9.08Z"
-OCT = "m33.91 27.38 2.71 2.71v3.82l-2.71 2.71h-3.82l-2.71-2.71v-3.82l2.71-2.71Z"
+from shapely.geometry import Polygon
+from shapely.affinity import translate
+
+# The khatam: two squares at 45 degrees (outer radius 31 in a 64 box).
+A_, B_, C_, D_ = 10.08, 53.92, 22.92, 41.08
+STAR_POLY = Polygon([(32, 1), (D_, A_), (B_, A_), (B_, C_), (63, 32), (B_, D_), (B_, B_), (D_, B_), (32, 63),
+                     (C_, B_), (A_, B_), (A_, D_), (1, 32), (A_, C_), (A_, A_), (C_, A_)])
+# One of the eight congruent kites (centre, two inner vertices, the upper-right tip): exactly 1/8 of the area.
+KITE_POLY = Polygon([(32, 32), (D_, A_), (B_, A_), (B_, C_)])
+assert abs(KITE_POLY.area / STAR_POLY.area - 0.125) < 1e-3
 
 
-def mark_svg(size, star="#4f46e5", share="#0891b2", gap_w=2.4, pad=0, bg=None, radius=0):
+def _path(p):
+    f = lambda v: ("%.2f" % v).rstrip("0").rstrip(".")
+    return "M" + " ".join(f"{f(x)} {f(y)}" for x, y in list(p.exterior.coords)[:-1]) + "Z"
+
+
+def mark_paths(cut=1.3):
+    """Star with the kite cut out (gap `cut`), and the kite drawn apart along its axis."""
+    body = STAR_POLY.difference(KITE_POLY.buffer(cut, join_style="mitre", mitre_limit=4))
+    share = translate(KITE_POLY.buffer(-0.5, join_style="mitre"), 1.5, -1.5)
+    return _path(body), _path(share)
+
+
+BODY, SHARE = mark_paths()  # the same paths as MARK_BODY / MARK_SHARE in src/components/ornament.tsx
+
+
+def mark_svg(size, star="#4f46e5", share="#0891b2", cut=1.3, pad=0, bg=None, radius=0):
     """Mark with true cut-outs (works on any background)."""
+    body, kite = mark_paths(cut)
     vb = 64 + 2 * pad
     bgrect = f'<rect x="{-pad}" y="{-pad}" width="{vb}" height="{vb}" rx="{radius}" fill="{bg}"/>' if bg else ""
     return f'''<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="{-pad} {-pad} {vb} {vb}">
-  <defs><mask id="m" maskUnits="userSpaceOnUse" x="{-pad}" y="{-pad}" width="{vb}" height="{vb}">
-    <rect x="{-pad}" y="{-pad}" width="{vb}" height="{vb}" fill="#fff"/>
-    <path d="{KITE}" fill="none" stroke="#000" stroke-width="{gap_w}" stroke-linejoin="round"/>
-    <path d="{OCT}" fill="#000"/>
-  </mask></defs>
-  {bgrect}
-  <g mask="url(#m)"><path d="{STAR}" fill="{star}"/><path d="{KITE}" fill="{share}"/></g>
+  {bgrect}<path d="{body}" fill="{star}"/><path d="{kite}" fill="{share}"/>
 </svg>'''
 
 
@@ -47,8 +64,8 @@ p{font-family:'Alegreya Sans',sans-serif;font-size:27px;color:#52525b;margin:22p
 .niche{position:absolute;right:96px;top:70px;width:330px;height:460px}
 </style></head><body>
 <div class="lat"></div><div class="fade"></div>
-<svg class="niche" viewBox="0 0 330 460"><path d="M1 460V150C1 95 40 68 99 52 132 43 152 30 165 2c13 28 33 41 66 50 59 16 98 43 98 98v310" fill="#eef0ff" stroke="#c9cdfa" stroke-width="2"/>
-<g transform="translate(85 160) scale(2.5)">STARG</g></svg>
+<svg class="niche" viewBox="-1 -1 202 280"><path d="M0 279V70.72A36 36 0 0 1 15.35 41.23A300 300 0 0 1 100 0A300 300 0 0 1 184.65 41.23A36 36 0 0 1 200 70.72V279" fill="#eef0ff" stroke="#c9cdfa" stroke-width="1.2"/>
+<g transform="translate(52 96) scale(1.5)">STARG</g></svg>
 <div class="wrap">
  <div class="row"><span class="wm">Islamic Ḥisāb</span><span class="ar">حساب</span></div>
  <h1>Zakat, inheritance, fidya and kaffārah, with the reasoning shown.</h1>
@@ -59,7 +76,7 @@ p{font-family:'Alegreya Sans',sans-serif;font-size:27px;color:#52525b;margin:22p
 
 css = (ROOT / "src/app/globals.css").read_text(encoding="utf-8")
 lattice = re.search(r"--lattice-light: (url\(.*?\"\));", css).group(1)
-starg = f'<path d="{STAR}" fill="#4f46e5"/><path d="{KITE}" fill="#0891b2" stroke="#eef0ff" stroke-width="2.4" stroke-linejoin="round"/><path d="{OCT}" fill="#eef0ff"/>'
+starg = f'<path d="{BODY}" fill="#4f46e5"/><path d="{SHARE}" fill="#0891b2"/>'
 OG = OG.replace("LATTICE", lattice).replace("STARG", starg)
 
 with sync_playwright() as p:
@@ -73,10 +90,10 @@ with sync_playwright() as p:
             return Image.open(io.BytesIO(pg.screenshot(omit_background=transparent, clip={"x": 0, "y": 0, "width": size, "height": size})))
 
         # favicon: bare mark, transparent, slightly heavier gap at tiny sizes
-        icos = [render(mark_svg(s, gap_w=3.4 if s <= 32 else 2.6), s) for s in (16, 32, 48)]
+        icos = [render(mark_svg(s, cut=2.2 if s <= 32 else 1.6), s) for s in (16, 32, 48)]
         icos[2].save(ROOT / "src/app/favicon.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48)], append_images=icos[:2])
         # app icons: mark on the lapis tint, inside the maskable safe zone
-        tile = lambda s: mark_svg(s, pad=26, bg="#eef0ff", gap_w=2.4)
+        tile = lambda s: mark_svg(s, pad=26, bg="#eef0ff")
         render(tile(192), 192, False).convert("RGB").save(ROOT / "public/icons/icon-192.png")
         render(tile(512), 512, False).convert("RGB").save(ROOT / "public/icons/icon-512.png")
         render(mark_svg(180, pad=18, bg="#eef0ff"), 180, False).convert("RGB").save(ROOT / "public/icons/apple-touch-icon.png")

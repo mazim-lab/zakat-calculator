@@ -84,16 +84,16 @@ export default function Home() {
 
           <div className="hue-indigo max-w-[420px] w-full mx-auto lg:me-0">
             <Niche tall>
-              <div className="grid justify-items-center -mt-[18%]">
+              <div className="grid justify-items-center -mt-[22%]">
                 <StarMark size={88} />
                 <p lang="ar" dir="rtl" className="ar mt-4 text-[44px] leading-[1.5] text-indigo-text">
-                  حِساب
+                  حِسَاب
                 </p>
                 <p className="mt-1 text-[19px] text-text">
                   <em>ḥisāb</em>: reckoning; a careful account of what is owed.
                 </p>
                 <p className="mt-3 text-[16px] text-text-2 ui leading-relaxed max-w-[30ch]">
-                  The star is a khatam, eight equal parts. One part is set apart, as a share is set apart from an
+                  The star is a khatam of eight equal parts. One part is set apart, as a share is set apart from an
                   estate.
                 </p>
               </div>

@@ -400,8 +400,9 @@ export default function InheritanceCalculator() {
                           <p className="text-[19px] text-text leading-snug">
                             {share > 0 ? (
                               <>
-                                <strong>{name}</strong> {s.count > 1 ? "share" : "receives"} {numberToFraction(share)} of the
-                                estate{s.count > 1 ? " together" : ""}:{" "}
+                                <strong>{name}</strong> {s.count > 1 ? "share" : "receives"}{" "}
+                                {Math.abs(share - 1) < 1e-9 ? "the whole estate" : `${numberToFraction(share)} of the estate`}
+                                {s.count > 1 ? " together" : ""}:{" "}
                                 <strong className="num whitespace-nowrap">{formatUSD(s.amount)}</strong>
                               </>
                             ) : (
