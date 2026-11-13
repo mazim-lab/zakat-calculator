@@ -12,6 +12,7 @@ import { calculateFidya, type FidyaFoodType } from "@/lib/fidya/calculate";
 import { InfoAccordion } from "@/components/InfoAccordion";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { OptionCard } from "@/components/OptionCard";
+import { money, count } from "@/components/format";
 
 const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
   { value: "hanafi", label: "Ḥanafī", labelAr: "حنفي" },
@@ -190,6 +191,7 @@ export function FidyaCalculator() {
                 prefix=""
                 placeholder="30"
                 suffix="days"
+                integer
                 hint="Include missed days from previous years if you haven't compensated for them yet"
               />
               <div role="group" aria-label="Quick fill: number of days" className="flex flex-wrap gap-2">
@@ -286,21 +288,21 @@ export function FidyaCalculator() {
 
               <div className="text-center py-4 rounded-[10px]" style={{ background: "var(--hue-bg)" }}>
                 <p className="text-sm text-text-2 m-0 mb-1">Total fidya due</p>
-                <p className="num text-[40px] sm:text-[48px] font-semibold leading-tight m-0" style={{ color: "var(--hue-text)" }}>
-                  ${result.total.toFixed(2)}
+                <p className="num text-[clamp(28px,10vw,40px)] sm:text-[48px] font-semibold leading-tight m-0 whitespace-nowrap" style={{ color: "var(--hue-text)" }}>
+                  {money(result.total)}
                 </p>
                 <p className="text-sm text-text-2 m-0 mt-2">
-                  <span className="num">${result.perDay.toFixed(2)}</span> per day × <span className="num">{result.missedDays}</span> days
+                  <span className="num">{money(result.perDay)}</span> per day × <span className="num">{count(result.missedDays)}</span> days
                 </p>
               </div>
 
               <dl className="m-0">
                 <Row label="School of jurisprudence">{madhabOptions.find((m) => m.value === madhab)?.label}</Row>
                 <Row label="Missed days">
-                  <span className="num">{result.missedDays}</span>
+                  <span className="num">{count(result.missedDays)}</span>
                 </Row>
                 <Row label="Per day">
-                  <span className="num">${result.perDay.toFixed(2)}</span>
+                  <span className="num">{money(result.perDay)}</span>
                 </Row>
                 <Row label="Calculation" small>
                   <span className="num">{result.unitDescription}</span>

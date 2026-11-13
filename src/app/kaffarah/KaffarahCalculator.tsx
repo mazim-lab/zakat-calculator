@@ -204,6 +204,7 @@ export function KaffarahCalculator() {
                 onChange={setInstances}
                 prefix=""
                 suffix={kaffarahType === "broken_fast" ? "days" : "times"}
+                integer
                 hint={
                   kaffarahType === "broken_fast"
                     ? "How many days did you deliberately break your fast? Each day requires a separate kaffārah."
