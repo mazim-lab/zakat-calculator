@@ -445,6 +445,52 @@ export function calculateInheritance(
     }
   }
 
+  // Further exclusions agreed by the four Sunni schools. Each one only applies
+  // to an heir still present, and keeps any reason a closer heir already gave.
+  const block = (heir: keyof Heirs, reason: string) => {
+    if (!heirs[heir]) return;
+    blockedHeirs.push(heir);
+    if (!reasons[heir]) reasons[heir] = reason;
+    delete heirs[heir];
+  };
+  const SIBLINGS: (keyof Heirs)[] = ['fullBrother', 'fullSister', 'paternalHalfBrother', 'paternalHalfSister', 'maternalHalfBrother', 'maternalHalfSister'];
+  // A son's son, like a son, excludes every kind of sibling.
+  if ((heirs.sonsSon ?? 0) > 0) {
+    for (const h of SIBLINGS) block(h, "Blocked by the son's son.");
+  }
+  // Maternal half-siblings inherit only when there is no child or child of a son,
+  // and no father or paternal grandfather (Qurʾān 4:12, kalālah).
+  const anyDescendant = (heirs.son ?? 0) > 0 || (heirs.daughter ?? 0) > 0 || (heirs.sonsSon ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0;
+  if (anyDescendant) {
+    block('maternalHalfBrother', "Blocked by a descendant of the deceased (Qurʾān 4:12 gives maternal siblings a share only when there is no child).");
+    block('maternalHalfSister', "Blocked by a descendant of the deceased (Qurʾān 4:12 gives maternal siblings a share only when there is no child).");
+  }
+  if (heirs.paternalGrandfather) {
+    block('maternalHalfBrother', "Blocked by the paternal grandfather.");
+    block('maternalHalfSister', "Blocked by the paternal grandfather.");
+  }
+  // Two or more daughters complete the two-thirds; a son's daughter then inherits
+  // only as a residuary with a son's son.
+  if ((heirs.daughter ?? 0) >= 2 && !((heirs.sonsSon ?? 0) > 0)) {
+    block('sonsDaughter', "Blocked: two or more daughters take the full two-thirds and there is no son's son to make her a residuary.");
+  }
+  // Sibling exclusions among full and paternal half-siblings. When a paternal
+  // grandfather inherits with siblings (Mālikī, Shāfiʿī, Ḥanbalī), the grandfather
+  // step below handles these heirs instead.
+  const grandfatherSharesWithSiblings = !!heirs.paternalGrandfather && madhab !== 'hanafi';
+  if (!grandfatherSharesWithSiblings) {
+    const femaleDescendant = (heirs.daughter ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0;
+    if ((heirs.fullBrother ?? 0) > 0) {
+      block('paternalHalfBrother', "Blocked by the full brother.");
+      block('paternalHalfSister', "Blocked by the full brother.");
+    } else if ((heirs.fullSister ?? 0) > 0 && femaleDescendant) {
+      block('paternalHalfBrother', "Blocked by the full sister, who takes the residue alongside the daughter(s).");
+      block('paternalHalfSister', "Blocked by the full sister, who takes the residue alongside the daughter(s).");
+    } else if ((heirs.fullSister ?? 0) >= 2 && !((heirs.paternalHalfBrother ?? 0) > 0)) {
+      block('paternalHalfSister', "Blocked: two or more full sisters take the full two-thirds and there is no paternal half-brother to make her a residuary.");
+    }
+  }
+
   const hasDescendants = (heirs.son ?? 0) > 0 || (heirs.daughter ?? 0) > 0 || (heirs.sonsSon ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0;
 
   // --- 2. Fixed Shares (Furūḍ) ---
@@ -508,12 +554,21 @@ export function calculateInheritance(
       reasons.sonsDaughter = "Multiple son's daughters share 2/3 as fixed share.";
     }
   }
+  // With exactly one daughter and no son's son, the son's daughter(s) take 1/6 to
+  // complete two-thirds (Ibn Masʿūd's report, Ṣaḥīḥ al-Bukhārī 6736).
+  if ((heirs.sonsDaughter ?? 0) > 0 && (heirs.son ?? 0) === 0 && heirs.daughter === 1 && (heirs.sonsSon ?? 0) === 0) {
+    shares.sonsDaughter = new SimpleFraction(1, 6);
+    reasons.sonsDaughter = "Receives 1/6 with one daughter, completing two-thirds (Ṣaḥīḥ al-Bukhārī 6736).";
+  }
 
   // Sisters' fixed shares (when no sons, daughters, father, grandfather)
   const hasDirectDescendants = (heirs.son ?? 0) > 0 || (heirs.daughter ?? 0) > 0 || (heirs.sonsSon ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0;
   const hasMaleAncestors = heirs.father || heirs.paternalGrandfather;
   
-  if ((heirs.fullSister ?? 0) > 0 && !hasDirectDescendants && !hasMaleAncestors) {
+  // A full brother makes the full sisters residuaries with him (Qurʾān 4:176), so
+  // they take no fixed share when he is present.
+  const hasFullBrother = (heirs.fullBrother ?? 0) > 0;
+  if ((heirs.fullSister ?? 0) > 0 && !hasDirectDescendants && !hasMaleAncestors && !hasFullBrother) {
     if (heirs.fullSister === 1) {
       shares.fullSister = new SimpleFraction(1, 2);
       reasons.fullSister = "Single full sister receives 1/2 as fixed share.";
@@ -523,8 +578,52 @@ export function calculateInheritance(
     }
   }
 
+  // Paternal half-sisters (Qurʾān 4:176 covers sisters through the father too):
+  // 1/2 alone, 2/3 for two or more, 1/6 beside exactly one full sister. A paternal
+  // half-brother makes them residuaries instead.
+  if ((heirs.paternalHalfSister ?? 0) > 0 && !hasDirectDescendants && !hasMaleAncestors && !hasFullBrother && !((heirs.paternalHalfBrother ?? 0) > 0)) {
+    const fullSisters = heirs.fullSister ?? 0;
+    if (fullSisters === 0) {
+      if (heirs.paternalHalfSister === 1) {
+        shares.paternalHalfSister = new SimpleFraction(1, 2);
+        reasons.paternalHalfSister = "Single paternal half-sister receives 1/2 as fixed share.";
+      } else {
+        shares.paternalHalfSister = new SimpleFraction(2, 3);
+        reasons.paternalHalfSister = "Paternal half-sisters share 2/3 as fixed share.";
+      }
+    } else if (fullSisters === 1) {
+      shares.paternalHalfSister = new SimpleFraction(1, 6);
+      reasons.paternalHalfSister = "Receives 1/6 beside one full sister, completing two-thirds.";
+    }
+  }
+
+  // Maternal half-siblings (Qurʾān 4:12): one takes 1/6; two or more share 1/3
+  // equally, male and female alike. Exclusions were applied above.
+  const maternalSiblings = (heirs.maternalHalfBrother ?? 0) + (heirs.maternalHalfSister ?? 0);
+  if (maternalSiblings > 0) {
+    const pool = maternalSiblings === 1 ? new SimpleFraction(1, 6) : new SimpleFraction(1, 3);
+    const why = maternalSiblings === 1
+      ? "Receives 1/6 as the only maternal half-sibling (Qurʾān 4:12)."
+      : "Maternal half-siblings share 1/3 equally, male and female alike (Qurʾān 4:12).";
+    if ((heirs.maternalHalfBrother ?? 0) > 0) {
+      shares.maternalHalfBrother = pool.mul(heirs.maternalHalfBrother ?? 0).div(maternalSiblings);
+      reasons.maternalHalfBrother = why;
+    }
+    if ((heirs.maternalHalfSister ?? 0) > 0) {
+      shares.maternalHalfSister = pool.mul(heirs.maternalHalfSister ?? 0).div(maternalSiblings);
+      reasons.maternalHalfSister = why;
+    }
+  }
+
   // Grandparents
-  if(heirs.paternalGrandfather && !heirs.father){
+  const grandfatherWithSiblings = grandfatherSharesWithSiblings && (
+    (heirs.fullBrother ?? 0) > 0 || (heirs.fullSister ?? 0) > 0 ||
+    (heirs.paternalHalfBrother ?? 0) > 0 || (heirs.paternalHalfSister ?? 0) > 0
+  );
+  // When he shares with siblings (Mālikī, Shāfiʿī, Ḥanbalī), the grandfather's
+  // whole entitlement is the best of the options computed in step 4, so he takes
+  // no separate fixed 1/6 here.
+  if(heirs.paternalGrandfather && !heirs.father && !grandfatherWithSiblings){
       shares.paternalGrandfather = new SimpleFraction(1,6);
       reasons.paternalGrandfather = 'Receives 1/6 in place of the father.'
   }
@@ -570,6 +669,16 @@ export function calculateInheritance(
            // Ḥanafī: grandfather blocks siblings entirely, or no siblings present
            residuaries.push('paternalGrandfather');
       }
+  } else if ((heirs.fullBrother ?? 0) > 0) {
+      // Full brother, with any full sisters at 2:1 (Qurʾān 4:176).
+      residuaries.push('fullBrother', 'fullSister');
+  } else if ((heirs.fullSister ?? 0) > 0 && ((heirs.daughter ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0)) {
+      // Full sister takes the residue alongside daughters (ʿaṣabah maʿa al-ghayr).
+      residuaries.push('fullSister');
+  } else if ((heirs.paternalHalfBrother ?? 0) > 0) {
+      residuaries.push('paternalHalfBrother', 'paternalHalfSister');
+  } else if ((heirs.paternalHalfSister ?? 0) > 0 && ((heirs.daughter ?? 0) > 0 || (heirs.sonsDaughter ?? 0) > 0)) {
+      residuaries.push('paternalHalfSister');
   }
 
 
@@ -588,6 +697,13 @@ export function calculateInheritance(
       totalFixedShares = new SimpleFraction(0, 1);
       Object.values(shares).forEach(s => totalFixedShares = totalFixedShares.add(s!));
       remainder = new SimpleFraction(1, 1).sub(totalFixedShares);
+  }
+
+  // A grandfather sharing with siblings never falls below 1/6 of the estate, even
+  // when the fixed shares leave nothing (the shares are then reduced by ʿawl).
+  if (grandfatherWithSiblings && remainder.numerator <= 0) {
+      shares.paternalGrandfather = new SimpleFraction(1, 6);
+      reasons.paternalGrandfather = "Grandfather with siblings (Zayd ibn Thābit): the fixed shares leave nothing, so he takes 1/6 of the estate.";
   }
 
   // Distribute remainder
@@ -638,36 +754,125 @@ export function calculateInheritance(
             shares.paternalGrandfather = (shares.paternalGrandfather ?? new SimpleFraction(0, 1)).add(bestShare);
             reasons.paternalGrandfather = `Grandfather with siblings (Zayd ibn Thābit): best of three options was ${chosenOption}.`;
 
-            // Distribute what remains after grandfather's share to siblings
+            // Distribute what remains after grandfather's share to siblings.
+            // Paternal half-siblings are counted against the grandfather above
+            // (al-muʿāddah), but a full sibling then takes their portion: a full
+            // brother takes it all with his sisters; full sisters alone take up to
+            // their fixed share (1/2, or 2/3 for two or more) and the paternal
+            // half-siblings keep whatever is left, at 2:1.
             const siblingRemainder = remainder.sub(bestShare);
             if (siblingRemainder.numerator > 0) {
-              const sibParts = brothers * 2 + sisters;
-              if (sibParts > 0) {
-                if ((heirs.fullBrother ?? 0) > 0) {
-                  shares.fullBrother = (shares.fullBrother ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul((heirs.fullBrother ?? 0) * 2).div(sibParts));
+              const fb = heirs.fullBrother ?? 0, fs = heirs.fullSister ?? 0;
+              const pb = heirs.paternalHalfBrother ?? 0, ps = heirs.paternalHalfSister ?? 0;
+              const give = (heir: keyof Heirs, amount: SimpleFraction, why: string) => {
+                if (amount.numerator <= 0) return;
+                shares[heir] = (shares[heir] ?? new SimpleFraction(0, 1)).add(amount);
+                reasons[heir] = why;
+              };
+              const shareWithGrandfather = "Shares the residue with the paternal grandfather (Zayd ibn Thābit's method), male twice the female.";
+              if (fb > 0) {
+                const parts = fb * 2 + fs;
+                give('fullBrother', siblingRemainder.mul(fb * 2).div(parts), shareWithGrandfather);
+                give('fullSister', siblingRemainder.mul(fs).div(parts), shareWithGrandfather);
+                if (pb > 0) reasons.paternalHalfBrother = "Counted against the grandfather, then excluded by the full brother (al-muʿāddah).";
+                if (ps > 0) reasons.paternalHalfSister = "Counted against the grandfather, then excluded by the full brother (al-muʿāddah).";
+                for (const h of ['paternalHalfBrother', 'paternalHalfSister'] as (keyof Heirs)[]) {
+                  if (heirs[h]) blockedHeirs.push(h);
                 }
-                if ((heirs.fullSister ?? 0) > 0) {
-                  shares.fullSister = (shares.fullSister ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul(heirs.fullSister ?? 0).div(sibParts));
+              } else if (fs > 0) {
+                const cap = fs === 1 ? new SimpleFraction(1, 2) : new SimpleFraction(2, 3);
+                const toFull = siblingRemainder.valueOf() <= cap.valueOf() || (pb + ps) === 0 ? siblingRemainder : cap;
+                give('fullSister', toFull, (pb + ps) > 0
+                  ? "Full sister(s) take up to their fixed share from the siblings' portion beside the grandfather (al-muʿāddah)."
+                  : shareWithGrandfather);
+                const rest = siblingRemainder.sub(toFull);
+                const halfParts = pb * 2 + ps;
+                if (rest.numerator > 0 && halfParts > 0) {
+                  give('paternalHalfBrother', rest.mul(pb * 2).div(halfParts), "Takes what is left of the siblings' portion after the full sister(s) (al-muʿāddah).");
+                  give('paternalHalfSister', rest.mul(ps).div(halfParts), "Takes what is left of the siblings' portion after the full sister(s) (al-muʿāddah).");
+                } else {
+                  for (const h of ['paternalHalfBrother', 'paternalHalfSister'] as (keyof Heirs)[]) {
+                    if (heirs[h]) {
+                      blockedHeirs.push(h);
+                      reasons[h] = "Counted against the grandfather, but nothing is left after the full sister(s) (al-muʿāddah).";
+                    }
+                  }
                 }
-                if ((heirs.paternalHalfBrother ?? 0) > 0) {
-                  shares.paternalHalfBrother = (shares.paternalHalfBrother ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul((heirs.paternalHalfBrother ?? 0) * 2).div(sibParts));
-                }
-                if ((heirs.paternalHalfSister ?? 0) > 0) {
-                  shares.paternalHalfSister = (shares.paternalHalfSister ?? new SimpleFraction(0, 1)).add(siblingRemainder.mul(heirs.paternalHalfSister ?? 0).div(sibParts));
-                }
+              } else {
+                const parts = pb * 2 + ps;
+                give('paternalHalfBrother', siblingRemainder.mul(pb * 2).div(parts), shareWithGrandfather);
+                give('paternalHalfSister', siblingRemainder.mul(ps).div(parts), shareWithGrandfather);
               }
             }
           } else {
             // No siblings or Hanafi (grandfather blocks siblings): takes full remainder
             shares.paternalGrandfather = (shares.paternalGrandfather ?? new SimpleFraction(0, 1)).add(remainder);
           }
+      } else if (residuaries.includes('fullBrother') || residuaries.includes('paternalHalfBrother')) {
+          // Brothers take the residue as ʿaṣabah, sisters of the same kind with
+          // them at 2:1 (Qurʾān 4:176; Ṣaḥīḥ al-Bukhārī 6732).
+          const maleHeir: keyof Heirs = residuaries.includes('fullBrother') ? 'fullBrother' : 'paternalHalfBrother';
+          const femaleHeir: keyof Heirs = maleHeir === 'fullBrother' ? 'fullSister' : 'paternalHalfSister';
+          const brothers = (heirs[maleHeir] as number | undefined) ?? 0;
+          const sisters = (heirs[femaleHeir] as number | undefined) ?? 0;
+          const parts = brothers * 2 + sisters;
+          shares[maleHeir] = (shares[maleHeir] ?? new SimpleFraction(0, 1)).add(remainder.mul(brothers * 2).div(parts));
+          reasons[maleHeir] = sisters > 0
+            ? "Receives the remainder as residuary (ʿaṣabah) with the sister(s), male twice the female (Qurʾān 4:176)."
+            : "Receives the remainder as residuary (ʿaṣabah).";
+          if (sisters > 0) {
+            shares[femaleHeir] = (shares[femaleHeir] ?? new SimpleFraction(0, 1)).add(remainder.mul(sisters).div(parts));
+            reasons[femaleHeir] = "Receives the remainder as residuary with the brother(s), half a brother's share (Qurʾān 4:176).";
+          }
+      } else if (residuaries.includes('fullSister') || residuaries.includes('paternalHalfSister')) {
+          const heir: keyof Heirs = residuaries.includes('fullSister') ? 'fullSister' : 'paternalHalfSister';
+          shares[heir] = (shares[heir] ?? new SimpleFraction(0, 1)).add(remainder);
+          reasons[heir] = "Receives the remainder as residuary alongside the daughter(s) (ʿaṣabah maʿa al-ghayr; Ṣaḥīḥ al-Bukhārī 6736).";
+      }
+  }
+
+  // Residuaries left with nothing are shown as excluded rather than silently dropped.
+  const possibleResiduaries: (keyof Heirs)[] = grandfatherWithSiblings
+      ? [...residuaries, 'fullBrother', 'fullSister', 'paternalHalfBrother', 'paternalHalfSister']
+      : residuaries;
+  for (const h of possibleResiduaries) {
+      if (heirs[h] && !shares[h] && !blockedHeirs.includes(h)) {
+          blockedHeirs.push(h);
+          reasons[h] = "Residuary heir: the fixed shares exhaust the estate, so nothing remains.";
       }
   }
 
 
+  // al-Akdariyyah (Mālikī, Shāfiʿī, Ḥanbalī, following Zayd ibn Thābit): husband,
+  // mother, paternal grandfather and one full or paternal sister, nobody else.
+  // Base 6 is raised to 9 (husband 3, mother 2, grandfather 1, sister 3), then the
+  // grandfather's and sister's 4 parts are re-divided 2:1, giving 27: husband 9,
+  // mother 6, grandfather 8, sister 4 (islamqa.info/ar/answers/240582).
+  const sisterKey: keyof Heirs | null =
+      heirs.fullSister === 1 && !heirs.paternalHalfSister ? 'fullSister'
+    : heirs.paternalHalfSister === 1 && !heirs.fullSister ? 'paternalHalfSister' : null;
+  const isAkdariyya = madhab !== 'hanafi' && !!heirs.husband && !heirs.wife && !!heirs.mother &&
+    !!heirs.paternalGrandfather && !heirs.father && sisterKey !== null && !hasDescendants &&
+    !heirs.fullBrother && !heirs.paternalHalfBrother;
+  let akdariyyaNote: string | undefined;
+  if (isAkdariyya && sisterKey) {
+    shares = {
+      husband: new SimpleFraction(9, 27),
+      mother: new SimpleFraction(6, 27),
+      paternalGrandfather: new SimpleFraction(8, 27),
+      [sisterKey]: new SimpleFraction(4, 27),
+    };
+    blockedHeirs = blockedHeirs.filter(h => h !== sisterKey);
+    reasons.husband = "Receives 9/27 (al-Akdariyyah).";
+    reasons.mother = "Receives 6/27 (al-Akdariyyah).";
+    reasons.paternalGrandfather = "Receives 8/27 (al-Akdariyyah): his 1/6 and the sister's 1/2 are pooled and re-divided 2:1.";
+    reasons[sisterKey] = "Receives 4/27 (al-Akdariyyah): her 1/2 is restored, then pooled with the grandfather's share and re-divided 2:1.";
+    akdariyyaNote = "This is al-Akdariyyah: the shares (husband 1/2, mother 1/3, grandfather 1/6, sister 1/2) were raised from 6 to 9 by ʿawl, then the grandfather's and sister's parts were re-divided 2:1, giving a base of 27.";
+  }
+
   // --- 5. Handle ʿAwl and Radd ---
-  let wasAwlApplied = false;
-  let awlExplanation = undefined;
+  let wasAwlApplied = isAkdariyya;
+  let awlExplanation = akdariyyaNote;
   let wasRaddApplied = false;
   let raddExplanation = undefined;
   

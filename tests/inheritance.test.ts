@@ -87,14 +87,50 @@ const SCENARIOS: { name: string; heirs: RawHeirs }[] = [
   { name: "Wife + paternal half-brother + paternal half-sister", heirs: { wife: 1, paternalHalfBrother: 1, paternalHalfSister: 1 } },
 ];
 
+// Scenarios whose shares were deliberately corrected in November 2026. The new
+// values are asserted, with sources, in tests/inheritance-classical.test.ts.
+const CORRECTED = new Set<string>([
+  ...["maliki", "shafii", "hanbali"].flatMap((m) => [
+    `Grandfather + 1 full brother|${m}`,
+    `Wife + grandfather + 2 brothers + 1 sister|${m}`,
+    `Mother + grandfather + 1 full sister|${m}`,
+  ]),
+  ...["hanafi", "maliki", "shafii", "hanbali"].flatMap((m) => [
+    `Full brother + full sister|${m}`,
+    `Class 2: grandmother + maternal half-brother|${m}`,
+    `Husband + 2 maternal half-sisters|${m}`,
+    `Daughter + full brother|${m}`,
+    `Wife + paternal half-brother + paternal half-sister|${m}`,
+  ]),
+]);
+// Scenarios where only the explanation text changed (shares are equal).
+const REWORDED = new Set<string>([]);
+
+const numeric = (r: CalculationResult) => ({
+  shares: r.shares.filter((s) => (s.share ?? 0) > 0).map((s) => [s.heir, s.share, s.amount]).sort(),
+  blocked: r.blocked.map((b) => b.heir).sort(),
+  bayt: r.baytAlMalAmount ?? 0,
+  awl: r.wasAwlApplied,
+});
+
 describe("calculateInheritance: src/lib equals the frozen original", () => {
   for (const sc of SCENARIOS) {
     for (const m of MADHABS) {
-      it(`${sc.name} [${m}]`, () => {
+      const key = `${sc.name}|${m}`;
+      it(`${sc.name} [${m}]${CORRECTED.has(key) ? " (corrected)" : REWORDED.has(key) ? " (reworded)" : ""}`, () => {
         for (const estate of [100000, 98765.43]) {
           const a: CalculationResult = calcNew(estate, copy(sc.heirs), m);
           const b: CalculationResult = calcOrig(estate, copy(sc.heirs), m);
-          expect(a).toStrictEqual(b);
+          if (CORRECTED.has(key)) {
+            expect(numeric(a)).not.toEqual(numeric(b));
+          } else if (REWORDED.has(key)) {
+            const na = numeric(a), nb = numeric(b);
+            expect(na.blocked).toEqual(nb.blocked);
+            expect(na.shares.length).toBe(nb.shares.length);
+            na.shares.forEach((s, i) => { expect(s[0]).toBe(nb.shares[i][0]); expect(s[1] as number).toBeCloseTo(nb.shares[i][1] as number, 12); });
+          } else {
+            expect(a).toStrictEqual(b);
+          }
         }
       });
     }
@@ -183,41 +219,37 @@ describe("textbook cases (hand-verified)", () => {
 });
 
 // ---------------------------------------------------------------------------
-// 4. Textbook cases where the current code DISAGREES (see NEEDS OWNER REVIEW).
-//    it.fails: these pass while the code still disagrees. When the owner fixes
-//    calculate.ts, they will start failing and should become normal tests.
+// 4. Former known disagreements, corrected in November 2026. These were pinned
+//    as expected failures; they now pass. Sources: tests/inheritance-classical.test.ts.
 // ---------------------------------------------------------------------------
-describe("known disagreements with textbook results (do not change code here)", () => {
-  it.fails("wife + full brother: 1/4 and 3/4 (brother is residuary)", () => {
-    // Wife 1/4 (4:12). Full brother takes the rest as ʿaṣabah: 3/4.
-    // Code: brother gets nothing, 3/4 goes to Bayt al-Māl.
+describe("formerly known disagreements, now corrected", () => {
+  it("wife + full brother: 1/4 and 3/4 (brother is residuary)", () => {
+    // Wife 1/4 (4:12). Full brother takes the rest as ʿaṣabah (Bukhārī 6732): 3/4.
     expectShares({ wife: 1, fullBrother: 1 }, { wife: [1, 4], fullBrother: [3, 4] });
   });
 
-  it.fails("daughter + full brother: 1/2 and 1/2 (the site's own Jaʿfarī note states this Sunni result)", () => {
-    // Daughter 1/2 (4:11). Brother residuary: 1/2. Code: daughter takes all by radd.
+  it("daughter + full brother: 1/2 and 1/2", () => {
+    // Daughter 1/2 (4:11). Brother residuary: 1/2.
     expectShares({ daughter: 1, fullBrother: 1 }, { daughter: [1, 2], fullBrother: [1, 2] });
   });
 
-  it.fails("full brother + full sister: 2/3 and 1/3 (4:176)", () => {
-    // Male takes the share of two females (4:176): 2 parts + 1 part. Code: sister takes all.
+  it("full brother + full sister: 2/3 and 1/3 (4:176)", () => {
+    // Male takes the share of two females (4:176): 2 parts + 1 part.
     expectShares({ fullBrother: 1, fullSister: 1 }, { fullBrother: [2, 3], fullSister: [1, 3] });
   });
 
-  it.fails("daughter + full sister: 1/2 and 1/2 (sister residuary with the daughter)", () => {
-    // Daughter 1/2. Full sister takes the rest (ʿaṣabah maʿa al-ghayr). Code: daughter takes all.
+  it("daughter + full sister: 1/2 and 1/2 (sister residuary with the daughter)", () => {
+    // Daughter 1/2. Full sister takes the rest (ʿaṣabah maʿa al-ghayr, Bukhārī 6736).
     expectShares({ daughter: 1, fullSister: 1 }, { daughter: [1, 2], fullSister: [1, 2] });
   });
 
-  it.fails("grandfather + 1 full brother [Mālikī/Shāfiʿī/Ḥanbalī]: 1/2 each (muqāsama)", () => {
+  it("grandfather + 1 full brother [Mālikī/Shāfiʿī/Ḥanbalī]: 1/2 each (muqāsama)", () => {
     // No fixed heirs; sharing as a brother gives each 1/2, the best of the options.
-    // Code adds the grandfather's 1/6 fixed share AND the muqāsama share: 7/12 and 5/12.
     expectShares({ paternalGrandfather: true, fullBrother: 1 }, { paternalGrandfather: [1, 2], fullBrother: [1, 2] }, ["maliki", "shafii", "hanbali"]);
   });
 
-  it("father + mother + 2 full brothers: mother 1/6, father 5/6 (corrected)", () => {
-    // Siblings excluded by the father still reduce the mother to 1/6 (4:11;
-    // islamqa.info/ar/answers/13632). Corrected in November 2026.
+  it("father + mother + 2 full brothers: mother 1/6, father 5/6", () => {
+    // Siblings excluded by the father still reduce the mother to 1/6 (4:11).
     expectShares({ father: true, mother: true, fullBrother: 2 }, { mother: [1, 6], father: [5, 6] });
   });
 });
