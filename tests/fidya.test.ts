@@ -84,23 +84,47 @@ const TABLE: Row[] = [
 ];
 
 describe("Fidya: calculateFidya equals the original inline useMemo", () => {
-  it("getWeightKg is unchanged for every school × food", () => {
+  it("getWeightKg is unchanged for every school × food, except the corrected Ḥanbalī half ṣāʿ", () => {
     for (const m of MADHABS) {
       for (const f of FOODS) {
-        expect(FIDYA_WEIGHTS[m].getWeightKg(f)).toBe(ORIG_FIDYA_WEIGHTS[m].getWeightKg(f));
+        if (m === "hanbali" && f !== "wheat") {
+          // Corrected November 2026: half a ṣāʿ = 2 mudd = 2 x 0.51 kg (the site's own mudd), not 1.6 kg.
+          expect(FIDYA_WEIGHTS[m].getWeightKg(f)).toBeCloseTo(2 * FIDYA_WEIGHTS.maliki.getWeightKg(f), 12);
+          expect(ORIG_FIDYA_WEIGHTS[m].getWeightKg(f)).toBe(1.6);
+        } else {
+          expect(FIDYA_WEIGHTS[m].getWeightKg(f)).toBe(ORIG_FIDYA_WEIGHTS[m].getWeightKg(f));
+        }
       }
     }
   });
 
+  it("Ḥanbalī: one mudd of wheat, two mudd of other staples (al-Mughnī; ṣāʿ = 4 mudd)", () => {
+    expect(FIDYA_WEIGHTS.hanbali.getWeightKg("wheat")).toBe(0.51);
+    expect(FIDYA_WEIGHTS.hanbali.getWeightKg("dates")).toBe(1.02);
+    const r = calculateFidya({ madhab: "hanbali", missedDays: 30, costPerMeal: 10, useWeight: true, pricePerKg: 2, foodType: "dates" })!;
+    expect(r.total).toBeCloseTo(30 * 1.02 * 2, 10); // 61.20
+  });
+
   it.each(TABLE)("%s days=%d meal=%d weight=%s price/kg=%d food=%s", (...row) => {
-    expect(comparable(calculateFidya({
+    const now = comparable(calculateFidya({
       madhab: row[0],
       missedDays: row[1],
       costPerMeal: row[2],
       useWeight: row[3],
       pricePerKg: row[4],
       foodType: row[5],
-    }))).toStrictEqual(comparable(originalFidya(...row)));
+    }));
+    const orig = comparable(originalFidya(...row));
+    if (row[0] === "hanbali" && now && orig) {
+      // Ḥanbalī measure text and half-ṣāʿ weight were corrected; the formula is the original one.
+      const kg = FIDYA_WEIGHTS.hanbali.getWeightKg(row[5]);
+      const perDay = row[3] ? kg * row[4] : row[2];
+      expect(now.perDay).toBe(perDay);
+      expect(now.total).toBe(perDay * row[1]);
+      expect(now.missedDays).toBe(orig.missedDays);
+    } else {
+      expect(now).toStrictEqual(orig);
+    }
   });
 });
 

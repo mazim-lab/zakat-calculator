@@ -34,8 +34,8 @@ export const FIDYA_AMOUNT_INFO: InfoPanel = {
     },
     {
       school: "Ḥanbalī School",
-      position: "One mudd of wheat (~510g), or half a ṣāʿ of other staples (~1.6 kg)",
-      reasoning: "The Ḥanbalī school differentiates by food type: wheat requires one mudd, while barley, dates, and raisins require half a ṣāʿ (about three times more by weight).",
+      position: "One mudd of wheat (~510 g), or half a ṣāʿ (two mudd) of other staples (~1.02 kg)",
+      reasoning: "The Ḥanbalī school differentiates by food type: wheat requires one mudd, while barley, dates, raisins and other staples require half a ṣāʿ, which is two mudd since one ṣāʿ is four mudd (al-Mughnī, mas'alah 496; al-Inṣāf). Using the same 510 g mudd this site uses for the other schools, that is about 1.02 kg.",
     },
     {
       school: "Jaʿfarī School",

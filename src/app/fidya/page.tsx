@@ -49,7 +49,7 @@ const FAQ = [
   },
   {
     q: "How much is fidya per day?",
-    a: "It is feeding one poor person for each missed day. In this calculator, the Ḥanafī amount is half a ṣāʿ of wheat (about 1.6 kg) or a full ṣāʿ of barley, dates or raisins (about 3.2 kg). The Mālikī and Shāfiʿī amount is one mudd of the local staple (about 0.51 kg). The Ḥanbalī amount is one mudd of wheat (about 0.51 kg) or half a ṣāʿ of other staples (about 1.6 kg). The Jaʿfarī amount is one mudd of food (about 0.75 kg).",
+    a: "It is feeding one poor person for each missed day. In this calculator, the Ḥanafī amount is half a ṣāʿ of wheat (about 1.6 kg) or a full ṣāʿ of barley, dates or raisins (about 3.2 kg). The Mālikī and Shāfiʿī amount is one mudd of the local staple (about 0.51 kg). The Ḥanbalī amount is one mudd of wheat (about 0.51 kg) or half a ṣāʿ, which is two mudd, of other staples (about 1.02 kg, using the same 0.51 kg mudd). The Jaʿfarī amount is one mudd of food (about 0.75 kg).",
   },
   {
     q: "Can I pay fidya in cash?",
