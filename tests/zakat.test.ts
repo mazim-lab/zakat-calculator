@@ -30,6 +30,7 @@ import {
   FALLBACK_SILVER_USD_PER_OZ,
   FALLBACK_PRICES_AS_OF,
 } from "@/lib/metal-fallback";
+import { cattleDue, camelsDue } from "@/lib/calculate";
 import { applyChoice, applyMadhab } from "@/lib/zakat/choices";
 import {
   EXAMPLE_ASSETS,
@@ -241,10 +242,33 @@ function run(fn: typeof calculateZakat, c: Case) {
 
 // Cases whose result was deliberately corrected in November 2026, with the new
 // total (each explained below) and the reason.
-const CORRECTED_TOTAL: Record<string, { total: number; why: string }> = {};
+const CORRECTED_TOTAL: Record<string, { total: number; why: string }> = {
+  // Cash 30,000 - debts (5,000 + 12 x 300) = 21,400 x 2.5% = 535; plus 1 sheep
+  // (150) and 10% of 2,000 (200), which the Mālikī note says debts do not reduce.
+  "06 Maliki preset, hidden-wealth debts with livestock and crops": { total: 885, why: "debts no longer reduce crops and livestock" },
+  // Base no longer includes the deferred RRSP and match: (25,000 - 800 - 1,550) x 2.5%.
+  "13 Custom: RRSP deferred, single-installment debts (all four loans)": { total: 566.25, why: "exempt items left out of the debt base" },
+  // Harvest value 652 with no weight: the 653 kg minimum is a weight, so it is
+  // not checked against a money value; 250 + 5% of 652 = 282.60.
+  "16 Crops irrigated, 5-wasq minimum, just below (652)": { total: 282.6, why: "minimum checked against weight, not value" },
+  // 121 sheep: 2 (300); 60 cattle: 2 tabīʿ (600); 25 camels: 1 bint makhāḍ in kind, not priced.
+  "21 Livestock tier edges (121/60/25)": { total: 25 + 300 + 600, why: "camel schedule from 25 head" },
+  // 400 sheep: 4 (600); 80 cattle: 2 musinnah (1,000); 36 camels: 1 bint labūn in kind.
+  "22 Livestock large herds (400/80/36)": { total: 25 + 600 + 1000, why: "cattle and camel schedules" },
+};
 // Cases where the amount due is unchanged but a reported field changed:
-// the stored fallback prices changed.
+// totalZakatableWealth no longer counts exempt rows, row notes were reworded,
+// and the fallback prices changed.
 const SAME_DUE = new Set<string>([
+  "04 Shafii preset, above gold nisab, RRSP deferred",
+  "08 Jafari preset, Khums + coins + crops + livestock + excluded assets",
+  "09 Custom: silver nisab, worn jewelry exempt, 18kt, dividends only",
+  "11 Custom: RRSP full balance, mixed holdings, TFSA cash-only",
+  "12 Custom: RRSP excluded, employer match excluded",
+  "15 Custom: crypto not zakatable",
+  "17 Crops rain-fed, 5-wasq minimum, at boundary (653)",
+  "18 Crops rain-fed, no minimum (Hanafi), 100",
+  "20 Livestock at minimums (40/30/5)",
   "26 All defaults, calculate.ts default (fallback) prices",
 ]);
 
@@ -366,17 +390,151 @@ describe("hand-verified worked examples", () => {
     expect(r.nisabThreshold).toBeCloseTo(892.5, 10);
     expect(r.totalZakatableWealth).toBeCloseTo(34155.2, 8);
     expect(r.totalZakatDue).toBeCloseTo(853.88, 8);
+    // Ḥanafī and Shāfiʿī totals are unchanged. Mālikī and Ḥanbalī exempt worn
+    // jewellery, which used to dilute the debt deduction:
+    // (20,000 + 15,000 x 30% + 3,000) - 7,200 = 20,300 x 2.5% = 507.50 (was 527.07).
+    const due = (m: (typeof EXAMPLE_SCHOOLS)[number]) =>
+      calculateZakat(exampleChoices(m), EXAMPLE_ASSETS, EXAMPLE_GOLD_PER_GRAM, EXAMPLE_SILVER_PER_GRAM).totalZakatDue;
+    const dueOrig = (m: (typeof EXAMPLE_SCHOOLS)[number]) =>
+      calculateZakatOriginal(exampleChoices(m), EXAMPLE_ASSETS, EXAMPLE_GOLD_PER_GRAM, EXAMPLE_SILVER_PER_GRAM).totalZakatDue;
     for (const m of EXAMPLE_SCHOOLS) {
-      expect(calculateZakat(exampleChoices(m), EXAMPLE_ASSETS, EXAMPLE_GOLD_PER_GRAM, EXAMPLE_SILVER_PER_GRAM)).toEqual(
-        calculateZakatOriginal(exampleChoices(m), EXAMPLE_ASSETS, EXAMPLE_GOLD_PER_GRAM, EXAMPLE_SILVER_PER_GRAM)
-      );
+      if (m === "maliki" || m === "hanbali") expect(due(m)).toBeCloseTo(507.5, 8);
+      else expect(due(m)).toBeCloseTo(dueOrig(m), 8);
     }
   });
 });
 
 // ---------------------------------------------------------------------------
-// 4. Stored fallback prices (refreshed November 2026)
+// 4. Corrections made in November 2026 (each with its source in the commit)
 // ---------------------------------------------------------------------------
+describe("debt deduction base excludes exempt and non-money items", () => {
+  it("20,000 cash, 5,000 debt, exempt worn jewellery: 375, not 412.97", () => {
+    // (20,000 - 5,000) x 2.5% = 375. The exempt jewellery must not dilute the debt.
+    const choices = preset("hanbali"); // jewellery exempt, 12-month debt deduction
+    const r = calculateZakat(choices, assets({ cashOnHand: 20000, creditCardBalance: 5000, goldJewelryWeightGrams: 100 }), 124.81, 1.58);
+    expect(r.totalZakatDue).toBeCloseTo(375, 10);
+    expect(r.totalZakatableWealth).toBeCloseTo(15000, 10);
+  });
+  it("deferred retirement funds do not dilute the debt", () => {
+    const r = calculateZakat(custom("hanafi", { rrspApproach: "defer_to_withdrawal" }), assets({ bankAccounts: 10000, rrsp401kBalance: 90000, creditCardBalance: 2000 }), 100, 1);
+    expect(r.totalZakatDue).toBeCloseTo(200, 10); // (10,000 - 2,000) x 2.5%
+  });
+  it("livestock head counts and crop values are not part of the debt base", () => {
+    const r = calculateZakat(preset("hanafi"), assets({ bankAccounts: 10000, creditCardBalance: 2000, sheepGoats: 40, cropValueOrWeight: 1000 }), 100, 1);
+    // money: (10,000 - 2,000) x 2.5% = 200; sheep 150; crops 10% of 1,000 = 100
+    expect(r.totalZakatDue).toBeCloseTo(450, 10);
+  });
+});
+
+describe("crops and livestock have their own minimum, independent of the money niṣāb", () => {
+  it("40 sheep and 30 cattle are due even when cash is below the niṣāb", () => {
+    const r = calculateZakat(preset("hanafi"), assets({ cashOnHand: 100, sheepGoats: 45, cattle: 35 }), 100, 1);
+    expect(r.meetsNisab).toBe(false);
+    expect(r.totalZakatDue).toBeCloseTo(450, 10); // 1 sheep (150) + 1 tabīʿ (300); cash 0
+  });
+  it("crops above the minimum are due even when cash is below the niṣāb", () => {
+    const r = calculateZakat(preset("shafii"), assets({ cashOnHand: 50, cropValueOrWeight: 4000, cropWeightKg: 900 }), 100, 1);
+    expect(r.meetsNisab).toBe(false);
+    expect(r.totalZakatDue).toBeCloseTo(400, 10);
+  });
+  it("Mālikī: debts reduce money, not crops or livestock", () => {
+    const r = calculateZakat(preset("maliki"), assets({ cashOnHand: 20000, personalLoans: 20000, sheepGoats: 40, cropValueOrWeight: 1000, cropWeightKg: 700 }), 100, 1);
+    expect(r.totalZakatDue).toBeCloseTo(150 + 100, 10);
+  });
+});
+
+describe("crop minimum is checked against weight in kg", () => {
+  it("652 kg exempt, 653 kg due (Sunni presets that apply the minimum)", () => {
+    const below = calculateZakat(preset("shafii"), assets({ cropValueOrWeight: 5000, cropWeightKg: 652 }), 100, 1);
+    const at = calculateZakat(preset("shafii"), assets({ cropValueOrWeight: 5000, cropWeightKg: 653 }), 100, 1);
+    expect(below.totalZakatDue).toBe(0);
+    expect(at.totalZakatDue).toBeCloseTo(500, 10);
+  });
+  it("a money value alone is charged, with a note that the minimum was not checked", () => {
+    const r = calculateZakat(preset("shafii"), assets({ cropValueOrWeight: 600 }), 100, 1);
+    const row = r.breakdown.find((b) => b.category === "Agricultural Produce")!;
+    expect(row.zakatDue).toBeCloseTo(60, 10);
+    expect(row.notes).toMatch(/not checked/);
+  });
+});
+
+describe("cattle schedule (hadith of Muʿādh, Sunan Abī Dāwūd 1576; Sistani ruling 1927)", () => {
+  const table: [number, number, number][] = [
+    // head, tabīʿ, musinnah (collector's choice, Shāfiʿī)
+    [29, -1, -1], [30, 1, 0], [39, 1, 0], [40, 0, 1], [59, 0, 1], [60, 2, 0], [69, 2, 0],
+    [70, 1, 1], [79, 1, 1], [80, 0, 2], [90, 3, 0], [100, 2, 1], [110, 1, 2], [120, 0, 3], [130, 3, 1], [140, 2, 2],
+  ];
+  it.each(table)("%i head", (n, t, m) => {
+    const d = cattleDue(n, "shafii");
+    if (t < 0) { expect(d).toBeNull(); return; }
+    expect({ tabi: d!.tabi, musinna: d!.musinna }).toEqual({ tabi: t, musinna: m });
+  });
+  it("at 120 the owner may give 4 tabīʿ instead (Ḥanbalī, Jaʿfarī)", () => {
+    expect(cattleDue(120, "hanbali")).toMatchObject({ tabi: 4, musinna: 0 });
+    expect(cattleDue(120, "hanbali")!.alternatives).toEqual([{ tabi: 0, musinna: 3 }]);
+    expect(cattleDue(120, "jafari")).toMatchObject({ tabi: 4, musinna: 0 });
+  });
+});
+
+describe("camel schedule (letter of Abū Bakr, Ṣaḥīḥ al-Bukhārī 1454; Sistani ruling 1925)", () => {
+  const pick = (n: number, m: string) => {
+    const d = camelsDue(n, m);
+    return d && { s: d.sheep, bm: d.bintMakhad, bl: d.bintLabun, h: d.hiqqa, j: d.jadhaa };
+  };
+  it("Sunni schedule up to 120", () => {
+    expect(pick(4, "shafii")).toBeNull();
+    expect(pick(5, "shafii")).toEqual({ s: 1, bm: 0, bl: 0, h: 0, j: 0 });
+    expect(pick(24, "shafii")).toEqual({ s: 4, bm: 0, bl: 0, h: 0, j: 0 });
+    expect(pick(25, "shafii")).toEqual({ s: 0, bm: 1, bl: 0, h: 0, j: 0 });
+    expect(pick(36, "shafii")).toEqual({ s: 0, bm: 0, bl: 1, h: 0, j: 0 });
+    expect(pick(46, "shafii")).toEqual({ s: 0, bm: 0, bl: 0, h: 1, j: 0 });
+    expect(pick(61, "shafii")).toEqual({ s: 0, bm: 0, bl: 0, h: 0, j: 1 });
+    expect(pick(76, "shafii")).toEqual({ s: 0, bm: 0, bl: 2, h: 0, j: 0 });
+    expect(pick(91, "shafii")).toEqual({ s: 0, bm: 0, bl: 0, h: 2, j: 0 });
+    expect(pick(120, "hanafi")).toEqual({ s: 0, bm: 0, bl: 0, h: 2, j: 0 });
+  });
+  it("above 120, majority: a bint labūn per 40, a ḥiqqah per 50", () => {
+    expect(pick(121, "hanbali")).toEqual({ s: 0, bm: 0, bl: 3, h: 0, j: 0 });
+    expect(pick(130, "shafii")).toEqual({ s: 0, bm: 0, bl: 2, h: 1, j: 0 });
+    expect(pick(140, "maliki")).toEqual({ s: 0, bm: 0, bl: 1, h: 2, j: 0 });
+    expect(pick(150, "maliki")).toEqual({ s: 0, bm: 0, bl: 0, h: 3, j: 0 });
+    expect(camelsDue(200, "shafii")!.alternatives).toEqual(["5 bint labūn"]);
+  });
+  it("above 120, Ḥanafī: the schedule restarts (istiʾnāf)", () => {
+    expect(pick(124, "hanafi")).toEqual({ s: 0, bm: 0, bl: 0, h: 2, j: 0 });
+    expect(pick(125, "hanafi")).toEqual({ s: 1, bm: 0, bl: 0, h: 2, j: 0 });
+    expect(pick(140, "hanafi")).toEqual({ s: 4, bm: 0, bl: 0, h: 2, j: 0 });
+    expect(pick(145, "hanafi")).toEqual({ s: 0, bm: 1, bl: 0, h: 2, j: 0 });
+    expect(pick(150, "hanafi")).toEqual({ s: 0, bm: 0, bl: 0, h: 3, j: 0 });
+    expect(pick(175, "hanafi")).toEqual({ s: 0, bm: 1, bl: 0, h: 3, j: 0 });
+    expect(pick(186, "hanafi")).toEqual({ s: 0, bm: 0, bl: 1, h: 3, j: 0 });
+    expect(pick(196, "hanafi")).toEqual({ s: 0, bm: 0, bl: 0, h: 4, j: 0 });
+  });
+  it("Jaʿfarī: 25 camels owe five sheep, the first camel is due at 26; 140 is 2 ḥiqqah + 1 bint labūn", () => {
+    expect(pick(25, "jafari")).toEqual({ s: 5, bm: 0, bl: 0, h: 0, j: 0 });
+    expect(pick(26, "jafari")).toEqual({ s: 0, bm: 1, bl: 0, h: 0, j: 0 });
+    expect(pick(140, "jafari")).toEqual({ s: 0, bm: 0, bl: 1, h: 2, j: 0 });
+  });
+  it("camels due in kind are not priced into the cash total", () => {
+    const r = calculateZakat(preset("hanafi"), assets({ camels: 30, cashOnHand: 1000 }), 100, 1);
+    expect(r.totalZakatDue).toBeCloseTo(25, 10);
+    expect(r.breakdown.find((b) => b.category === "Camels")!.notes).toMatch(/in kind/);
+  });
+});
+
+describe("sheep schedule", () => {
+  it("Sunni: 301 to 399 owe three sheep, 400 owe four (Bukhārī 1454)", () => {
+    for (const [n, k] of [[300, 3], [301, 3], [399, 3], [400, 4], [500, 5]] as const) {
+      const r = calculateZakat(preset("hanafi"), assets({ sheepGoats: n }), 100, 1);
+      expect(r.totalZakatDue, String(n)).toBeCloseTo(k * 150, 10);
+    }
+  });
+  it("Jaʿfarī: 301 to 399 owe four sheep (Sistani ruling 1928)", () => {
+    const r = calculateZakat(preset("jafari"), assets({ sheepGoats: 301 }), 100, 1);
+    expect(r.totalZakatDue).toBeCloseTo(4 * 150, 10);
+  });
+});
+
 describe("fallback metal prices", () => {
   it("are dated and come from the same Yahoo futures source as /api/metals", () => {
     expect(FALLBACK_PRICES_AS_OF).toBe("2026-11-13");

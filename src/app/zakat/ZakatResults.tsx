@@ -29,6 +29,11 @@ export function ZakatResults({
     choices.nisabStandard === "gold"
       ? `${GOLD_NISAB_GRAMS_DISPLAY} g of gold at ${fmt(goldPrice)} per gram`
       : `${SILVER_NISAB_GRAMS_DISPLAY} g of silver at ${fmt(silverPrice)} per gram`;
+  // Crops and livestock have their own minimums, so something can be due even
+  // when money is below the niṣāb.
+  const visibleDue = result.breakdown.some(
+    (b) => b.zakatDue > 0 && /^(Agricultural Produce|Sheep & Goats|Cattle|Camels)$/.test(b.category),
+  );
 
   return (
     <div className="space-y-6" aria-live="polite">
@@ -38,7 +43,10 @@ export function ZakatResults({
           {result.meetsNisab ? "Your wealth meets the niṣāb threshold" : "Your wealth is below the niṣāb threshold"}
         </p>
         <p className="text-text-2 mt-1 leading-relaxed">
-          {!result.meetsNisab && "Zakat is not obligatory. "}
+          {!result.meetsNisab &&
+            (visibleDue
+              ? "Zakat on money is not obligatory. Crops and livestock have their own minimums and are shown below. "
+              : "Zakat is not obligatory. ")}
           Niṣāb used: <span className="num font-semibold text-text">{fmt(result.nisabThreshold)}</span> ({choices.nisabStandard}{" "}
           standard: <span className="num">{nisabBasis}</span>).
         </p>

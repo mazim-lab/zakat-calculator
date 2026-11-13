@@ -885,12 +885,24 @@ export function ZakatCalculator() {
               Agricultural Zakat (ʿUshr) is due at harvest, with no waiting period. Enter the value of your harvest
               produce.
             </Lead>
-            <CurrencyInput
-              label="Crop Value / Weight (kg or $)"
+            <Money
+              symbol={currencySymbol}
+              label="Harvest value"
               value={assets.cropValueOrWeight}
               onChange={(v) => updateAsset("cropValueOrWeight", v)}
+              hint="Market value of the harvest. Zakat is a share of this value."
+            />
+            <CurrencyInput
+              label="Harvest weight"
+              value={assets.cropWeightKg ?? 0}
+              onChange={(v) => updateAsset("cropWeightKg", v)}
               prefix=""
-              hint={choices.agriculturalMinimum ? "Minimum threshold: 653 kg (5 wasqs)" : "No minimum threshold per Ḥanafī school"}
+              suffix="kg"
+              hint={
+                choices.agriculturalMinimum
+                  ? "Used only to check the minimum of five wasqs: 653 kg as this calculator counts it."
+                  : "No minimum threshold per Ḥanafī school, so the weight is not needed."
+              }
             />
             <OptionGroup title="Irrigation method">
               <OptionCard

@@ -86,7 +86,10 @@ export interface AssetInputs {
   cryptoValue: number;
 
   // Agricultural
+  /** Market value of the harvest, in the selected currency. */
   cropValueOrWeight: number;
+  /** Harvest weight in kilograms, used only to check the five-wasq minimum. */
+  cropWeightKg?: number;
   isIrrigated: boolean;
 
   // Livestock
