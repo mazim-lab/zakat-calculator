@@ -54,7 +54,7 @@ const FAQ = [
   },
   {
     q: "Who do I pay Zakat al-Fiṭr for?",
-    a: "All schools agree you pay for yourself, your spouse, your minor children and any dependents you support, including infants born before the Eid prayer. The Jaʿfarī school also includes guests who are in your home at sunset on the eve of Eid.",
+    a: "In the Mālikī, Shāfiʿī and Ḥanbalī schools you pay for yourself, your spouse, your minor children and any dependents you must support, including infants born before the Eid prayer. In the Ḥanafī school a husband is not obliged to pay for his wife (she pays her own if she owns the niṣāb), and the duty itself falls only on someone who owns the niṣāb beyond basic needs, while the other schools require only food beyond the day and night of Eid. The Jaʿfarī school also includes guests who are in your home at sunset on the eve of Eid.",
   },
   {
     q: "How much is it per person?",

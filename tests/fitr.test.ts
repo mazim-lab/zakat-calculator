@@ -122,3 +122,15 @@ describe("Zakat al-Fiṭr: hand-verified worked examples", () => {
     expect(c.method).toBe("$12.00 per person (local equivalent)");
   });
 });
+
+describe("Zakat al-Fiṭr: school differences stated, not claimed as agreement (corrected November 2026)", () => {
+  it("eligibility and the wife's fiṭr are attributed per school", async () => {
+    const info = await import("@/lib/zakat-fitr/scholarly-info");
+    const overview = info.FITR_OVERVIEW_INFO.positions;
+    expect(overview.some((p) => /All Schools/.test(p.school))).toBe(false);
+    expect(overview.find((p) => p.school === "Ḥanafī School")!.position).toMatch(/niṣāb/);
+    const who = info.FITR_WHO_INFO.positions;
+    expect(who.find((p) => p.school === "Ḥanafī School")!.position).toMatch(/not obliged to pay for his wife/);
+    expect(who.some((p) => p.school === "All Schools (agreed)")).toBe(false);
+  });
+});

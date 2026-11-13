@@ -51,9 +51,19 @@ export const FIDYA_ELIGIBILITY_INFO: InfoPanel = {
   description: "Fidya is specifically for those with a permanent or long-term inability to fast. The categories differ slightly between schools.",
   positions: [
     {
-      school: "All Schools (agreed)",
-      position: "Elderly persons who cannot fast, and those with chronic/terminal illness",
-      reasoning: "There is consensus that someone who is too old or too ill to fast (with no expectation of recovery) pays fidya instead.",
+      school: "Ḥanafī and Ḥanbalī Schools (and one Shāfiʿī view)",
+      position: "Elderly persons who cannot fast, and those with chronic/terminal illness, must pay fidya",
+      reasoning: "Fidya is obligatory for someone too old or too ill to fast with no expectation of recovery. The Mālikī school holds it is recommended (mustaḥab), not obligatory (Dar al-Ifta al-Misriyya, fatwa 16126).",
+    },
+    {
+      school: "Mālikī School",
+      position: "Fidya for the elderly and the chronically ill is recommended, not obligatory",
+      reasoning: "They are excused from fasting; feeding a poor person for each day is encouraged but not required (Dar al-Ifta al-Misriyya, fatwa 16126).",
+    },
+    {
+      school: "Jaʿfarī School (Sistani)",
+      position: "An elderly person for whom fasting is extremely hard pays one mudd (about 750 g) per day; one who cannot fast at all owes no fidya",
+      reasoning: "Sistani, Islamic Laws ruling 1694.",
     },
     {
       school: "Ḥanafī School",

@@ -37,7 +37,7 @@ const kg = (m: Madhab, f: "wheat" | "barley" | "dates" | "raisins" | "rice") => 
 const FAQ = [
   {
     q: "Who pays fidya?",
-    a: "Someone who cannot fast and has no reasonable expectation of being able to make the fasts up later, such as an elderly person or someone with a chronic or terminal illness. All schools agree on these cases.",
+    a: "Someone who cannot fast and has no reasonable expectation of being able to make the fasts up later, such as an elderly person or someone with a chronic or terminal illness. The Ḥanafī and Ḥanbalī schools, and one Shāfiʿī view, make fidya obligatory in these cases; the Mālikī school makes it recommended, not obligatory. Ayatollah Sistani requires it from an elderly person for whom fasting is extremely hard, but not from one who cannot fast at all.",
   },
   {
     q: "I was ill for a few days. Do I pay fidya?",
@@ -110,7 +110,7 @@ export default function Page() {
           <p>
             Its basis is Qur&apos;an 2:184. In Dr. Mustafa Khattab&apos;s translation (The Clear Quran): &ldquo;For
             those who can only fast with extreme difficulty, compensation can be made by feeding a needy person
-            ˹for every day not fasted˺.&rdquo; Scholars agree it applies to people with a permanent inability to fast.
+            ˹for every day not fasted˺.&rdquo; The schools differ on whether it is obligatory or only recommended for those with a permanent inability to fast; see the eligibility notes below.
           </p>
           <p>
             Fidya is different from kaffārah. Fidya compensates for <strong>inability</strong> to fast. Kaffārah is

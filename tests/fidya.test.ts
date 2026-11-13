@@ -154,3 +154,13 @@ describe("Fidya: hand-verified worked examples", () => {
     expect(c.unitDescription).toBe("$10 per meal (local cost)");
   });
 });
+
+describe("Fidya: eligibility differences stated, not claimed as consensus (corrected November 2026)", () => {
+  it("Mālikī: recommended, not obligatory; Sistani: none if fasting is impossible", async () => {
+    const { FIDYA_ELIGIBILITY_INFO } = await import("@/lib/fidya/scholarly-info");
+    const p = FIDYA_ELIGIBILITY_INFO.positions;
+    expect(p.some((x) => x.school === "All Schools (agreed)")).toBe(false);
+    expect(p.find((x) => x.school === "Mālikī School" && /recommended/.test(x.position))).toBeTruthy();
+    expect(p.find((x) => /Sistani/.test(x.school))!.position).toMatch(/cannot fast at all owes no fidya/);
+  });
+});

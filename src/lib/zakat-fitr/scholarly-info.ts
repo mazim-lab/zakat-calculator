@@ -6,11 +6,18 @@ export const FITR_OVERVIEW_INFO: InfoPanel = {
     "Zakat al-Fiṭr (also called Ṣadaqat al-Fiṭr or Fiṭrānah) is a mandatory charitable payment made at the end of Ramadan, before the Eid al-Fiṭr prayer. It is completely separate from annual Zakat al-Māl (wealth-based Zakat). Its purpose is to purify the fasting person from any shortcomings during Ramadan and to ensure that poor people can also celebrate Eid.",
   positions: [
     {
-      school: "All Schools (agreed)",
+      school: "Mālikī, Shāfiʿī and Ḥanbalī Schools",
       position:
-        "Zakat al-Fiṭr is obligatory (wājib) on every Muslim who has enough food/wealth for themselves and their dependents on the day of Eid",
+        "Zakat al-Fiṭr is obligatory (wājib) on every Muslim who has food left over, beyond what they and their dependents need for the day and night of Eid",
       reasoning:
-        "Based on the hadith of Ibn ʿUmar: 'The Messenger of Allah ﷺ made Zakat al-Fiṭr obligatory (one ṣāʿ of dates or one ṣāʿ of barley) on every Muslim, slave or free, male or female, young or old.' (Bukhari & Muslim)",
+        "Based on the hadith of Ibn ʿUmar: 'The Messenger of Allah ﷺ made Zakat al-Fiṭr obligatory (one ṣāʿ of dates or one ṣāʿ of barley) on every Muslim, slave or free, male or female, young or old.' (Bukhari & Muslim). The three schools' texts set the threshold at food beyond one day and night (Islamweb fatwa 57063).",
+    },
+    {
+      school: "Ḥanafī School",
+      position:
+        "Zakat al-Fiṭr is obligatory only on someone who owns the niṣāb (the Zakat threshold) beyond their basic needs and debts",
+      reasoning:
+        "Al-Durr al-Mukhtār sets the condition as owning a niṣāb surplus to one's basic needs (Dar al-Ifta al-Misriyya, fatwa 12877). Someone below that may still give it voluntarily.",
     },
   ],
   note: "This is NOT the same as your annual Zakat (Zakat al-Māl). Zakat al-Māl is 2.5% of your wealth paid once a year. Zakat al-Fiṭr is a fixed per-person amount paid once at the end of Ramadan, regardless of your total wealth.",
@@ -84,11 +91,18 @@ export const FITR_WHO_INFO: InfoPanel = {
   description: "Zakat al-Fiṭr is paid per person, not per household. You pay for yourself and every dependent.",
   positions: [
     {
-      school: "All Schools (agreed)",
+      school: "Mālikī, Shāfiʿī and Ḥanbalī Schools",
       position:
         "You pay for yourself, your spouse, your minor children, and any dependents you are financially responsible for.",
       reasoning:
-        "The head of household pays on behalf of all members. This includes infants born before the Eid prayer and anyone you financially support.",
+        "The head of household pays on behalf of those he must support. This includes infants born before the Eid prayer.",
+    },
+    {
+      school: "Ḥanafī School",
+      position:
+        "You pay for yourself and your minor children. A husband is not obliged to pay for his wife; she pays her own if she owns the niṣāb, though he may pay it for her.",
+      reasoning:
+        "The Ḥanafī school ties the duty to full guardianship (wilāyah), which a husband does not have over his wife, while the majority tie it to the duty of maintenance (Dar al-Ifta al-Misriyya, fatwa 18439).",
     },
     {
       school: "Jaʿfarī School (additional)",
