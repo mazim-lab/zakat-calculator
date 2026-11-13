@@ -16,6 +16,7 @@ import {
 import { GOLD_NISAB_GRAMS_DISPLAY, SILVER_NISAB_GRAMS_DISPLAY } from "@/lib/zakat/page-math";
 import { tidyDash } from "@/lib/zakat/display";
 import { ZakatCalculator } from "./ZakatCalculator";
+import { Rosette } from "@/components/ornament";
 
 const PATH = "/zakat";
 const TITLE = "Zakat Calculator";
@@ -165,11 +166,11 @@ export default function ZakatPage() {
       <Section id="how-it-works" title="How this calculator works">
         <ol className="list-none p-0 m-0 grid gap-3">
           {HOW_STEPS.map((s, i) => (
-            <li key={s.name} className="card p-4 sm:p-5 flex gap-4">
-              <span className="mono text-[13px] font-semibold text-text-3 pt-0.5">{String(i + 1).padStart(2, "0")}</span>
+            <li key={s.name} className="card p-5 sm:p-6 flex gap-4 hue-indigo">
+              <Rosette n={i + 1} state="done" size={36} />
               <div>
-                <p className="font-semibold text-text">{s.name}</p>
-                <p className="mt-1 text-[15px] text-text-2 leading-relaxed">{s.text}</p>
+                <p className="font-bold text-[19px] text-text">{s.name}</p>
+                <p className="mt-1 text-[17px] text-text-2 leading-relaxed">{s.text}</p>
               </div>
             </li>
           ))}

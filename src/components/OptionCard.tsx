@@ -27,15 +27,15 @@ export function OptionCard({ selected, onClick, title, subtitle, description, ba
       <div className="relative">
         <button type="button" className="option" aria-pressed={selected} onClick={onClick}>
           <span className="option-radio" aria-hidden="true" />
-          <span className={`flex-1 min-w-0 ${description ? "pe-10" : ""}`}>
-            <span className="block font-semibold text-[15.5px] text-text leading-snug">{title}</span>
+          <span className={`flex-1 min-w-0 ${description ? "pe-11" : ""}`}>
+            <span className="block font-bold text-[17.5px] text-text leading-snug">{title}</span>
             {badge && (
-              <span className="chip chip-amber mt-1.5 !whitespace-normal">
+              <span className="chip chip-amber mt-2 !whitespace-normal">
                 <span {...arabicProps(badge)}>{badge}</span>
               </span>
             )}
             {subtitle && (
-              <span className="block text-sm text-text-2 mt-0.5 leading-snug">
+              <span className="block text-[16px] text-text-2 mt-1 leading-snug">
                 <span {...arabicProps(subtitle)}>{subtitle}</span>
               </span>
             )}
@@ -45,7 +45,7 @@ export function OptionCard({ selected, onClick, title, subtitle, description, ba
           <button
             type="button"
             onClick={() => setShowInfo((s) => !s)}
-            className="absolute top-2.5 end-2.5 w-9 h-9 rounded-full grid place-items-center border border-border bg-surface text-text-2 hover:text-text hover:border-border-strong cursor-pointer"
+            className="absolute top-2 end-2 w-11 h-11 rounded-full grid place-items-center text-text-2 hover:text-indigo-text hover:bg-surface-2 cursor-pointer"
             aria-expanded={showInfo}
             aria-controls={infoId}
             aria-label={`More about: ${title}`}
@@ -58,11 +58,11 @@ export function OptionCard({ selected, onClick, title, subtitle, description, ba
         )}
       </div>
       {description && (
-        <div id={infoId} hidden={!showInfo} className="fade-in mx-1 mt-1.5 mb-1 panel !py-3 text-sm text-text-2 leading-relaxed">
+        <div id={infoId} hidden={!showInfo} className="fade-in mx-1 mt-2 mb-1 panel !py-3 text-[16px] text-text-2 leading-relaxed ui">
           {description}
         </div>
       )}
-      {children && <div className="mt-2 ms-8">{children}</div>}
+      {children && <div className="mt-2 ms-9">{children}</div>}
     </div>
   );
 }

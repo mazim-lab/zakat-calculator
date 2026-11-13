@@ -221,7 +221,7 @@ export default function AboutPage() {
             <tbody>
               {SETTING_LABELS.map((row) => (
                 <tr key={row.key}>
-                  <th scope="row" className="!normal-case !tracking-normal !text-[14px] !font-semibold !text-text !bg-surface">
+                  <th scope="row" className="!normal-case !tracking-normal !text-[16.5px] !font-semibold !text-text !bg-surface">
                     {row.label}
                   </th>
                   {SCHOOL_COLUMNS.map((s) => {

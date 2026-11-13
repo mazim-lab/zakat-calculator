@@ -13,6 +13,7 @@ import { calculateFitr } from "@/lib/zakat-fitr/calculate";
 import { InfoAccordion } from "@/components/InfoAccordion";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { OptionCard } from "@/components/OptionCard";
+import { Niche, Stepper } from "@/components/ornament";
 import { money, count } from "@/components/format";
 
 const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
@@ -43,9 +44,9 @@ function Arrow({ back = false }: { back?: boolean }) {
 
 function Row({ label, children, small = false }: { label: string; children: React.ReactNode; small?: boolean }) {
   return (
-    <div className="flex justify-between gap-4 py-2.5 border-t border-border first:border-t-0">
-      <dt className="text-text-2 text-[15px]">{label}</dt>
-      <dd className={`m-0 font-semibold text-text text-end ${small ? "text-sm max-w-[60%]" : "text-[15px]"}`}>{children}</dd>
+    <div className="flex justify-between gap-4 py-3 border-t border-border first:border-t-0">
+      <dt className="text-text-2 text-[17px]">{label}</dt>
+      <dd className={`m-0 font-bold text-text text-end ${small ? "text-[16px] max-w-[60%]" : "text-[17.5px]"}`}>{children}</dd>
     </div>
   );
 }
@@ -86,35 +87,17 @@ export function ZakatFitrCalculator() {
     headingRef.current?.focus();
   }, [step]);
 
-  const headingClass = "text-[22px] sm:text-[24px] font-[650] text-text outline-none";
+  const headingClass = "text-[28px] sm:text-[34px] font-bold leading-tight text-text outline-none";
 
   return (
     <div className="hue-cyan">
       {/* Progress */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between gap-3 mb-2">
-          <p className="text-sm text-text-2 m-0">
-            Step <span className="num">{step + 1}</span> of <span className="num">{STEPS.length}</span>: {STEP_LABELS[currentStep]}
-          </p>
-          <ol className="flex gap-1.5 list-none p-0 m-0" aria-label="Progress">
-            {STEPS.map((s, i) => (
-              <li
-                key={s}
-                aria-label={`Step ${i + 1}: ${STEP_LABELS[s]}`}
-                aria-current={i === step ? "step" : undefined}
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: i <= step ? "var(--hue)" : "var(--border-strong)" }}
-              />
-            ))}
-          </ol>
-        </div>
-        <div className="progress-track" aria-hidden="true">
-          <div className="progress-fill" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
-        </div>
+      <div className="mb-6">
+        <Stepper labels={STEPS.map((s) => STEP_LABELS[s])} current={step} />
       </div>
 
       {/* Steps */}
-      <div className="card hue-stripe p-5 sm:p-7 mb-5">
+      <div className="card p-5 sm:p-9 mb-6">
         <div key={currentStep} className="fade-in">
           {/* Intro */}
           {currentStep === "intro" && (
@@ -122,7 +105,7 @@ export function ZakatFitrCalculator() {
               <h2 ref={headingRef} tabIndex={-1} className={headingClass}>
                 What is Zakat al-Fiṭr?
               </h2>
-              <div className="space-y-4 text-[16px] text-text-2 leading-relaxed">
+              <div className="space-y-4 text-[18.5px] text-text-2 leading-relaxed">
                 <p>
                   <strong className="text-text">Zakat al-Fiṭr</strong> (<span lang="ar" dir="rtl" className="ar">زكاة الفطر</span>, also called{" "}
                   <strong className="text-text">Fiṭrānah</strong> or <strong className="text-text">Ṣadaqat al-Fiṭr</strong>) is a
@@ -151,7 +134,7 @@ export function ZakatFitrCalculator() {
               <h2 ref={headingRef} tabIndex={-1} id="fitr-school-h" className={headingClass}>
                 Select your school of jurisprudence
               </h2>
-              <p className="text-[16px] text-text-2">
+              <p className="text-[18.5px] text-text-2">
                 Schools differ on the amount of food required and whether cash payment is acceptable.
               </p>
               <Link href="/find-your-school" className="btn btn-ghost w-full sm:w-auto justify-between">
@@ -180,7 +163,7 @@ export function ZakatFitrCalculator() {
               <h2 ref={headingRef} tabIndex={-1} className={headingClass}>
                 Your household
               </h2>
-              <p className="text-[16px] text-text-2">
+              <p className="text-[18.5px] text-text-2">
                 You pay Zakat al-Fiṭr for yourself and every person you are financially responsible for, including
                 infants.
               </p>
@@ -221,11 +204,11 @@ export function ZakatFitrCalculator() {
                 />
               </div>
               <div className="panel flex items-center justify-between" aria-live="polite">
-                <p className="text-sm text-text-2 m-0">Total people</p>
-                <p className="num text-[28px] font-semibold text-text m-0">{totalPeople}</p>
+                <p className="text-text-2 m-0">Total people</p>
+                <p className="num text-[32px] font-bold text-text m-0">{totalPeople}</p>
               </div>
               {totalPeople <= 0 && (
-                <p className="text-sm text-text-2 m-0">Enter at least one person to continue.</p>
+                <p className="text-text-2 m-0">Enter at least one person to continue.</p>
               )}
             </div>
           )}
@@ -236,10 +219,10 @@ export function ZakatFitrCalculator() {
               <h2 ref={headingRef} tabIndex={-1} id="fitr-cost-h" className={headingClass}>
                 Amount per person
               </h2>
-              <p className="text-[16px] text-text-2">Choose how you would like to calculate the per-person amount.</p>
+              <p className="text-[18.5px] text-text-2">Choose how you would like to calculate the per-person amount.</p>
               {!fitrInfo.cashPermitted && (
-                <div className="callout callout-warning text-text-2 text-sm">
-                  <p className="m-0 font-semibold text-text">
+                <div className="callout callout-warning text-text-2">
+                  <p className="m-0 font-bold text-text">
                     The {madhabLabel} school classically requires giving actual food, not cash.
                   </p>
                   {fitrInfo.modernCashNote && <p className="mt-1.5 mb-0">{fitrInfo.modernCashNote}</p>}
@@ -260,7 +243,7 @@ export function ZakatFitrCalculator() {
                 />
               </div>
 
-              <hr className="border-0 border-t border-border my-1" />
+              <hr className="border-0 border-t-[3px] border-double border-border my-2" />
 
               {!useWeight ? (
                 <CurrencyInput
@@ -272,11 +255,11 @@ export function ZakatFitrCalculator() {
               ) : (
                 <div className="space-y-4">
                   <div className="panel">
-                    <p className="text-sm text-text-2 m-0">Required per person:</p>
+                    <p className="text-text-2 m-0">Required per person:</p>
                     <p className="font-semibold text-text m-0 mt-0.5">
                       <span className="num">{fitrInfo.weightKg}</span> kg of staple food
                     </p>
-                    <p className="text-[13px] text-text-2 m-0 mt-1">{fitrInfo.measure}</p>
+                    <p className="text-[15.5px] text-text-2 m-0 mt-1">{fitrInfo.measure}</p>
                   </div>
                   <CurrencyInput
                     label="Price per kilogram of staple food"
@@ -296,18 +279,16 @@ export function ZakatFitrCalculator() {
                 Your Zakat al-Fiṭr
               </h2>
 
-              <div className="text-center py-4 rounded-[10px]" style={{ background: "var(--hue-bg)" }}>
-                <p className="text-sm text-text-2 m-0 mb-1">Total due</p>
-                <p className="num text-[clamp(28px,10vw,40px)] sm:text-[48px] font-semibold leading-tight m-0 whitespace-nowrap" style={{ color: "var(--hue-text)" }}>
-                  {money(result.total)}
-                </p>
-                <p className="text-sm text-text-2 m-0 mt-2">
+              <Niche label="Total due">
+                <p className="result-lede m-0">Total due</p>
+                <p className="result-figure m-0 mt-2">{money(result.total)}</p>
+                <p className="text-[17.5px] text-text-2 m-0 mt-3">
                   <span className="num">{money(result.perPerson)}</span> × <span className="num">{count(result.totalPeople)}</span>{" "}
                   {result.totalPeople === 1 ? "person" : "people"}
                 </p>
-              </div>
+              </Niche>
 
-              <dl className="m-0">
+              <dl className="m-0 card px-5 sm:px-7 py-1">
                 <Row label="School of jurisprudence">{madhabLabel}</Row>
                 <Row label="People in household">
                   <span className="num">{count(result.totalPeople)}</span>
@@ -322,7 +303,7 @@ export function ZakatFitrCalculator() {
                   {fitrInfo.cashPermitted ? (
                     <span className="text-success-ink">Yes</span>
                   ) : (
-                    <span className="text-warning-ink text-sm">Classically no, but widely accepted via charities</span>
+                    <span className="text-warning-ink text-[16px]">Classically no, but widely accepted via charities</span>
                   )}
                 </Row>
                 <Row label="Classical measure" small>
@@ -330,13 +311,13 @@ export function ZakatFitrCalculator() {
                 </Row>
               </dl>
 
-              <div className="callout callout-info text-sm text-text-2 leading-relaxed">
+              <div className="callout callout-info text-text-2 leading-relaxed">
                 <strong className="text-text">When to pay:</strong> Before the Eid al-Fiṭr prayer. Most scholars recommend
                 paying a few days early so recipients can use it for Eid preparations. Paying after the Eid prayer is
                 considered a regular charity (ṣadaqah), not Zakat al-Fiṭr.
               </div>
 
-              <div className="callout callout-info text-sm text-text-2 leading-relaxed">
+              <div className="callout callout-info text-text-2 leading-relaxed">
                 <strong className="text-text">How to pay:</strong> Give directly to a poor person, or through your local
                 mosque or an Islamic charity that distributes food or funds before Eid. Many organizations accept Zakat
                 al-Fiṭr online and distribute it in communities where it is most needed.

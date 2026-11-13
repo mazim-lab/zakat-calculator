@@ -48,12 +48,11 @@ export function PricePanel({
   const ratesAsOf = ratesUpdated ? formatDateTime(new Date(ratesUpdated)) : "";
 
   return (
-    <div className="card p-4 sm:p-5" aria-live="polite">
+    <div className="card p-5 sm:p-6 bg-surface-featured" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="eyebrow">Prices used in this calculation</p>
         {isLive ? (
           <span className="chip chip-green">
-            <span className="hue-dot" style={{ background: "var(--success)" }} aria-hidden="true" />
             Live market price
           </span>
         ) : status === "loading" ? (
@@ -63,20 +62,20 @@ export function PricePanel({
         )}
       </div>
 
-      <dl className="mt-3 grid grid-cols-2 gap-3 m-0">
+      <dl className="mt-4 grid grid-cols-2 gap-4 m-0">
         <div>
-          <dt className="text-[13.5px] text-text-2">Gold, per gram</dt>
-          <dd className="m-0 num text-[18px] font-semibold text-text">{fmt(goldPrice)}</dd>
-          {!compact && <dd className="m-0 num text-[13px] text-text-2">{fmt(goldPricePerOunce(goldPrice))} per troy oz</dd>}
+          <dt className="text-[16px] text-text-2 ui">Gold, per gram</dt>
+          <dd className="m-0 num text-[24px] font-bold text-text">{fmt(goldPrice)}</dd>
+          {!compact && <dd className="m-0 num text-[15.5px] text-text-2">{fmt(goldPricePerOunce(goldPrice))} per troy oz</dd>}
         </div>
         <div>
-          <dt className="text-[13.5px] text-text-2">Silver, per gram</dt>
-          <dd className="m-0 num text-[18px] font-semibold text-text">{fmt(silverPrice)}</dd>
+          <dt className="text-[16px] text-text-2 ui">Silver, per gram</dt>
+          <dd className="m-0 num text-[24px] font-bold text-text">{fmt(silverPrice)}</dd>
         </div>
       </dl>
 
       {/* Fixed-height status line so the panel does not jump when prices arrive. */}
-      <p className="mt-3 text-[13.5px] text-text-2 leading-relaxed min-h-[2.6em]">
+      <p className="mt-3 text-[16px] text-text-2 leading-relaxed min-h-[2.6em] ui">
         {isLive && (
           <>
             Live market price{asOf ? <>, as of <span className="num">{asOf}</span></> : null}. Source: Yahoo Finance quotes for
@@ -90,8 +89,8 @@ export function PricePanel({
       </p>
 
       {!isLive && (
-        <div className="callout callout-warning mt-2 text-[14px]">
-          <p className="font-semibold text-text">These prices are placeholders</p>
+        <div className="callout callout-warning mt-2 text-[16.5px]">
+          <p className="font-bold text-text">These prices are placeholders</p>
           <p className="text-text-2 mt-1 leading-relaxed">
             These are fallback prices from {FALLBACK_PRICES_AS_OF_LABEL} (Yahoo Finance gold and silver futures) and may
             be out of date. Gold and silver prices
@@ -101,7 +100,7 @@ export function PricePanel({
       )}
 
       {notConverted && (
-        <div className="callout callout-warning mt-2 text-[14px]">
+        <div className="callout callout-warning mt-2 text-[16.5px]">
           <p className="text-text-2 leading-relaxed">
             Exchange rates have not loaded, so these prices are still in US dollars, not {currency}. The result will be
             wrong until rates load. You can switch the currency to USD, or try again later.
@@ -110,7 +109,7 @@ export function PricePanel({
       )}
 
       {!notConverted && currency !== "USD" && exchangeRates && (
-        <p className="mt-2 text-[13px] text-text-2">
+        <p className="mt-2 text-[15.5px] text-text-2 ui">
           Converted at 1 USD = <span className="num">{exchangeRates[currency]?.toFixed(4)}</span> {currency}
           {ratesAsOf ? <>, rate as of <span className="num">{ratesAsOf}</span></> : null}.
         </p>

@@ -129,9 +129,9 @@ export function LanguageSwitcher() {
         Translate this page (machine translation)
       </label>
       <svg
-        className="pointer-events-none absolute top-1/2 -translate-y-1/2 start-2.5 text-text-3"
-        width="15"
-        height="15"
+        className="pointer-events-none absolute top-1/2 -translate-y-1/2 start-[14px] text-text-2"
+        width="17"
+        height="17"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -145,7 +145,7 @@ export function LanguageSwitcher() {
         id="lang-select"
         defaultValue="en"
         onChange={(e) => handleChange(e.target.value)}
-        className="!min-h-[40px] !w-[52px] !text-transparent sm:!text-text-2 sm:!w-[150px] !py-1.5 !ps-8 !text-[14px]"
+        className="!min-h-[44px] !w-[46px] !rounded-full max-sm:!bg-none max-sm:!px-0 !text-transparent sm:!text-text-2 sm:!w-[158px] !py-1.5 sm:!ps-9 !text-[15.5px] !border-border"
       >
         {LANGUAGES.map((l) => (
           <option key={l.code} value={l.code} lang={l.code} className="text-text bg-surface">

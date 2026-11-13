@@ -5,7 +5,7 @@ import { useSyncExternalStore } from "react";
 type Mode = "light" | "dark" | "system";
 const KEY = "ih-theme";
 const ORDER: Mode[] = ["system", "light", "dark"];
-const LABEL: Record<Mode, string> = { system: "System theme", light: "Light theme", dark: "Dark theme" };
+const LABEL: Record<Mode, string> = { system: "Auto theme (follows your device)", light: "Day theme", dark: "Night theme" };
 
 function apply(mode: Mode) {
   const dark = mode === "dark" || (mode === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -34,7 +34,9 @@ function getSnapshot(): Mode {
   return m === "light" || m === "dark" ? m : "system";
 }
 
-/** Three-way theme toggle (system / light / dark), as on FAEConf. */
+const WORD: Record<Mode, string> = { system: "Auto", light: "Day", dark: "Night" };
+
+/** Theme control: a pill that cycles Auto, Day and Night. Day is an eight-ray sun, Night a restrained crescent. */
 export function ThemeToggle() {
   const mode = useSyncExternalStore(subscribe, getSnapshot, () => "system" as Mode);
 
@@ -43,7 +45,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className="btn btn-ghost !min-h-[40px] !w-10 !p-0"
+      className="theme-pill"
       onClick={() => {
         try {
           localStorage.setItem(KEY, next);
@@ -54,21 +56,26 @@ export function ThemeToggle() {
       aria-label={`${LABEL[mode]}. Switch to ${LABEL[next].toLowerCase()}`}
       title={LABEL[mode]}
     >
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        {mode === "light" && (
-          <>
-            <circle cx="12" cy="12" r="4" />
-            <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-          </>
-        )}
-        {mode === "dark" && <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />}
-        {mode === "system" && (
-          <>
-            <rect x="2" y="4" width="20" height="13" rx="2" />
-            <path d="M8 21h8M12 17v4" />
-          </>
-        )}
-      </svg>
+      <span className="theme-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          {mode === "light" && (
+            <>
+              <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none" />
+              <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1" />
+            </>
+          )}
+          {mode === "dark" && <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a6.8 6.8 0 0 0 10.5 10.5z" fill="currentColor" stroke="none" />}
+          {mode === "system" && (
+            <>
+              <circle cx="12" cy="12" r="8" />
+              <path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none" />
+            </>
+          )}
+        </svg>
+      </span>
+      <span className="theme-word" aria-hidden="true">
+        {WORD[mode]}
+      </span>
     </button>
   );
 }

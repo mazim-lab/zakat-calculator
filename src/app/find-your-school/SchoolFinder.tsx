@@ -88,7 +88,7 @@ export default function SchoolFinder() {
   const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
 
   return (
-    <div className="hue-neutral card hue-stripe p-5 sm:p-7">
+    <div className="hue-neutral card p-5 sm:p-9">
       {!result && (
           <div key={question.id} className="fade-in">
             <div className="mb-6">
@@ -102,7 +102,7 @@ export default function SchoolFinder() {
               >
                 <div className="progress-fill" style={{ width: `${progress}%` }} />
               </div>
-              <p className="mt-2 text-[13px] text-text-2">
+              <p className="mt-3 text-[16px] text-text-2 ui">
                 Question <span className="num">{currentQ + 1}</span> of <span className="num">{QUESTIONS.length}</span>
               </p>
             </div>
@@ -111,13 +111,13 @@ export default function SchoolFinder() {
               id={headingId}
               ref={headingRef}
               tabIndex={-1}
-              className="text-[21px] sm:text-[24px] font-[650] tracking-[-0.015em] outline-none"
+              className="text-[28px] sm:text-[34px] font-bold leading-tight outline-none"
             >
               {question.question}
             </h2>
-            {question.subtitle && <p className="mt-2 text-[15px] text-text-2 leading-relaxed">{question.subtitle}</p>}
+            {question.subtitle && <p className="mt-3 text-[18.5px] text-text-2 leading-relaxed">{question.subtitle}</p>}
 
-            <div role="group" aria-labelledby={headingId} className="mt-5 grid gap-2">
+            <div role="group" aria-labelledby={headingId} className="mt-6 grid gap-3">
               {question.options.map((opt) => {
                 const selected = answers[question.id] === opt.value;
                 return (
@@ -130,8 +130,8 @@ export default function SchoolFinder() {
                   >
                     <span className="option-radio" aria-hidden="true" />
                     <span>
-                      <span className="block font-semibold text-text">{opt.label}</span>
-                      {opt.detail && <span className="block mt-0.5 text-[14px] text-text-2 leading-snug">{opt.detail}</span>}
+                      <span className="block font-bold text-[17.5px] text-text">{opt.label}</span>
+                      {opt.detail && <span className="block mt-1 text-[16px] text-text-2 leading-snug">{opt.detail}</span>}
                     </span>
                   </button>
                 );
@@ -155,11 +155,11 @@ export default function SchoolFinder() {
             <h2
               ref={resultRef}
               tabIndex={-1}
-              className="mt-2 text-[28px] sm:text-[34px] font-bold tracking-[-0.025em] leading-tight flex flex-wrap items-baseline gap-x-3 outline-none"
+              className="mt-2 text-[34px] sm:text-[44px] font-bold leading-tight flex flex-wrap items-baseline gap-x-4 outline-none"
             >
               <span>{result.school}</span>
               {result.schoolAr && (
-                <span lang="ar" dir="rtl" className="ar text-[24px] sm:text-[28px] font-normal text-text-2">
+                <span lang="ar" dir="rtl" className="ar text-[32px] sm:text-[40px] font-normal text-indigo-text">
                   {result.schoolAr}
                 </span>
               )}
@@ -168,7 +168,7 @@ export default function SchoolFinder() {
               <span className={`chip ${CONFIDENCE[result.confidence].chip}`}>{CONFIDENCE[result.confidence].label}</span>
             </p>
 
-            <p className="mt-5 text-[16.5px] text-text-2 leading-relaxed max-w-[65ch]">{result.explanation}</p>
+            <p className="mt-5 text-[18.5px] text-text-2 leading-relaxed max-w-[65ch]">{result.explanation}</p>
 
             <div className="callout callout-info mt-6">
               <p className="text-text-2 leading-relaxed">
@@ -179,15 +179,15 @@ export default function SchoolFinder() {
               </p>
             </div>
 
-            <h3 className="mt-8 text-[17px] font-semibold">Now try our calculators</h3>
-            <ul className="mt-3 grid gap-2 sm:grid-cols-2 list-none p-0 m-0">
+            <h3 className="mt-10 text-[24px] font-bold">Now try our calculators</h3>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2 list-none p-0 m-0">
               {TOOLS.map((t) => (
                 <li key={t.href}>
                   <Link
                     href={t.href}
-                    className={`card card-link hue-${t.hue} flex items-center gap-3 px-4 py-3 min-h-[44px] font-semibold text-text`}
+                    className={`card card-link hue-${t.hue} flex items-center gap-3 px-5 py-4 min-h-[56px] font-bold text-[18px] text-text`}
                   >
-                    <span className="hue-dot" aria-hidden="true" />
+                    <span className="hue-star" aria-hidden="true" />
                     {t.title}
                   </Link>
                 </li>

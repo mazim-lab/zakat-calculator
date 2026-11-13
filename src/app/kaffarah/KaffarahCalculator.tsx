@@ -13,6 +13,7 @@ import {
 import { InfoAccordion } from "@/components/InfoAccordion";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { OptionCard } from "@/components/OptionCard";
+import { Niche, Rosette, Stepper } from "@/components/ornament";
 
 const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
   { value: "hanafi", label: "Ḥanafī", labelAr: "حنفي" },
@@ -42,9 +43,9 @@ function Arrow({ back = false }: { back?: boolean }) {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex justify-between gap-4 py-2.5 border-t border-border first:border-t-0">
-      <dt className="text-text-2 text-[15px]">{label}</dt>
-      <dd className="m-0 font-semibold text-text text-end text-[15px]">{children}</dd>
+    <div className="flex justify-between gap-4 py-3 border-t border-border first:border-t-0">
+      <dt className="text-text-2 text-[17px]">{label}</dt>
+      <dd className="m-0 font-bold text-text text-end text-[17.5px]">{children}</dd>
     </div>
   );
 }
@@ -78,35 +79,17 @@ export function KaffarahCalculator() {
     headingRef.current?.focus();
   }, [step]);
 
-  const headingClass = "text-[22px] sm:text-[24px] font-[650] text-text outline-none";
+  const headingClass = "text-[28px] sm:text-[34px] font-bold leading-tight text-text outline-none";
 
   return (
     <div className="hue-amber">
       {/* Progress */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between gap-3 mb-2">
-          <p className="text-sm text-text-2 m-0">
-            Step <span className="num">{step + 1}</span> of <span className="num">{STEPS.length}</span>: {STEP_LABELS[currentStep]}
-          </p>
-          <ol className="flex gap-1.5 list-none p-0 m-0" aria-label="Progress">
-            {STEPS.map((s, i) => (
-              <li
-                key={s}
-                aria-label={`Step ${i + 1}: ${STEP_LABELS[s]}`}
-                aria-current={i === step ? "step" : undefined}
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: i <= step ? "var(--hue)" : "var(--border-strong)" }}
-              />
-            ))}
-          </ol>
-        </div>
-        <div className="progress-track" aria-hidden="true">
-          <div className="progress-fill" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
-        </div>
+      <div className="mb-6">
+        <Stepper labels={STEPS.map((s) => STEP_LABELS[s])} current={step} />
       </div>
 
       {/* Steps */}
-      <div className="card hue-stripe p-5 sm:p-7 mb-5">
+      <div className="card p-5 sm:p-9 mb-6">
         <div key={currentStep} className="fade-in">
           {/* Intro */}
           {currentStep === "intro" && (
@@ -114,7 +97,7 @@ export function KaffarahCalculator() {
               <h2 ref={headingRef} tabIndex={-1} className={headingClass}>
                 What is kaffārah?
               </h2>
-              <div className="space-y-4 text-[16px] text-text-2 leading-relaxed">
+              <div className="space-y-4 text-[18.5px] text-text-2 leading-relaxed">
                 <p>
                   <strong className="text-text">Kaffārah</strong> (<span lang="ar" dir="rtl" className="ar">كَفَّارَة</span>,
                   &ldquo;expiation&rdquo; or &ldquo;atonement&rdquo;) is a prescribed penalty in Islamic law for specific
@@ -140,7 +123,7 @@ export function KaffarahCalculator() {
               <h2 ref={headingRef} tabIndex={-1} id="kaff-type-h" className={headingClass}>
                 What happened?
               </h2>
-              <p className="text-[16px] text-text-2">Select the type of violation that requires kaffārah.</p>
+              <p className="text-[18.5px] text-text-2">Select the type of violation that requires kaffārah.</p>
               <div role="group" aria-labelledby="kaff-type-h" className="space-y-2">
                 {KAFFARAH_TYPES.map((kt) => (
                   <OptionCard
@@ -162,7 +145,7 @@ export function KaffarahCalculator() {
               <h2 ref={headingRef} tabIndex={-1} id="kaff-school-h" className={headingClass}>
                 Select your school of jurisprudence
               </h2>
-              <p className="text-[16px] text-text-2">
+              <p className="text-[18.5px] text-text-2">
                 Requirements for kaffārah vary significantly between schools, especially for broken fasts.
               </p>
               <Link href="/find-your-school" className="btn btn-ghost w-full sm:w-auto justify-between">
@@ -191,7 +174,7 @@ export function KaffarahCalculator() {
               <h2 ref={headingRef} tabIndex={-1} className={headingClass}>
                 Cost estimate
               </h2>
-              <p className="text-[16px] text-text-2">If the feeding option applies, we can estimate the monetary cost.</p>
+              <p className="text-[18.5px] text-text-2">If the feeding option applies, we can estimate the monetary cost.</p>
               <CurrencyInput
                 label="Cost of one meal in your area"
                 value={costPerMeal}
@@ -226,10 +209,10 @@ export function KaffarahCalculator() {
               {/* Shāfiʿī / Ḥanbalī eating or drinking notice */}
               {kaffarahType === "broken_fast" && (madhab === "shafii" || madhab === "hanbali") && (
                 <div className="callout callout-warning">
-                  <p className="text-sm font-semibold text-text m-0 mb-1">
+                  <p className="font-bold text-text m-0 mb-1">
                     Important: did you break your fast by eating or drinking?
                   </p>
-                  <p className="text-sm text-text-2 m-0">
+                  <p className="text-text-2 m-0">
                     In the {madhab === "shafii" ? "Shāfiʿī" : "Ḥanbalī"} school, kaffārah is only required for breaking a
                     fast by <strong className="text-text">sexual intercourse</strong>. If you deliberately ate or drank,
                     you owe only <strong className="text-text">qaḍāʾ</strong> (making up the day) and sincere repentance,{" "}
@@ -241,17 +224,15 @@ export function KaffarahCalculator() {
 
               {/* Feeding cost estimate (only where feeding is one of the options) */}
               {hasFeedingOption(kaffarahType, madhab) ? (
-                <div className="text-center py-4 rounded-[10px]" style={{ background: "var(--hue-bg)" }}>
-                  <p className="text-sm text-text-2 m-0 mb-1">{kaffarahEstimateLabel(instances)}</p>
-                  <p className="num text-[36px] sm:text-[44px] font-semibold leading-tight m-0" style={{ color: "var(--hue-text)" }}>
-                    {kaffarahTotalText(feedingEstimate, instances)}
-                  </p>
-                  <p className="num text-sm text-text-2 m-0 mt-1">{kaffarahBreakdownText(feedingEstimate, costPerMeal, instances)}</p>
-                </div>
+                <Niche label={kaffarahEstimateLabel(instances)}>
+                  <p className="result-lede m-0">{kaffarahEstimateLabel(instances)}</p>
+                  <p className="result-figure m-0 mt-2">{kaffarahTotalText(feedingEstimate, instances)}</p>
+                  <p className="num text-[17.5px] text-text-2 m-0 mt-3">{kaffarahBreakdownText(feedingEstimate, costPerMeal, instances)}</p>
+                </Niche>
               ) : (
                 <div className="callout callout-info">
-                  <p className="text-sm font-semibold text-text m-0 mb-1">No feeding option in this school</p>
-                  <p className="text-sm text-text-2 m-0">
+                  <p className="font-bold text-text m-0 mb-1">No feeding option in this school</p>
+                  <p className="text-text-2 m-0">
                     For accidental killing the Qurʾān (4:92) names only freeing a believing slave and, for whoever cannot,
                     fasting two consecutive months. None of the four Sunni schools allows feeding the poor instead, so no
                     cost is shown. The kaffārah is the fast{instances > 1 ? `, for each of the ${instances} instances` : ""}.
@@ -260,42 +241,37 @@ export function KaffarahCalculator() {
               )}
 
               {/* Type & School */}
-              <dl className="m-0">
+              <dl className="m-0 card px-5 sm:px-7 py-1">
                 <Row label="Violation">{KAFFARAH_TYPES.find((t) => t.id === kaffarahType)?.title}</Row>
                 <Row label="School">{madhabOptions.find((m) => m.value === madhab)?.label}</Row>
                 <Row label="Options">
-                  <span className="text-sm">{ruling.isSequential ? "Sequential (try in order)" : "Choose any option"}</span>
+                  <span className="text-[16.5px]">{ruling.isSequential ? "Sequential (try in order)" : "Choose any option"}</span>
                 </Row>
               </dl>
 
               {/* Options */}
               <div>
-                <h3 className="font-semibold text-[17px] text-text mb-3">
+                <h3 className="font-bold text-[24px] text-text mb-4">
                   {ruling.isSequential ? "Options (must be attempted in this order)" : "Options (you may choose any)"}
                 </h3>
                 <ol className="list-none p-0 m-0 space-y-3">
                   {ruling.options.map((opt, i) => (
                     <li
                       key={i}
-                      className={`p-4 rounded-[10px] border border-border ${
+                      className={`p-5 rounded-[var(--radius)] border border-border ${
                         opt.action.includes("slave") ? "bg-surface-2 text-text-2" : "bg-surface"
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <span
-                          className="num shrink-0 w-7 h-7 rounded-full grid place-items-center text-sm font-bold"
-                          style={{ background: "var(--hue-bg)", color: "var(--hue-text)", border: "1px solid var(--hue-border)" }}
-                        >
-                          {opt.order}
-                        </span>
+                        <Rosette n={opt.order} state={opt.action.includes("slave") ? "todo" : "done"} size={36} />
                         <div className="min-w-0">
-                          <p className={`font-semibold text-[15.5px] m-0 ${opt.action.includes("slave") ? "text-text-2" : "text-text"}`}>
+                          <p className={`font-bold text-[18.5px] m-0 ${opt.action.includes("slave") ? "text-text-2" : "text-text"}`}>
                             {opt.action}
                             {opt.isFallback && (
-                              <span className="text-[13px] font-normal text-text-2 ms-2">(if previous option is impossible)</span>
+                              <span className="text-[15.5px] font-normal text-text-2 ms-2">(if previous option is impossible)</span>
                             )}
                           </p>
-                          <p className="text-sm text-text-2 mt-1 mb-0 leading-relaxed">{opt.detail}</p>
+                          <p className="text-[16.5px] text-text-2 mt-1 mb-0 leading-relaxed">{opt.detail}</p>
                         </div>
                       </div>
                     </li>
@@ -305,15 +281,15 @@ export function KaffarahCalculator() {
 
               {/* Notes */}
               <div>
-                <h3 className="font-semibold text-[17px] text-text mb-3">Important notes</h3>
-                <ul className="list-disc ps-5 m-0 space-y-2 text-sm text-text-2 leading-relaxed">
+                <h3 className="font-bold text-[24px] text-text mb-4">Important notes</h3>
+                <ul className="star-list m-0 space-y-2.5 text-[17px] text-text-2 leading-relaxed">
                   {ruling.notes.map((note, i) => (
                     <li key={i}>{note}</li>
                   ))}
                 </ul>
               </div>
 
-              <div className="callout callout-info text-sm text-text-2 leading-relaxed">
+              <div className="callout callout-info text-text-2 leading-relaxed">
                 <strong className="text-text">Remember:</strong> Kaffārah is not just a financial transaction. It requires
                 sincere repentance (<strong className="text-text">tawbah</strong>) and a genuine intention not to repeat
                 the violation. The financial or physical penalty is the outward part; the spiritual part is equally

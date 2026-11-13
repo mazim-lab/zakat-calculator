@@ -6,18 +6,14 @@ import { useEffect, useState } from "react";
 import { NAV, SCHOOL_FINDER } from "@/lib/site";
 import { ThemeToggle } from "./ThemeToggle";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { StarMark } from "./ornament";
 
 export function Logo() {
   return (
-    <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0" aria-label="Islamic Ḥisāb home">
-      <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">
-        <rect width="28" height="28" rx="6.5" fill="var(--mark-bg)" />
-        <circle cx="9" cy="14" r="2.6" fill="var(--mark-1)" />
-        <circle cx="14" cy="14" r="2.6" fill="var(--mark-2)" />
-        <circle cx="19" cy="14" r="2.6" fill="var(--mark-3)" />
-      </svg>
-      <span className="text-[17px] font-bold tracking-[-0.02em] text-text whitespace-nowrap">Islamic Ḥisāb</span>
-      <span lang="ar" dir="rtl" className="ar text-[17px] text-text-2 hidden sm:inline" aria-hidden="true">
+    <Link href="/" className="flex items-center gap-2.5 no-underline shrink-0 min-h-[44px]" aria-label="Islamic Ḥisāb home">
+      <StarMark size={34} />
+      <span className="wordmark">Islamic Ḥisāb</span>
+      <span lang="ar" dir="rtl" className="wordmark-ar hidden sm:inline" aria-hidden="true">
         حساب
       </span>
     </Link>
@@ -41,10 +37,9 @@ export function SiteHeader() {
 
   return (
     <header className="site-header">
-      <div className="topbar" aria-hidden="true" />
-      <div className="container flex items-center justify-between gap-3 h-14">
+      <div className="container flex items-center justify-between gap-3 h-[68px]">
         <Logo />
-        <nav aria-label="Main" className="hidden lg:flex items-center gap-0.5">
+        <nav aria-label="Main" className="hidden lg:flex items-center gap-1">
           {links.map((l) => (
             <Link key={l.href} href={l.href} className="nav-link" aria-current={isActive(l.href) ? "page" : undefined}>
               {l.label}
@@ -56,7 +51,7 @@ export function SiteHeader() {
           <ThemeToggle />
           <button
             type="button"
-            className="lg:hidden btn btn-ghost !min-h-[40px] !px-3"
+            className="lg:hidden btn btn-ghost !min-h-[44px] !w-11 !px-0"
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen((o) => !o)}
@@ -69,22 +64,22 @@ export function SiteHeader() {
         </div>
       </div>
       <div id="mobile-menu" hidden={!open} className="lg:hidden border-t border-border bg-surface">
-        <nav aria-label="Main (mobile)" className="container py-2 grid">
+        <nav aria-label="Main (mobile)" className="container py-3 grid gap-1">
           {links.map((l) => (
             <Link
               key={l.href}
               href={l.href}
-              className="nav-link !justify-start !text-base !min-h-[44px]"
+              className="nav-link !justify-start !text-[18px] !min-h-[48px]"
               aria-current={isActive(l.href) ? "page" : undefined}
               onClick={() => setOpen(false)}
             >
               {l.label}
             </Link>
           ))}
-          <Link href="/glossary" onClick={() => setOpen(false)} className="nav-link !text-base !min-h-[44px]" aria-current={isActive("/glossary") ? "page" : undefined}>
+          <Link href="/glossary" onClick={() => setOpen(false)} className="nav-link !text-[18px] !min-h-[48px]" aria-current={isActive("/glossary") ? "page" : undefined}>
             Glossary
           </Link>
-          <Link href="/about" onClick={() => setOpen(false)} className="nav-link !text-base !min-h-[44px]" aria-current={isActive("/about") ? "page" : undefined}>
+          <Link href="/about" onClick={() => setOpen(false)} className="nav-link !text-[18px] !min-h-[48px]" aria-current={isActive("/about") ? "page" : undefined}>
             About &amp; methodology
           </Link>
         </nav>

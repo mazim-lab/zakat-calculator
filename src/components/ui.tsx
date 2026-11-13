@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { TOOLS, type Hue } from "@/lib/site";
 import type { FaqItem } from "@/lib/seo";
 import { faqJsonLd } from "@/lib/seo";
+import { Ornament } from "./ornament";
 
 /** Inline JSON-LD block. */
 export function JsonLd({ data }: { data: object | object[] }) {
@@ -27,13 +28,13 @@ export function Ar({ children, className = "" }: { children: ReactNode; classNam
 
 export function Breadcrumbs({ items }: { items: { name: string; href?: string }[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="text-sm text-text-2">
+    <nav aria-label="Breadcrumb" className="ui text-[15.5px] text-text-2">
       <ol className="flex flex-wrap items-center gap-1.5 list-none p-0 m-0">
         {items.map((it, i) => (
           <li key={i} className="flex items-center gap-1.5">
             {i > 0 && <span aria-hidden="true" className="text-text-3">/</span>}
             {it.href ? (
-              <Link href={it.href} className="hover:text-text underline-offset-4 hover:underline">
+              <Link href={it.href} className="inline-flex items-center min-h-[44px] min-w-[44px] hover:text-text underline-offset-4 hover:underline">
                 {it.name}
               </Link>
             ) : (
@@ -67,23 +68,23 @@ export function PageIntro({
   breadcrumb?: string;
 }) {
   return (
-    <header className={`hue-${hue} pt-8 pb-6 sm:pt-12 sm:pb-8`}>
+    <header className={`hue-${hue} pt-8 pb-8 sm:pt-12 sm:pb-10`}>
       {breadcrumb && (
-        <div className="mb-5">
+        <div className="mb-6">
           <Breadcrumbs items={[{ name: "Home", href: "/" }, { name: breadcrumb }]} />
         </div>
       )}
-      {eyebrow && (
-        <p className="eyebrow flex items-center gap-2 mb-3">
-          <span className="hue-dot" aria-hidden="true" />
-          {eyebrow}
-        </p>
-      )}
-      <h1 className="text-[30px] sm:text-[40px] font-bold tracking-[-0.025em] leading-[1.15] flex flex-wrap items-baseline gap-x-4 gap-y-1">
+      {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
+      <h1 className="text-[34px] sm:text-[48px] font-bold leading-[1.1] flex flex-wrap items-baseline gap-x-5 gap-y-1">
         <span>{title}</span>
-        {titleAr && <Ar className="text-[28px] sm:text-[34px] font-normal text-text-2">{titleAr}</Ar>}
+        {titleAr && (
+          <Ar className="text-[32px] sm:text-[42px] font-normal" >
+            <span style={{ color: "var(--hue-text)" }}>{titleAr}</span>
+          </Ar>
+        )}
       </h1>
-      {lead && <p className="mt-4 text-[17px] sm:text-lg text-text-2 max-w-[62ch] leading-relaxed">{lead}</p>}
+      {lead && <p className="mt-5 text-[19px] sm:text-[21px] text-text-2 max-w-[60ch] leading-relaxed">{lead}</p>}
+      <Ornament className="mt-8 max-w-[240px]" />
       {children}
     </header>
   );
@@ -100,10 +101,9 @@ export function Callout({
   children: ReactNode;
   className?: string;
 }) {
-  const toneClass = tone === "neutral" ? "" : `callout-${tone}`;
   return (
-    <div className={`callout ${toneClass} ${className}`}>
-      {title && <p className="font-semibold text-text mb-1">{title}</p>}
+    <div className={`callout callout-${tone} ${className}`}>
+      {title && <p className="font-bold text-text mb-1 text-[18.5px]">{title}</p>}
       <div className="text-text-2 leading-relaxed">{children}</div>
     </div>
   );
@@ -133,8 +133,9 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-h`} className={`py-8 sm:py-10 border-t border-border ${className}`}>
-      <h2 id={`${id}-h`} className="text-[24px] sm:text-[26px] font-[650] mb-5">
+    <section id={id} aria-labelledby={`${id}-h`} className={`pt-6 pb-8 sm:pt-8 sm:pb-12 ${className}`}>
+      <Ornament className="mb-8" />
+      <h2 id={`${id}-h`} className="text-[28px] sm:text-[32px] font-bold mb-6">
         {title}
       </h2>
       {children}
@@ -149,7 +150,7 @@ export function Faq({ items, withJsonLd = true }: { items: (FaqItem & { body?: R
       {items.map((it, i) => (
         <details key={i} className="disclosure">
           <summary>{it.q}</summary>
-          <div className="disclosure-body prose text-[15.5px]">{it.body ?? <p>{it.a}</p>}</div>
+          <div className="disclosure-body prose text-[17px]">{it.body ?? <p>{it.a}</p>}</div>
         </details>
       ))}
       {withJsonLd && <JsonLd data={faqJsonLd(items.map(({ q, a }) => ({ q, a })))} />}
@@ -160,12 +161,12 @@ export function Faq({ items, withJsonLd = true }: { items: (FaqItem & { body?: R
 /** On-page table of contents for long content. */
 export function Toc({ items }: { items: { id: string; label: string }[] }) {
   return (
-    <nav aria-label="On this page" className="panel">
-      <p className="eyebrow mb-2">On this page</p>
-      <ol className="m-0 ps-5 space-y-1 text-[15px]">
+    <nav aria-label="On this page" className="card jadwal p-6 sm:p-7">
+      <p className="eyebrow mb-3">On this page</p>
+      <ol className="m-0 ps-6 grid gap-1.5 text-[17px] sm:columns-2 sm:block [&>li]:mb-1.5 marker:text-[var(--rubric)]">
         {items.map((it) => (
           <li key={it.id}>
-            <a href={`#${it.id}`} className="text-text-2 hover:text-text underline-offset-4 hover:underline">
+            <a href={`#${it.id}`} className="text-text-2 hover:text-indigo-text underline-offset-4 hover:underline">
               {it.label}
             </a>
           </li>
@@ -181,11 +182,12 @@ export function RelatedTools({ current }: { current?: string }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {tools.map((t) => (
-        <Link key={t.href} href={t.href} className={`card card-link hue-${t.hue} hue-stripe p-4`}>
-          <span className="flex items-center gap-2 font-semibold text-text">
-            {t.title} <Ar className="text-text-2 font-normal">{t.titleAr}</Ar>
+        <Link key={t.href} href={t.href} className={`card card-link hue-${t.hue} p-5`}>
+          <span className="flex items-center gap-2.5 font-bold text-[19px] text-text">
+            <span className="hue-star" aria-hidden="true" />
+            {t.title} <Ar className="font-normal text-[21px]"><span style={{ color: "var(--hue-text)" }}>{t.titleAr}</span></Ar>
           </span>
-          <span className="block text-sm text-text-2 mt-1 leading-relaxed">{t.summary}</span>
+          <span className="block text-[16px] text-text-2 mt-2 leading-relaxed">{t.summary}</span>
         </Link>
       ))}
     </div>
@@ -195,7 +197,7 @@ export function RelatedTools({ current }: { current?: string }) {
 /** Source citation line used under explanatory content. */
 export function Sources({ children }: { children: ReactNode }) {
   return (
-    <div className="mt-6 text-[13.5px] text-text-2 leading-relaxed">
+    <div className="mt-8 text-[16px] text-text-2 leading-relaxed">
       <p className="eyebrow mb-1">Sources</p>
       {children}
     </div>

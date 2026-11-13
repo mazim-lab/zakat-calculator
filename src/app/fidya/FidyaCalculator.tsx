@@ -12,6 +12,7 @@ import { calculateFidya, type FidyaFoodType } from "@/lib/fidya/calculate";
 import { InfoAccordion } from "@/components/InfoAccordion";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { OptionCard } from "@/components/OptionCard";
+import { Niche, Stepper } from "@/components/ornament";
 import { money, count } from "@/components/format";
 
 const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
@@ -42,9 +43,9 @@ function Arrow({ back = false }: { back?: boolean }) {
 
 function Row({ label, children, small = false }: { label: string; children: React.ReactNode; small?: boolean }) {
   return (
-    <div className="flex justify-between gap-4 py-2.5 border-t border-border first:border-t-0">
-      <dt className="text-text-2 text-[15px]">{label}</dt>
-      <dd className={`m-0 font-semibold text-text text-end ${small ? "text-sm max-w-[60%]" : "text-[15px]"}`}>{children}</dd>
+    <div className="flex justify-between gap-4 py-3 border-t border-border first:border-t-0">
+      <dt className="text-text-2 text-[17px]">{label}</dt>
+      <dd className={`m-0 font-bold text-text text-end ${small ? "text-[16px] max-w-[60%]" : "text-[17.5px]"}`}>{children}</dd>
     </div>
   );
 }
@@ -80,35 +81,17 @@ export function FidyaCalculator() {
     headingRef.current?.focus();
   }, [step]);
 
-  const headingClass = "text-[22px] sm:text-[24px] font-[650] text-text outline-none";
+  const headingClass = "text-[28px] sm:text-[34px] font-bold leading-tight text-text outline-none";
 
   return (
     <div className="hue-green">
       {/* Progress */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between gap-3 mb-2">
-          <p className="text-sm text-text-2 m-0">
-            Step <span className="num">{step + 1}</span> of <span className="num">{STEPS.length}</span>: {STEP_LABELS[currentStep]}
-          </p>
-          <ol className="flex gap-1.5 list-none p-0 m-0" aria-label="Progress">
-            {STEPS.map((s, i) => (
-              <li
-                key={s}
-                aria-label={`Step ${i + 1}: ${STEP_LABELS[s]}`}
-                aria-current={i === step ? "step" : undefined}
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: i <= step ? "var(--hue)" : "var(--border-strong)" }}
-              />
-            ))}
-          </ol>
-        </div>
-        <div className="progress-track" aria-hidden="true">
-          <div className="progress-fill" style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
-        </div>
+      <div className="mb-6">
+        <Stepper labels={STEPS.map((s) => STEP_LABELS[s])} current={step} />
       </div>
 
       {/* Steps */}
-      <div className="card hue-stripe p-5 sm:p-7 mb-5">
+      <div className="card p-5 sm:p-9 mb-6">
         <div key={currentStep} className="fade-in">
           {/* Step: Intro */}
           {currentStep === "intro" && (
@@ -116,7 +99,7 @@ export function FidyaCalculator() {
               <h2 ref={headingRef} tabIndex={-1} className={headingClass}>
                 What is fidya?
               </h2>
-              <div className="space-y-4 text-[16px] text-text-2 leading-relaxed">
+              <div className="space-y-4 text-[18.5px] text-text-2 leading-relaxed">
                 <p>
                   <strong className="text-text">Fidya</strong> (<span lang="ar" dir="rtl" className="ar">فِدْيَة</span>,
                   &ldquo;ransom&rdquo; or &ldquo;compensation&rdquo;) is a payment made to feed a poor person for each day of
@@ -128,8 +111,8 @@ export function FidyaCalculator() {
                   expectation of being able to fast in the future.
                 </p>
                 <div className="callout callout-warning">
-                  <p className="text-sm font-semibold text-text m-0 mb-1">Fidya is not for:</p>
-                  <ul className="text-sm text-text-2 list-disc ps-5 m-0 space-y-1">
+                  <p className="font-bold text-text m-0 mb-1">Fidya is not for:</p>
+                  <ul className="text-text-2 star-list m-0 space-y-1.5">
                     <li>
                       Deliberately breaking a fast. That requires <strong className="text-text">kaffārah</strong>{" "}
                       (expiation).
@@ -153,7 +136,7 @@ export function FidyaCalculator() {
               <h2 ref={headingRef} tabIndex={-1} id="fidya-school-h" className={headingClass}>
                 Select your school of jurisprudence
               </h2>
-              <p className="text-[16px] text-text-2">The amount of food (and therefore cost) varies between schools.</p>
+              <p className="text-[18.5px] text-text-2">The amount of food (and therefore cost) varies between schools.</p>
               <Link href="/find-your-school" className="btn btn-ghost w-full sm:w-auto justify-between">
                 Not sure which school you follow? Take our short quiz
                 <Arrow />
@@ -180,7 +163,7 @@ export function FidyaCalculator() {
               <h2 ref={headingRef} tabIndex={-1} className={headingClass}>
                 How many days?
               </h2>
-              <p className="text-[16px] text-text-2">
+              <p className="text-[18.5px] text-text-2">
                 Enter the total number of fasting days you need to compensate for. A full Ramadan is typically 29 or 30
                 days.
               </p>
@@ -201,7 +184,7 @@ export function FidyaCalculator() {
                     type="button"
                     onClick={() => setMissedDays(n)}
                     aria-pressed={missedDays === n}
-                    className={`btn btn-ghost num !px-4 ${missedDays === n ? "!border-accent !text-text !bg-surface-2" : ""}`}
+                    className={`btn btn-ghost num !min-w-[64px] !px-4 ${missedDays === n ? "!border-[var(--hue-text)] !text-[var(--hue-text)] !bg-[var(--hue-bg)]" : ""}`}
                   >
                     {n}
                   </button>
@@ -216,7 +199,7 @@ export function FidyaCalculator() {
               <h2 ref={headingRef} tabIndex={-1} id="fidya-amount-h" className={headingClass}>
                 Calculation method
               </h2>
-              <p className="text-[16px] text-text-2">Choose how you would like to calculate the fidya amount.</p>
+              <p className="text-[18.5px] text-text-2">Choose how you would like to calculate the fidya amount.</p>
               <div role="group" aria-labelledby="fidya-amount-h" className="space-y-2">
                 <OptionCard
                   selected={!useWeight}
@@ -232,7 +215,7 @@ export function FidyaCalculator() {
                 />
               </div>
 
-              <hr className="border-0 border-t border-border my-1" />
+              <hr className="border-0 border-t-[3px] border-double border-border my-2" />
 
               {!useWeight ? (
                 <CurrencyInput
@@ -286,17 +269,15 @@ export function FidyaCalculator() {
                 Your fidya obligation
               </h2>
 
-              <div className="text-center py-4 rounded-[10px]" style={{ background: "var(--hue-bg)" }}>
-                <p className="text-sm text-text-2 m-0 mb-1">Total fidya due</p>
-                <p className="num text-[clamp(28px,10vw,40px)] sm:text-[48px] font-semibold leading-tight m-0 whitespace-nowrap" style={{ color: "var(--hue-text)" }}>
-                  {money(result.total)}
-                </p>
-                <p className="text-sm text-text-2 m-0 mt-2">
+              <Niche label="Total fidya due">
+                <p className="result-lede m-0">Total fidya due</p>
+                <p className="result-figure m-0 mt-2">{money(result.total)}</p>
+                <p className="text-[17.5px] text-text-2 m-0 mt-3">
                   <span className="num">{money(result.perDay)}</span> per day × <span className="num">{count(result.missedDays)}</span> days
                 </p>
-              </div>
+              </Niche>
 
-              <dl className="m-0">
+              <dl className="m-0 card px-5 sm:px-7 py-1">
                 <Row label="School of jurisprudence">{madhabOptions.find((m) => m.value === madhab)?.label}</Row>
                 <Row label="Missed days">
                   <span className="num">{count(result.missedDays)}</span>
@@ -312,7 +293,7 @@ export function FidyaCalculator() {
                 </Row>
               </dl>
 
-              <div className="callout callout-info text-sm text-text-2 leading-relaxed">
+              <div className="callout callout-info text-text-2 leading-relaxed">
                 <strong className="text-text">How to pay:</strong> Fidya can be given as actual food or as cash to a poor
                 person or an Islamic charity. Many organizations accept fidya payments and distribute food on your behalf.
                 The payment is made for each day individually: you feed one poor person per missed day (it can be

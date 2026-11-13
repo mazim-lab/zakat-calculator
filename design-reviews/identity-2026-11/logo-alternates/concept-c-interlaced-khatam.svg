@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>IslamicHisab mark, concept C: interlaced khatam</title>
+  <!-- Two square bands woven over and under (Nasrid and Mamluk strapwork); the octagonal well holds a single point. -->
+  <g fill="none" stroke-width="5" stroke-linejoin="miter">
+    <path d="M32.00 5.00L59.00 32.00L32.00 59.00L5.00 32.00Z" stroke="#4f46e5"/>
+    <path d="M51.09 12.91L51.09 51.09L12.91 51.09L12.91 12.91Z" stroke="#0891b2"/>
+    <path d="M45.72 18.72L56.47 29.47M45.28 45.72L34.53 56.47M18.28 45.28L7.53 34.53M18.72 18.28L29.47 7.53" stroke="#fff" stroke-width="8.6"/>
+    <path d="M45.72 18.72L56.47 29.47M45.28 45.72L34.53 56.47M18.28 45.28L7.53 34.53M18.72 18.28L29.47 7.53" stroke="#4f46e5"/>
+    <path d="M51.09 32.31L51.09 47.51M31.69 51.09L16.49 51.09M12.91 31.69L12.91 16.49M32.31 12.91L47.51 12.91" stroke="#fff" stroke-width="8.6"/>
+    <path d="M51.09 32.31L51.09 47.51M31.69 51.09L16.49 51.09M12.91 31.69L12.91 16.49M32.31 12.91L47.51 12.91" stroke="#0891b2"/>
+  </g>
+  <circle cx="32" cy="32" r="4" fill="#4f46e5"/>
+</svg>

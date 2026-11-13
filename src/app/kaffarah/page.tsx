@@ -157,7 +157,7 @@ export default function Page() {
                       <th
                         scope="rowgroup"
                         rowSpan={row.bySchool.length}
-                        className="!normal-case !tracking-normal !text-[14px] !text-text !font-semibold align-top border-t border-border"
+                        className="!normal-case !tracking-normal !text-[16.5px] !text-text !font-semibold align-top border-t border-border"
                       >
                         {row.type.title}
                       </th>
