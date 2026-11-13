@@ -418,9 +418,11 @@ export default function AboutPage() {
       <Section id="corrections" title="Corrections">
         <div className="prose">
           <p>
-            <strong>13 November 2026.</strong> We checked every calculator against the Qurʾān, authentic hadith,
+            <strong>13 November 2026.</strong> We reviewed every calculator against the Qurʾān, authentic hadith,
             recognised references for each school and, for the Jaʿfarī school, Ayatollah Sistani&apos;s published
-            rulings. We corrected the following. Each correction names its source in the calculator&apos;s notes.
+            rulings. The review was done by the site&apos;s maintainers with AI assistance, against the sources cited.
+            No scholar reviewed it, and it is not a scholarly endorsement. We corrected the following. Each correction
+            names its source in the calculator&apos;s notes.
           </p>
           <ul>
             {CORRECTIONS.map((c) => (
