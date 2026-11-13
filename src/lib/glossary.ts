@@ -52,7 +52,7 @@ const ENTRIES: GlossaryEntry[] = [
     ar: "نصاب",
     also: "nisab",
     definition:
-      "The minimum amount of wealth you must own before Zakat is due. Schools differ on whether to measure it by gold or by silver. This calculator uses 85 g of gold or 595 g of silver, depending on the standard you choose.",
+      "The minimum amount of wealth you must own before Zakat is due. Schools differ on whether to measure it by gold or by silver. This calculator uses 85 g of gold or 595 g of silver, depending on the standard you choose; for the Jaʿfarī school it uses Sistani's 69.12 g of gold or about 483.84 g of silver.",
     ...ZAKAT,
   },
   {
@@ -87,7 +87,7 @@ const ENTRIES: GlossaryEntry[] = [
     ar: "وسق",
     also: "plural awsuq; often written wasqs",
     definition:
-      "An old Arabian measure of volume, used to set the niṣāb for crops at five wasqs. Most schools apply this minimum; the Ḥanafī school charges Zakat on any quantity. This calculator uses 653 kg for five wasqs.",
+      "An old Arabian measure of volume, used to set the niṣāb for crops at five wasqs. Most schools apply this minimum; the Ḥanafī school charges Zakat on any quantity. This calculator uses 653 kg for five wasqs, and about 847 kg for the Jaʿfarī school (Sistani), checked against the weight of the harvest.",
     ...ZAKAT,
   },
   {

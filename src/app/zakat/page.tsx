@@ -52,7 +52,7 @@ const HOW_STEPS: { name: string; text: string }[] = [
   },
   {
     name: "Compare with the niṣāb and apply the rate",
-    text: "If your wealth after debts is at or above the niṣāb, Zakat is 2.5% of the zakatable amount. Debts reduce every line in proportion. A solar year adds about 3%. Crops are 10% or 5% and livestock follows its own tables.",
+    text: "If your wealth after debts is at or above the niṣāb, Zakat is 2.5% of the zakatable amount. Debts reduce the money lines in proportion. A solar year adds about 3%. Crops (10% or 5%) and livestock (fixed tables) have their own minimums and are due even when your money is below the niṣāb.",
   },
   {
     name: "Read the breakdown",
@@ -181,7 +181,8 @@ export default function ZakatPage() {
             <li>
               <strong>Niṣāb test.</strong> For the niṣāb test the calculator adds the full value of your cash, metals,
               investments, accounts and other money assets, then subtracts your deductible debts. If the result is below
-              the niṣāb, every line shows zero, including crops and livestock.
+              the niṣāb, the money lines show zero. Crops and livestock are not part of this test: they have their own
+              minimums (five wasqs; 40 sheep, 30 cattle, 5 camels) and are never added to money to reach a niṣāb.
             </li>
             <li>
               <strong>What is counted at 2.5%.</strong> Cash, bank balances, gold and silver at the spot price, zakatable
@@ -198,18 +199,24 @@ export default function ZakatPage() {
               reduced to its zakatable share. Cash in the account counts in full.
             </li>
             <li>
-              <strong>Debts.</strong> When debts are deductible, the calculator lowers every Zakat line by the same
-              proportion: your zakatable total after debts divided by your zakatable total before debts.
+              <strong>Debts.</strong> When debts are deductible, the calculator lowers every money line that is
+              charged by the same proportion: your charged money total after debts divided by the same total before debts.
+              Exempt items (such as exempt jewelry or deferred retirement funds) are not part of that total, and debts do
+              not reduce crops or livestock.
             </li>
             <li>
-              <strong>Crops.</strong> 10% for rain-fed crops and 5% for irrigated crops. Every preset except the Ḥanafī
-              one applies a minimum of 653 kg (5 wasqs); below it, crops are exempt.
+              <strong>Crops.</strong> 10% for rain-fed crops and 5% for irrigated crops, charged on the harvest value
+              you enter. Every preset except the Ḥanafī one applies a minimum of five wasqs, checked against the harvest
+              weight in kilograms: 653 kg as this calculator counts it, or about 847 kg for the Jaʿfarī school
+              (Sistani). Below it, crops are exempt. If you enter no weight, the minimum is not checked.
             </li>
             <li>
               <strong>Livestock.</strong> Sheep and goats from 40 head, cattle from 30 and camels from 5. The number of
-              animals due follows a fixed table. The calculator then converts them to money using fixed estimates built
-              into the code (for example 150 per sheep), not a market price. If you own livestock, value the animals due
-              at local prices.
+              animals due follows the schedules in the letter of Abū Bakr (Ṣaḥīḥ al-Bukhārī 1454) and the hadith of
+              Muʿādh for cattle (a tabīʿ per 30, a musinnah per 40), with each school's rule above 120 camels and
+              Sistani's schedule for the Jaʿfarī school. Sheep and cattle due are converted to money with fixed estimates
+              built into the code (150 per sheep, 300 per tabīʿ, 500 per musinnah), not market prices. Camels due as
+              camels are shown in kind and not priced. If you own livestock, value the animals due at local prices.
             </li>
             <li>
               <strong>Khums (Jaʿfarī).</strong> 20% of annual income minus annual expenses, split equally between Sahm
