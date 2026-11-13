@@ -368,9 +368,11 @@ export function ZakatCalculator() {
                 <OptionCard
                   selected={choices.nisabStandard === "silver"}
                   onClick={() => updateChoice("nisabStandard", "silver")}
-                  title={`Silver Standard (${choices.madhab === "jafari" ? JAFARI_SILVER_NISAB_GRAMS : SILVER_NISAB_GRAMS_DISPLAY} grams)`}
+                  title={`Silver Standard (${choices.madhab === "jafari" ? `about ${JAFARI_SILVER_NISAB_GRAMS}` : SILVER_NISAB_GRAMS_DISPLAY} grams)`}
                   subtitle={`About ${fmt(choices.madhab === "jafari" ? JAFARI_SILVER_NISAB_GRAMS * silverPrice : silverNisabValue(silverPrice))}`}
-                  description="More cautious approach. It ensures more people fulfill their Zakat obligation."
+                  description={choices.madhab === "jafari"
+                    ? "More cautious approach. Sistani states 105 ṣayrafī mithqāls; the grams are a derived conversion (4.608 g per mithqāl, from his Islamic Laws glossary)."
+                    : "More cautious approach. It ensures more people fulfill their Zakat obligation."}
                 />
               </OptionGroup>
               {pricesArePlaceholders && (

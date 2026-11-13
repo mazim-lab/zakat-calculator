@@ -52,7 +52,7 @@ const ENTRIES: GlossaryEntry[] = [
     ar: "نصاب",
     also: "nisab",
     definition:
-      "The minimum amount of wealth you must own before Zakat is due. Schools differ on whether to measure it by gold or by silver. This calculator uses 85 g of gold or 595 g of silver, depending on the standard you choose; for the Jaʿfarī school it uses Sistani's 69.12 g of gold or about 483.84 g of silver.",
+      "The minimum amount of wealth you must own before Zakat is due. Schools differ on whether to measure it by gold or by silver. This calculator uses 85 g of gold or 595 g of silver, depending on the standard you choose; for the Jaʿfarī school it uses Sistani's 69.12 g of gold or about 483.84 g of silver (a derived conversion of his 105 ṣayrafī mithqāls; his Summary of the Rules of Worship says about 487 g).",
     ...ZAKAT,
   },
   {

@@ -30,7 +30,7 @@ export function ZakatResults({
   const nisabBasis =
     choices.nisabStandard === "gold"
       ? `${jafari ? JAFARI_GOLD_NISAB_GRAMS : GOLD_NISAB_GRAMS_DISPLAY} g of gold at ${fmt(goldPrice)} per gram`
-      : `${jafari ? JAFARI_SILVER_NISAB_GRAMS : SILVER_NISAB_GRAMS_DISPLAY} g of silver at ${fmt(silverPrice)} per gram`;
+      : `${jafari ? `about ${JAFARI_SILVER_NISAB_GRAMS} g (derived from 105 ṣayrafī mithqāls)` : `${SILVER_NISAB_GRAMS_DISPLAY} g`} of silver at ${fmt(silverPrice)} per gram`;
   // Crops and livestock have their own minimums, so something can be due even
   // when money is below the niṣāb.
   const visibleDue = result.breakdown.some(

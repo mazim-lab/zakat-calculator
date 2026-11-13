@@ -287,8 +287,9 @@ export default function AboutPage() {
           <ul>
             <li>
               The niṣāb is 85 g of gold or 595 g of silver, at the price above, depending on the standard you choose.
-              For the Jaʿfarī school it is Ayatollah Sistani&apos;s 69.12 g of gold or 105 ṣayrafī mithqāls (about
-              483.84 g) of silver.
+              For the Jaʿfarī school it is Ayatollah Sistani&apos;s 69.12 g of gold or 105 ṣayrafī mithqāls of silver.
+              Sistani gives no gram figure for silver; the calculator uses 483.84 g, a derived conversion at the 4.608 g
+              per mithqāl given in his Islamic Laws glossary (his Summary of the Rules of Worship says about 487 g).
             </li>
             <li>
               Most zakatable wealth is charged at 2.5%. Crops are charged at 10% if rain-fed or 5% if irrigated, on the
