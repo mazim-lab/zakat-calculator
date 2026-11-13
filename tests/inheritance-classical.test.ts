@@ -133,6 +133,8 @@ const ROWS: Row[] = [
   { name: "al-Mushtarakah, Ḥanafī and Ḥanbalī: full brother gets nothing", heirs: { husband: true, mother: true, maternalHalfBrother: 2, fullBrother: 1 }, madhabs: ["hanafi", "hanbali"], expect: { husband: "1/2", mother: "1/6", maternalHalfBrother: "1/3" }, blocked: ["fullBrother"], source: S.mushtaraka },
   { name: "al-Mushtarakah, Mālikī and Shāfiʿī: full brother shares the 1/3 per head", heirs: { husband: true, mother: true, maternalHalfBrother: 2, fullBrother: 1 }, madhabs: ["maliki", "shafii"], expect: { husband: "1/2", mother: "1/6", maternalHalfBrother: "2/9", fullBrother: "1/9" }, source: S.mushtaraka },
   { name: "al-Mushtarakah, Mālikī and Shāfiʿī: full brother and sister share per head", heirs: { husband: true, mother: true, maternalHalfSister: 2, fullBrother: 1, fullSister: 1 }, madhabs: ["maliki", "shafii"], expect: { husband: "1/2", mother: "1/6", maternalHalfSister: "1/6", fullBrother: "1/12", fullSister: "1/12" }, source: S.mushtaraka },
+  { name: "father + paternal grandmother: father excludes his mother (Hanafi, Maliki, Shafi'i)", heirs: { father: true, paternalGrandmother: true }, madhabs: ["hanafi", "maliki", "shafii"], expect: { father: "1" }, blocked: ["paternalGrandmother"], source: "https://shamela.ws/book/8463/2625 https://dorar.net/feqhia/13719" },
+  { name: "father + paternal grandmother: she inherits beside her son (Hanbali)", heirs: { father: true, paternalGrandmother: true }, madhabs: ["hanbali"], expect: { father: "5/6", paternalGrandmother: "1/6" }, source: "https://shamela.ws/book/8463/2625" },
 ];
 
 const ESTATE = 120000;

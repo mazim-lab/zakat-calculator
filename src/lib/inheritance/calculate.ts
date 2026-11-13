@@ -499,6 +499,14 @@ export function calculateInheritance(
       reasons.maternalHalfBrother = reasons.maternalHalfSister = "Blocked by the father.";
   }
   
+  // The father excludes his own mother (the paternal grandmother) in the Ḥanafī,
+  // Mālikī and Shāfiʿī schools; in the Ḥanbalī school she inherits beside him
+  // (al-Mughnī 6/303, shamela.ws/book/8463/2625; dorar.net/feqhia/13719).
+  if (heirs.father && heirs.paternalGrandmother && madhab !== 'hanbali') {
+      blockedHeirs.push('paternalGrandmother');
+      reasons.paternalGrandmother = "Blocked by the father (Ḥanafī, Mālikī and Shāfiʿī schools; the Ḥanbalī school lets her inherit beside him).";
+  }
+
   // A mother blocks grandmothers
   if(heirs.mother){
       blockedHeirs.push('paternalGrandmother', 'maternalGrandmother');
