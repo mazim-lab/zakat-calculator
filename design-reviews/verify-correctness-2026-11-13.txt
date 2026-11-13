@@ -1,0 +1,34 @@
+Correctness pass, 2026-11-13. Production build (next build, next start -p 3123).
+
+## Unit tests
+vitest run: 7 files, 669 tests passed (was 434 before this pass; 6 expected-failure
+inheritance cases flipped to normal passing tests).
+
+## Routes (HTTP)
+All 18 routes 200 with the same content types as verify-routes-seo-a11y.txt;
+/does-not-exist 404.
+
+## SEO head + structure (HTTP)
+All 9 pages: 1 h1, canonical, og, twitter card, JSON-LD present, 0 em dashes in
+visible text, no "TODO" in visible text (/about TODO(owner) removed).
+
+## Mobile 360px horizontal overflow (same-origin iframe, 360px wide)
+/ /zakat /zakat-fitr /fidya /kaffarah /inheritance /find-your-school /glossary /about: ok
+
+## Wizard walk (light + dark, 360px + 1280px)
+Per step: visible inputs labelled, buttons and links named, img alt present,
+no duplicate ids, no horizontal overflow, no em dash, no page errors.
+/zakat        13 steps advanced; clean (all four combinations)
+/zakat-fitr    4 steps advanced; clean (all four combinations)
+/fidya         2 steps advanced by the generic walker, which stops at the
+               "How many days?" step (Continue is disabled until days are
+               entered, unchanged UI); with 30 days entered it advances 2 more
+               steps to the result ($300.00 for 30 days at $10). clean
+/kaffarah      4 steps advanced; clean. Accidental killing + Hanafi: result shows
+               "No feeding option in this school", no cost figure.
+/inheritance   3 steps advanced; clean. Wife + maternal half-sister: wife 1/4,
+               maternal half-sister 1/6 (Qur'an 4:12), then radd per school.
+
+## Build-time worked examples
+/zakat: Hanafi 853.88 and Shafi'i 687.50 unchanged; Maliki and Hanbali 507.50
+(were 527.07). /inheritance examples unchanged (13/36; 'awl to 8).
