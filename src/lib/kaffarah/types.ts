@@ -19,14 +19,14 @@ export const KAFFARAH_TYPES: KaffarahTypeInfo[] = [
     id: "broken_fast",
     title: "Deliberately Broken Fast",
     titleAr: "كفارة الإفطار",
-    description: "You intentionally broke your fast during Ramadan without a valid excuse — by eating, drinking, or sexual intercourse.",
+    description: "You intentionally broke your fast during Ramadan without a valid excuse, by eating, drinking, or sexual intercourse.",
     icon: "🌙",
   },
   {
     id: "broken_oath",
     title: "Broken Oath",
     titleAr: "كفارة اليمين",
-    description: "You swore an oath (yamīn) in Allah's name and then broke it — e.g., 'I swear by Allah I will do X' and then did not.",
+    description: "You swore an oath (yamīn) in Allah's name and then broke it, e.g., 'I swear by Allah I will do X' and then did not.",
     icon: "🤝",
   },
   {
@@ -40,7 +40,7 @@ export const KAFFARAH_TYPES: KaffarahTypeInfo[] = [
     id: "accidental_killing",
     title: "Accidental Killing",
     titleAr: "كفارة القتل الخطأ",
-    description: "Unintentional causing of death — such as a car accident. The kaffārah is in addition to blood money (diyah) owed to the victim's family.",
+    description: "Unintentional causing of death, such as a car accident. The kaffārah is in addition to blood money (diyah) owed to the victim's family.",
     icon: "⚠️",
   },
 ];

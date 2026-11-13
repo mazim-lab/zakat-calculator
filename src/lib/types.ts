@@ -282,7 +282,7 @@ export const STEPS: StepConfig[] = [
   {
     id: "khums",
     title: "Khums",
-    subtitle: "20% on surplus annual income (Ja'farī)",
+    subtitle: "20% on surplus annual income (Jaʿfarī)",
     icon: "🕌",
   },
   {

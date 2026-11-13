@@ -16,7 +16,7 @@ export const FITR_AMOUNTS: Record<Madhab, FitrAmountInfo> = {
     weightKg: 1.6, // half ṣāʿ of wheat
     measure: "Half a ṣāʿ of wheat (~1.6 kg), or one ṣāʿ (~3.2 kg) of barley, dates, or raisins",
     description:
-      "The Ḥanafī school uniquely allows half a ṣāʿ of wheat (the most common staple) as sufficient, while other grains require a full ṣāʿ. Cash payment is explicitly permitted — you may pay the monetary equivalent of the food instead of actual food. This makes it the most practical option in modern contexts.",
+      "The Ḥanafī school uniquely allows half a ṣāʿ of wheat (the most common staple) as sufficient, while other grains require a full ṣāʿ. Cash payment is explicitly permitted: you may pay the monetary equivalent of the food instead of actual food. This makes it the most practical option in modern contexts.",
     cashPermitted: true,
   },
   maliki: {
@@ -50,7 +50,7 @@ export const FITR_AMOUNTS: Record<Madhab, FitrAmountInfo> = {
     weightKg: 3.0, // Ja'fari ṣāʿ is slightly larger
     measure: "One ṣāʿ (~3 kg) of commonly consumed food",
     description:
-      "The Jaʿfarī school requires one ṣāʿ (approximately 3 kg) of food commonly consumed in your area — such as wheat, barley, dates, raisins, rice, or corn. Cash equivalent is permitted. The obligation applies to every household member, including guests who are present at the time of sunset on the eve of Eid al-Fiṭr.",
+      "The Jaʿfarī school requires one ṣāʿ (approximately 3 kg) of food commonly consumed in your area, such as wheat, barley, dates, raisins, rice, or corn. Cash equivalent is permitted. The obligation applies to every household member, including guests who are present at the time of sunset on the eve of Eid al-Fiṭr.",
     cashPermitted: true,
   },
 };

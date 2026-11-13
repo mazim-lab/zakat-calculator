@@ -20,7 +20,7 @@ export const KAFFARAH_FAST_INFO: InfoPanel = {
     {
       school: "Ḥanafī School",
       position: "Kaffārah required for deliberately eating, drinking, OR sexual intercourse",
-      reasoning: "Any intentional breaking of the fast — including eating and drinking — requires kaffārah plus making up the day. The three options (free a slave → fast 60 days → feed 60 people) must be tried in order.",
+      reasoning: "Any intentional breaking of the fast (including eating and drinking) requires kaffārah plus making up the day. The three options (free a slave → fast 60 days → feed 60 people) must be tried in order.",
     },
     {
       school: "Shāfiʿī & Ḥanbalī Schools",
@@ -29,13 +29,13 @@ export const KAFFARAH_FAST_INFO: InfoPanel = {
     },
     {
       school: "Mālikī School",
-      position: "Kaffārah for eating, drinking, or intercourse — AND the options are interchangeable",
+      position: "Kaffārah for eating, drinking, or intercourse, AND the options are interchangeable",
       reasoning: "Like the Ḥanafī school, any deliberate breaking triggers kaffārah. Unlike other schools, the Mālikī school allows you to choose freely between the options (they are not strictly ordered).",
     },
     {
       school: "Jaʿfarī School",
       position: "Options are alternatives (choose any). If the violation was ḥarām, some require all three combined",
-      reasoning: "The three standard options are interchangeable. However, if the fast was broken by something intrinsically forbidden (ḥarām — e.g., alcohol, forbidden food), some Jaʿfarī authorities require the combined kaffārah (kaffārat al-jamʿ): all three at once.",
+      reasoning: "The three standard options are interchangeable. However, if the fast was broken by something intrinsically forbidden (ḥarām, e.g., alcohol, forbidden food), some Jaʿfarī authorities require the combined kaffārah (kaffārat al-jamʿ): all three at once.",
     },
   ],
   note: "This difference matters enormously in practice. Under the Shāfiʿī/Ḥanbalī view, someone who deliberately ate during Ramadan owes only one day of make-up fasting. Under the Ḥanafī/Mālikī view, they owe 60 days of fasting (or the equivalent).",
@@ -48,7 +48,7 @@ export const KAFFARAH_OATH_INFO: InfoPanel = {
     {
       school: "All Schools (agreed)",
       position: "Feed 10 poor people, OR clothe 10 poor people, OR free a slave. If unable: fast 3 days.",
-      reasoning: "The first three options are interchangeable — you may choose whichever is most practical. Fasting 3 days is ONLY permitted if you genuinely cannot afford any of the first three.",
+      reasoning: "The first three options are interchangeable: you may choose whichever is most practical. Fasting 3 days is ONLY permitted if you genuinely cannot afford any of the first three.",
     },
     {
       school: "Ḥanafī & Ḥanbalī Schools",

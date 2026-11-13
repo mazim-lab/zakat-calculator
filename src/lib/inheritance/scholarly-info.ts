@@ -4,7 +4,7 @@ import { InfoPanel } from './types';
 export const awlInfo: InfoPanel = {
   title: "Understanding 'ʿAwl' (Proportional Reduction)",
   description:
-    "ʿAwl, or proportional reduction, is a mechanism applied when the fixed, Quranically-defined shares (Furūḍ) of all heirs add up to more than 100% of the estate. Instead of some heirs being denied their share, all shares are reduced proportionally to make the total equal 100%.",
+    "ʿAwl, or proportional reduction, is a mechanism applied when the fixed, Quranically defined shares (Furūḍ) of all heirs add up to more than 100% of the estate. Instead of some heirs being denied their share, all shares are reduced proportionally to make the total equal 100%.",
   positions: [
     {
       school: 'All Sunni Schools (Ḥanafī, Mālikī, Shāfiʿī, Ḥanbalī)',
@@ -55,7 +55,7 @@ export const hajbInfo: InfoPanel = {
      {
       school: 'Example of Partial Exclusion',
       position: 'The presence of a child reduces the share of the spouse. For example, a husband inherits 1/2, but this is reduced to 1/4 if the deceased has a child. A wife inherits 1/4, but this is reduced to 1/8 in the presence of a child.',
-      reasoning: 'These reductions are explicitly mentioned in the Quran in Sūrat al-Nisāʾ, verses 12.',
+      reasoning: 'These reductions are explicitly mentioned in the Quran in Sūrat al-Nisāʾ, verse 12.',
     },
   ],
 };
@@ -67,7 +67,7 @@ export const grandfatherSiblingsInfo: InfoPanel = {
     {
       school: 'Ḥanafī School',
       position: 'The paternal grandfather is treated like the father in his absence and therefore blocks all siblings (full, paternal, and maternal) from inheriting.',
-      reasoning: 'They consider the grandfather a direct ascendant (an "usul"), just like the father, and give him the same status in the absence of the father. The Quran refers to a grandfather as "father" (e.g., 2:133).',
+      reasoning: 'They consider the grandfather a direct ascendant (aṣl), just like the father, and give him the same status in the absence of the father. The Quran refers to a grandfather as "father" (e.g., 2:133).',
     },
     {
       school: 'Mālikī, Shāfiʿī, Ḥanbalī Schools',
@@ -89,7 +89,7 @@ export const jafariSystemInfo: InfoPanel = {
     },
     {
       school: "No ʿAṣabah (Jaʿfarī)",
-      position: "There are no 'residuary' heirs. When fixed shares don't exhaust the estate, the surplus returns to the fixed-share heirs via radd — it does NOT pass to male agnatic relatives.",
+      position: "There are no 'residuary' heirs. When fixed shares don't exhaust the estate, the surplus returns to the fixed-share heirs via radd. It does NOT pass to male agnatic relatives.",
       reasoning: "The Jaʿfarī school argues that the Sunni concept of ʿaṣabah contradicts the Quranic inheritance verses, which they interpret as giving specific shares to all heirs. Surplus should return proportionally to those same heirs.",
     },
     {
@@ -110,12 +110,12 @@ export function getBaytAlMalInfo(hasSpouse: boolean): InfoPanel {
     if (hasSpouse) {
         // Spouse-only case: remainder after spouse's fixed share
         return {
-            title: "Bayt al-Māl (بيت المال) — The Public Treasury",
-            description: "When only a spouse inherits and no other heirs exist, the spouse receives their fixed Quranic share and the remainder goes to Bayt al-Māl — the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done with this remainder.",
+            title: "Bayt al-Māl (بيت المال): The Public Treasury",
+            description: "When only a spouse inherits and no other heirs exist, the spouse receives their fixed Quranic share and the remainder goes to Bayt al-Māl, the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done with this remainder.",
             positions: [
                 {
                     school: "Majority of Contemporary Scholars (Fiqh Council of North America, European Council for Fatwa and Research)",
-                    position: "The remainder should be directed to Islamic charitable causes — mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
+                    position: "The remainder should be directed to Islamic charitable causes: mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
                     reasoning: "Since no legitimate Bayt al-Māl exists in Western nations, Islamic community institutions are the closest functional equivalent. They serve the same purpose of benefiting the Muslim public. This is the most widely recommended position for Muslims living in non-Muslim-majority countries."
                 },
                 {
@@ -134,12 +134,12 @@ export function getBaytAlMalInfo(hasSpouse: boolean): InfoPanel {
     } else {
         // No heirs at all
         return {
-            title: "Bayt al-Māl (بيت المال) — The Public Treasury",
-            description: "When there are no heirs at all, the entire estate goes to Bayt al-Māl — the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done.",
+            title: "Bayt al-Māl (بيت المال): The Public Treasury",
+            description: "When there are no heirs at all, the entire estate goes to Bayt al-Māl, the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done.",
             positions: [
                 {
                     school: "Majority of Contemporary Scholars (Fiqh Council of North America, European Council for Fatwa and Research)",
-                    position: "The estate should be directed to Islamic charitable causes — mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
+                    position: "The estate should be directed to Islamic charitable causes: mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
                     reasoning: "Since no legitimate Bayt al-Māl exists in Western nations, Islamic community institutions are the closest functional equivalent. They serve the same purpose of benefiting the Muslim public. This is the most widely recommended position for Muslims living in non-Muslim-majority countries."
                 },
                 {
@@ -148,13 +148,13 @@ export function getBaytAlMalInfo(hasSpouse: boolean): InfoPanel {
                     reasoning: "Since Western governments provide public services (infrastructure, welfare, security), they serve a similar function. Most scholars reject this view because Western governments do not distribute wealth according to Sharīʿah priorities."
                 },
             ],
-            note: "Practical advice: Write a waṣiyyah (Islamic will) that explicitly directs your estate to specific Islamic charities. Without a will, most Western jurisdictions will distribute your estate according to their own intestacy laws — which almost certainly will not follow Islamic inheritance law. Planning ahead ensures your wealth benefits the Muslim community as intended by the Sharīʿah."
+            note: "Practical advice: Write a waṣiyyah (Islamic will) that explicitly directs your estate to specific Islamic charities. Without a will, most Western jurisdictions will distribute your estate according to their own intestacy laws, which almost certainly will not follow Islamic inheritance law. Planning ahead ensures your wealth benefits the Muslim community as intended by the Sharīʿah."
         };
     }
 }
 
 export const umariyyatanInfo: InfoPanel = {
-    title: 'The "Umariyyatān" (Two Cases of ʿUmar)',
+    title: 'The "ʿUmariyyatān" (Two Cases of ʿUmar)',
     description: 'These are two specific inheritance scenarios where the mother\'s share is calculated differently to prevent her from inheriting more than or equal to the father, which would contradict the general principle of the male receiving double the female\'s share when they are of the same class.',
     positions: [
         {
