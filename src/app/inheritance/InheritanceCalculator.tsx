@@ -356,11 +356,11 @@ export default function InheritanceCalculator() {
                     </div>
                     {hasSpouseShare && (
                       <div className="rounded-md bg-surface p-3 border border-success-border">
-                        <p className="font-semibold text-text">2. Redistribute to the spouse via radd (position of ʿUthmān ibn ʿAffān)</p>
+                        <p className="font-semibold text-text">2. Return it to the spouse (view of some later Ḥanafī scholars)</p>
                         <p className="mt-1 text-text-2">
-                          Some scholars hold that when no Bayt al-Māl exists, the remainder should return to the spouse. This
-                          view is adopted in the personal status codes of Egypt, Pakistan, and some Gulf states, and is
-                          recommended by some scholars specifically for Western Muslims.
+                          Some later Ḥanafī scholars held that when no Bayt al-Māl exists, the remainder may return to the
+                          spouse. A report from ʿUthmān ibn ʿAffān is sometimes cited for it. The calculator does not apply
+                          this view; it is shown so you can discuss it with a scholar.
                         </p>
                       </div>
                     )}
