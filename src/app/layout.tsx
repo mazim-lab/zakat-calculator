@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   applicationName: SITE.name,
   manifest: "/manifest.json",
   appleWebApp: { capable: true, title: "Ḥisāb", statusBarStyle: "default" },
-  icons: { icon: "/favicon.ico", apple: "/icons/icon-192.png" },
+  icons: { icon: "/favicon.ico", apple: "/icons/apple-touch-icon.png" },
   formatDetection: { telephone: false },
 };
 
