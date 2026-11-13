@@ -465,7 +465,10 @@ export function calculateInheritance(
     reasons.father = `Receives 1/6 as a fixed share due to the presence of descendants. Will also take remainder if any.`;
   }
   if (heirs.mother) {
-      const numberOfSiblings = (heirs.fullBrother ?? 0) + (heirs.fullSister ?? 0) + (heirs.paternalHalfBrother ?? 0) + (heirs.paternalHalfSister ?? 0) + (heirs.maternalHalfBrother ?? 0) + (heirs.maternalHalfSister ?? 0);
+      // Qurʾān 4:11: the mother takes 1/6 if the deceased had brothers or sisters.
+      // Siblings count even when they are themselves excluded (for example by the
+      // father), so they are counted from the heirs as entered, before exclusion.
+      const numberOfSiblings = (initialHeirs.fullBrother ?? 0) + (initialHeirs.fullSister ?? 0) + (initialHeirs.paternalHalfBrother ?? 0) + (initialHeirs.paternalHalfSister ?? 0) + (initialHeirs.maternalHalfBrother ?? 0) + (initialHeirs.maternalHalfSister ?? 0);
       if(numberOfSiblings >= 2){
           shares.mother = new SimpleFraction(1,6);
           reasons.mother = `Receives 1/6 due to the presence of two or more siblings.`

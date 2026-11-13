@@ -215,9 +215,9 @@ describe("known disagreements with textbook results (do not change code here)", 
     expectShares({ paternalGrandfather: true, fullBrother: 1 }, { paternalGrandfather: [1, 2], fullBrother: [1, 2] }, ["maliki", "shafii", "hanbali"]);
   });
 
-  it.fails("father + mother + 2 full brothers: mother 1/6, father 5/6", () => {
-    // Majority: siblings excluded by the father still reduce the mother to 1/6 (4:11).
-    // Code counts siblings after removing blocked heirs, so the mother gets 1/3.
+  it("father + mother + 2 full brothers: mother 1/6, father 5/6 (corrected)", () => {
+    // Siblings excluded by the father still reduce the mother to 1/6 (4:11;
+    // islamqa.info/ar/answers/13632). Corrected in November 2026.
     expectShares({ father: true, mother: true, fullBrother: 2 }, { mother: [1, 6], father: [5, 6] });
   });
 });
