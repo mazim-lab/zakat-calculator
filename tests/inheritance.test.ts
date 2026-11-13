@@ -95,6 +95,10 @@ const CORRECTED = new Set<string>([
   "Father + mother only|jafari",
   "Class 2: grandmother + maternal half-brother|jafari",
   "Grandfather + 1 full brother|jafari",
+  // Senior review: a wife who is the only heir takes 1/4 and the rest is the
+  // Imam's share, not returned to her (Sistani, Minhaj al-Salihin 1059).
+  "Wife only|jafari",
+  "Four wives only|jafari",
   "Wife + grandfather + 2 brothers + 1 sister|jafari",
   ...["maliki", "shafii", "hanbali"].flatMap((m) => [
     `Grandfather + 1 full brother|${m}`,

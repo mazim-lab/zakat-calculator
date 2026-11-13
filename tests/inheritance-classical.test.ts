@@ -135,6 +135,10 @@ const ROWS: Row[] = [
   { name: "al-Mushtarakah, Mālikī and Shāfiʿī: full brother and sister share per head", heirs: { husband: true, mother: true, maternalHalfSister: 2, fullBrother: 1, fullSister: 1 }, madhabs: ["maliki", "shafii"], expect: { husband: "1/2", mother: "1/6", maternalHalfSister: "1/6", fullBrother: "1/12", fullSister: "1/12" }, source: S.mushtaraka },
   { name: "father + paternal grandmother: father excludes his mother (Hanafi, Maliki, Shafi'i)", heirs: { father: true, paternalGrandmother: true }, madhabs: ["hanafi", "maliki", "shafii"], expect: { father: "1" }, blocked: ["paternalGrandmother"], source: "https://shamela.ws/book/8463/2625 https://dorar.net/feqhia/13719" },
   { name: "father + paternal grandmother: she inherits beside her son (Hanbali)", heirs: { father: true, paternalGrandmother: true }, madhabs: ["hanbali"], expect: { father: "5/6", paternalGrandmother: "1/6" }, source: "https://shamela.ws/book/8463/2625" },
+  { name: "Jaʿfarī: wife + father + mother + daughter + 2 brothers (1/120 disputed)", heirs: { wife: 1, father: true, mother: true, daughter: 1, fullBrother: 2 }, madhabs: JAFARI, expect: { wife: "1/8", father: "7/40", mother: "1/6", daughter: "21/40" }, unresolved: "1/120", source: `${S.minhaj} (masa'il 993, 997)` },
+  { name: "Jaʿfarī: wife alone takes 1/4, rest is the Imam's share", heirs: { wife: 1 }, madhabs: JAFARI, expect: { wife: "1/4" }, unresolved: "3/4", source: `${S.minhajSpouses} (mas'ala 1059)` },
+  { name: "Jaʿfarī: husband alone takes everything", heirs: { husband: true }, madhabs: JAFARI, expect: { husband: "1" }, source: `${S.minhajSpouses} (mas'ala 1059)` },
+  { name: "Jaʿfarī: full sister + maternal half-brother (surplus to the full sister)", heirs: { fullSister: 1, maternalHalfBrother: 1 }, madhabs: JAFARI, expect: { fullSister: "5/6", maternalHalfBrother: "1/6" }, source: `${S.minhajClass2} (mas'ala 1023)` },
 ];
 
 const ESTATE = 120000;

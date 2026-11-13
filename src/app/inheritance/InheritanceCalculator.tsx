@@ -70,7 +70,7 @@ function buildPieData(result: CalculationResult, estateValue: number): DonutSlic
   }
   if (result.unresolvedAmount && result.unresolvedAmount > 0) {
     pieData.push({
-      name: "To be settled by agreement",
+      name: "Not assigned (see note)",
       value: result.unresolvedAmount,
       share: result.unresolvedAmount / estateValue,
       fraction: numberToFraction(result.unresolvedAmount / estateValue),
@@ -324,7 +324,7 @@ export default function InheritanceCalculator() {
             {(result.unresolvedAmount ?? 0) > 0 && (
               <div className="callout callout-warning">
                 <p className="font-semibold text-text">
-                  Part of the estate is to be settled by agreement:{" "}
+                  Part of the estate is not assigned by the calculator:{" "}
                   <span className="num">{formatUSD(result.unresolvedAmount ?? 0)}</span>
                   <span className="ms-2 text-sm font-normal text-text-2 num">({formatPercent((result.unresolvedAmount ?? 0) / resultEstate)})</span>
                 </p>

@@ -358,34 +358,62 @@ function calculateJafari(
   let unresolvedExplanation: string | undefined;
   const jafariNotes: string[] = [];
 
-  const onlyParentsAndOneDaughter =
-    !!heirs.father && !!heirs.mother && heirs.daughter === 1 && !heirs.son && !heirs.husband && !heirs.wife;
-  if (onlyParentsAndOneDaughter && motherHasHajib) {
-    // Sistani, Islamic Laws ruling 2750: father 1/5, mother 1/6, daughter 3/5; the
-    // remaining 1/30 is to be settled by agreement (muṣālaḥah) as an obligatory
-    // precaution. The calculator does not assign that 1/30 to anyone.
-    shares.father = new SimpleFraction(1, 5);
-    shares.daughter = new SimpleFraction(3, 5);
-    reasons.father = "Receives 1/5 (Sistani, Islamic Laws ruling 2750).";
-    reasons.daughter = "Receives 3/5 (Sistani, Islamic Laws ruling 2750).";
-    reasons.mother = "Receives 1/6: the qualifying brothers and sisters reduce her share (Sistani, Islamic Laws ruling 2750).";
-    unresolvedAmount = estate / 30;
-    unresolvedExplanation = "Ayatollah Sistani (Islamic Laws ruling 2750) rules that the remaining 1/30 must, as an obligatory precaution, be settled by agreement (muṣālaḥah) between the father, mother and daughter. The calculator does not assign it.";
+  const onlySpouseIsWife = !!heirs.wife && Object.keys(shares).every(h => h === 'wife');
+  const disputedReturn = motherHasHajib && hasDescendants && !!shares.mother &&
+    finalTotal.valueOf() < 1 && finalTotal.numerator > 0;
+  if (onlySpouseIsWife) {
+    // Sistani, Minhāj al-Ṣāliḥīn 1059: a wife who is the only heir takes her 1/4;
+    // the rest is not returned to her but belongs to the Imam. The calculator
+    // does not assign that portion.
+    unresolvedAmount = (1 - shares.wife!.valueOf()) * estate;
+    unresolvedExplanation = `Ayatollah Sistani (Minhāj al-Ṣāliḥīn, mas'ala 1059) rules that when the wife is the only heir she takes her fixed 1/4 and the remaining ${new SimpleFraction(1, 1).sub(shares.wife!).toFractionString()} is not returned to her; it belongs to the Imam (sahm al-Imām). The calculator does not assign it. Ask Ayatollah Sistani's office how it is to be paid.`;
+  } else if (disputedReturn) {
+    // Both parents and a daughter (or daughters' line) with a surplus, and the
+    // father alive with qualifying brothers and sisters. The well-known view
+    // keeps the mother out of the return of the surplus; Sistani calls this
+    // doubtful (maḥall ishkāl) and requires the difference to be settled by
+    // agreement (Minhāj al-Ṣāliḥīn 993 and 997; Islamic Laws ruling 2750, which
+    // gives father 1/5, mother 1/6, daughter 3/5 and leaves 1/30). The calculator
+    // computes the return both ways, gives each heir the smaller of the two
+    // results, and leaves the disputed difference unassigned.
+    const surplus = new SimpleFraction(1, 1).sub(finalTotal);
+    const withMother = Object.keys(shares).filter(h => h !== 'husband' && h !== 'wife') as (keyof Heirs)[];
+    const withoutMother = withMother.filter(h => h !== 'mother');
+    const allocate = (recipients: (keyof Heirs)[]) => {
+      const base = recipients.reduce((s, h) => s.add(shares[h]!), new SimpleFraction(0, 1));
+      const out: Partial<Record<keyof Heirs, SimpleFraction>> = {};
+      for (const h of recipients) out[h] = shares[h]!.add(surplus.mul(shares[h]!).div(base));
+      return out;
+    };
+    const a = allocate(withMother);
+    const b = allocate(withoutMother);
+    for (const h of withMother) {
+      const va = a[h] ?? shares[h]!;
+      const vb = b[h] ?? shares[h]!;
+      shares[h] = va.valueOf() <= vb.valueOf() ? va : vb;
+    }
+    let assigned = new SimpleFraction(0, 1);
+    Object.values(shares).forEach(s => assigned = assigned.add(s!));
+    const disputed = new SimpleFraction(1, 1).sub(assigned);
+    reasons.mother = "Receives 1/6: the qualifying brothers and sisters reduce her share. Whether she also shares in the return of the surplus is disputed (Sistani, Minhāj al-Ṣāliḥīn 993; Islamic Laws ruling 2750).";
+    if (shares.father) reasons.father = `Receives ${shares.father.toFractionString()}, the smaller of the two possible results for the disputed return of the surplus (Sistani, Minhāj al-Ṣāliḥīn 993, 997; Islamic Laws ruling 2750).`;
+    for (const k of ['daughter', 'sonsDaughter'] as (keyof Heirs)[]) {
+      if (shares[k]) reasons[k] = `Receives ${shares[k]!.toFractionString()}, the smaller of the two possible results for the disputed return of the surplus (Sistani, Minhāj al-Ṣāliḥīn 993, 997; Islamic Laws ruling 2750).`;
+    }
+    unresolvedAmount = disputed.valueOf() * estate;
+    unresolvedExplanation = `The well-known view keeps the mother out of the return of the surplus when qualifying brothers and sisters reduce her to 1/6. Ayatollah Sistani calls this doubtful and rules that, as an obligatory precaution, the difference (${disputed.toFractionString()} of the estate) must be settled by agreement (muṣālaḥah) between the mother on one side and the father and daughter on the other (Minhāj al-Ṣāliḥīn 993 and 997; Islamic Laws ruling 2750). The calculator does not assign it. Please consult a scholar or his office.`;
   } else if (class2Unresolved) {
     unresolvedAmount = class2Unresolved.valueOf() * estate;
     unresolvedExplanation = `Ayatollah Sistani (Islamic Laws ruling 2771, case 6) gives the paternal half-sister(s) their fixed share and the maternal grandparent 1/3, and rules that the remaining ${class2Unresolved.toFractionString()} must, as an obligatory precaution, be settled by agreement between them. The calculator does not assign it.`;
   } else if (finalTotal.valueOf() < 1 && finalTotal.numerator > 0) {
     wasRaddApplied = true;
     const surplus = new SimpleFraction(1, 1).sub(finalTotal);
-    // In Ja'fari, radd goes to all heirs EXCEPT spouse (unless no other heirs).
-    // A mother reduced to 1/6 by qualifying siblings does not share in the return
-    // (the majority position recorded in Minhāj al-Ṣāliḥīn 993).
-    let raddRecipients: string[] = Object.keys(shares).filter(h => h !== 'husband' && h !== 'wife' && !(h === 'mother' && motherHasHajib && hasDescendants));
-    if (motherHasHajib && hasDescendants && shares.mother) {
-      jafariNotes.push("The mother, reduced to 1/6 by qualifying brothers and sisters, was left out of the return of the surplus. Ayatollah Sistani records this as the majority view but treats it as doubtful and advises a settlement between the heirs over the difference (Minhāj al-Ṣāliḥīn 993). Consult his office for this case.");
-    }
+    // In Ja'fari, radd goes to all heirs except the spouse. A husband who is the
+    // only heir takes the rest by radd (Minhāj al-Ṣāliḥīn 1059); a wife alone is
+    // handled above. The disputed case of a mother reduced by siblings is also
+    // handled above.
+    let raddRecipients: string[] = Object.keys(shares).filter(h => h !== 'husband' && h !== 'wife');
     if (raddRecipients.length === 0) {
-      // Only spouse — radd goes to spouse
       raddRecipients = Object.keys(shares);
     }
     const raddTotal = raddRecipients.reduce((sum, h) => sum.add(shares[h as keyof Heirs]!), new SimpleFraction(0, 1));
