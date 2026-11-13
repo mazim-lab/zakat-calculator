@@ -94,7 +94,7 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       { order: 1, action: "Feed 10 poor people", detail: "One meal each, or the equivalent in staple food (one mudd per person in most schools; half a ṣāʿ in the Ḥanafī school).", isFallback: false },
       { order: 2, action: "Clothe 10 poor people", detail: "Provide each person with clothing sufficient to cover their body for prayer (at minimum, a garment covering the ʿawrah).", isFallback: false },
       { order: 3, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
-      { order: 4, action: "Fast 3 days", detail: madhab === "hanafi" || madhab === "hanbali" ? "Must be 3 consecutive days." : "3 days (consecutive is preferred but not required in this school).", isFallback: true },
+      { order: 4, action: "Fast 3 days", detail: madhab === "hanafi" || madhab === "hanbali" || madhab === "jafari" ? "Must be 3 consecutive days." : "3 days (consecutive is preferred but not required in this school).", isFallback: true },
     ];
 
     return {
@@ -109,6 +109,8 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
           ? "The Ḥanafī school requires the 3 fasting days to be consecutive."
           : madhab === "hanbali"
           ? "The Ḥanbalī school also requires the 3 fasting days to be consecutive."
+          : madhab === "jafari"
+          ? "Ayatollah Sistani requires the 3 fasting days to be consecutive (Islamic Laws, ruling 2687)."
           : "In this school, the 3 fasting days do not need to be consecutive (though it is preferred).",
       ],
     };
@@ -160,7 +162,7 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       ],
       notes: [
         "Based on Quran 4:92. This kaffārah is in ADDITION to blood money (diyah) paid to the victim's family.",
-        "Most Sunni schools agree there is no feeding option for accidental killing: only freeing a slave or fasting. This is based on the Quranic text which mentions only these two options.",
+        "None of the four Sunni schools allows feeding 60 poor people in place of the fast for accidental killing, in its relied-upon position: the Qurʾān (4:92) mentions only freeing a slave and fasting. If you cannot fast, ask a scholar about your case.",
         "The blood money (diyah) amount is a separate calculation and is borne by the killer's ʿāqilah (extended family/clan) in most schools.",
       ],
     };
@@ -174,11 +176,24 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
   };
 }
 
+/**
+ * Whether feeding the poor is one of the kaffārah options for this type and
+ * school. For accidental killing the four Sunni schools allow no feeding
+ * (Qurʾān 4:92; Dar al-Ifta fatwa 17000); the Jaʿfarī school allows it as the
+ * last resort (Sistani, Minhāj al-Ṣāliḥīn, masʾalah 746).
+ */
+export function hasFeedingOption(type: KaffarahType, madhab: Madhab): boolean {
+  return !(type === "accidental_killing" && madhab !== "jafari");
+}
+
 export function estimateFeedingCost(
   type: KaffarahType,
   madhab: Madhab,
   costPerMeal: number
 ): { people: number; totalCost: number } {
+  if (!hasFeedingOption(type, madhab)) {
+    return { people: 0, totalCost: 0 };
+  }
   if (type === "broken_oath") {
     return { people: 10, totalCost: 10 * costPerMeal };
   }

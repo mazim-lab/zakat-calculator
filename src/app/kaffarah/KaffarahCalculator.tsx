@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import Link from "next/link";
 import { Madhab, KaffarahType, KAFFARAH_TYPES } from "@/lib/kaffarah/types";
-import { getKaffarahRuling, estimateFeedingCost } from "@/lib/kaffarah/rulings";
+import { getKaffarahRuling, estimateFeedingCost, hasFeedingOption } from "@/lib/kaffarah/rulings";
 import { kaffarahTotalText, kaffarahBreakdownText, kaffarahEstimateLabel } from "@/lib/kaffarah/calculate";
 import {
   KAFFARAH_OVERVIEW_INFO,
@@ -238,14 +238,25 @@ export function KaffarahCalculator() {
                 </div>
               )}
 
-              {/* Feeding cost estimate */}
-              <div className="text-center py-4 rounded-[10px]" style={{ background: "var(--hue-bg)" }}>
-                <p className="text-sm text-text-2 m-0 mb-1">{kaffarahEstimateLabel(instances)}</p>
-                <p className="num text-[36px] sm:text-[44px] font-semibold leading-tight m-0" style={{ color: "var(--hue-text)" }}>
-                  {kaffarahTotalText(feedingEstimate, instances)}
-                </p>
-                <p className="num text-sm text-text-2 m-0 mt-1">{kaffarahBreakdownText(feedingEstimate, costPerMeal, instances)}</p>
-              </div>
+              {/* Feeding cost estimate (only where feeding is one of the options) */}
+              {hasFeedingOption(kaffarahType, madhab) ? (
+                <div className="text-center py-4 rounded-[10px]" style={{ background: "var(--hue-bg)" }}>
+                  <p className="text-sm text-text-2 m-0 mb-1">{kaffarahEstimateLabel(instances)}</p>
+                  <p className="num text-[36px] sm:text-[44px] font-semibold leading-tight m-0" style={{ color: "var(--hue-text)" }}>
+                    {kaffarahTotalText(feedingEstimate, instances)}
+                  </p>
+                  <p className="num text-sm text-text-2 m-0 mt-1">{kaffarahBreakdownText(feedingEstimate, costPerMeal, instances)}</p>
+                </div>
+              ) : (
+                <div className="callout callout-info">
+                  <p className="text-sm font-semibold text-text m-0 mb-1">No feeding option in this school</p>
+                  <p className="text-sm text-text-2 m-0">
+                    For accidental killing the Qurʾān (4:92) names only freeing a believing slave and, for whoever cannot,
+                    fasting two consecutive months. None of the four Sunni schools allows feeding the poor instead, so no
+                    cost is shown. The kaffārah is the fast{instances > 1 ? `, for each of the ${instances} instances` : ""}.
+                  </p>
+                </div>
+              )}
 
               {/* Type & School */}
               <dl className="m-0">

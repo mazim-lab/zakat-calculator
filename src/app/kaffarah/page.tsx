@@ -56,7 +56,7 @@ const FAQ = [
   },
   {
     q: "What is the kaffārah for a broken oath?",
-    a: "Feed ten poor people, or clothe ten poor people, or free a slave. Only if you cannot afford any of these, fast three days. This is based on Qur'an 5:89. The Ḥanafī and Ḥanbalī schools require the three days to be consecutive; the Mālikī and Shāfiʿī schools prefer it but do not require it.",
+    a: "Feed ten poor people, or clothe ten poor people, or free a slave. Only if you cannot afford any of these, fast three days. This is based on Qur'an 5:89. The Ḥanafī and Ḥanbalī schools, and Ayatollah Sistani for the Jaʿfarī school, require the three days to be consecutive; the Mālikī and Shāfiʿī schools prefer it but do not require it.",
   },
   {
     q: "Why does every ruling mention freeing a slave?",
@@ -133,8 +133,9 @@ export default function Page() {
             </li>
           </ul>
           <p>
-            The estimate is a guide to one option, not the whole ruling. For accidental killing, the Sunni rulings shown
-            have no feeding option, so the cost figure does not apply there. For a broken fast in the Shāfiʿī and
+            The estimate is a guide to one option, not the whole ruling. For accidental killing, the four Sunni schools
+            have no feeding option, so the calculator shows no cost there; the Jaʿfarī ruling (Sistani) allows feeding
+            only if fasting is impossible. For a broken fast in the Shāfiʿī and
             Ḥanbalī schools, it only applies if the fast was broken by intercourse.
           </p>
         </div>

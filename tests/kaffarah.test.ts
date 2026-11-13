@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { getKaffarahRuling, estimateFeedingCost } from "@/lib/kaffarah/rulings";
+import { getKaffarahRuling, estimateFeedingCost, hasFeedingOption } from "@/lib/kaffarah/rulings";
 import {
   getKaffarahRuling as origGetKaffarahRuling,
   estimateFeedingCost as origEstimateFeedingCost,
@@ -46,17 +46,51 @@ function structural(r: KaffarahRuling) {
   };
 }
 
+// Corrected in November 2026 (sources in the commit messages):
+// - accidental killing, Sunni schools: no feeding option, so no feeding cost;
+// - broken oath, Jaʿfarī: Sistani ruling 2687 requires the 3 days to be consecutive.
+const NO_FEEDING = (t: KaffarahType, m: Madhab) => t === "accidental_killing" && m !== "jafari";
+const RULING_CHANGED = (t: KaffarahType, m: Madhab) => NO_FEEDING(t, m) || (t === "broken_oath" && m === "jafari");
+
 describe("Kaffārah: rulings.ts equals the frozen original for every type × school", () => {
   for (const t of TYPES) {
     for (const m of MADHABS) {
-      it(`getKaffarahRuling(${t}, ${m})`, () => {
-        expect(structural(getKaffarahRuling(t, m))).toStrictEqual(structural(origGetKaffarahRuling(t, m)));
+      it(`getKaffarahRuling(${t}, ${m})${RULING_CHANGED(t, m) ? " (corrected)" : ""}`, () => {
+        const now = structural(getKaffarahRuling(t, m));
+        const orig = structural(origGetKaffarahRuling(t, m));
+        if (RULING_CHANGED(t, m)) {
+          expect(now.options.map((o) => o.action)).toEqual(orig.options.map((o) => o.action));
+          expect(now.isSequential).toBe(orig.isSequential);
+          expect(now).not.toStrictEqual(orig);
+        } else {
+          expect(now).toStrictEqual(orig);
+        }
       });
       it.each([0, 1, 7.5, 10, 12.345])(`estimateFeedingCost(${t}, ${m}, %d)`, (cost) => {
-        expect(estimateFeedingCost(t, m, cost)).toStrictEqual(origEstimateFeedingCost(t, m, cost));
+        if (NO_FEEDING(t, m)) expect(estimateFeedingCost(t, m, cost)).toStrictEqual({ people: 0, totalCost: 0 });
+        else expect(estimateFeedingCost(t, m, cost)).toStrictEqual(origEstimateFeedingCost(t, m, cost));
       });
     }
   }
+});
+
+describe("Kaffārah corrections", () => {
+  it("accidental killing: no feeding option in the four Sunni schools, feeding last in Jaʿfarī", () => {
+    for (const m of ["hanafi", "maliki", "shafii", "hanbali"] as Madhab[]) {
+      expect(hasFeedingOption("accidental_killing", m)).toBe(false);
+      expect(getKaffarahRuling("accidental_killing", m).options.some((o) => /feed/i.test(o.action))).toBe(false);
+    }
+    expect(hasFeedingOption("accidental_killing", "jafari")).toBe(true);
+    expect(estimateFeedingCost("accidental_killing", "jafari", 10)).toStrictEqual({ people: 60, totalCost: 600 });
+    for (const t of ["broken_fast", "broken_oath", "zihar"] as KaffarahType[]) for (const m of MADHABS) expect(hasFeedingOption(t, m)).toBe(true);
+  });
+  it("broken oath, Jaʿfarī: the three fasting days must be consecutive (Sistani 2687)", () => {
+    const r = getKaffarahRuling("broken_oath", "jafari");
+    expect(r.options.find((o) => o.action === "Fast 3 days")!.detail).toBe("Must be 3 consecutive days.");
+    expect(r.notes.join(" ")).toMatch(/2687/);
+    // Mālikī and Shāfiʿī unchanged: consecutive not required (Islamweb fatwa 114168)
+    expect(getKaffarahRuling("broken_oath", "maliki").options[3].detail).toMatch(/not required/);
+  });
 });
 
 // [type, madhab, costPerMeal, instances]
@@ -81,7 +115,9 @@ const TABLE: Row[] = [
 describe("Kaffārah: extracted display arithmetic equals the original JSX", () => {
   it.each(TABLE)("%s %s meal=%d instances=%d", (type, madhab, cost, instances) => {
     const est = estimateFeedingCost(type, madhab, cost);
-    const orig = originalJsx(origEstimateFeedingCost(type, madhab, cost), cost, instances);
+    // Where there is no feeding option the UI shows no cost; the formatter is
+    // still the original one, applied to the corrected zero estimate.
+    const orig = originalJsx(NO_FEEDING(type, madhab) ? { people: 0, totalCost: 0 } : origEstimateFeedingCost(type, madhab, cost), cost, instances);
     expect(kaffarahTotalCost(est, instances)).toBe(orig.total);
     expect(kaffarahEstimateLabel(instances)).toBe(orig.label);
     expect(kaffarahTotalText(est, instances)).toBe(orig.totalText);
