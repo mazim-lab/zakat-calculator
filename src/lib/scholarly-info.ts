@@ -65,8 +65,8 @@ export const NISAB_INFO: InfoPanel = {
     },
     {
       school: "Jaʿfarī School",
-      position: "20 sharʿī mithqals of gold (~69.12g) or 105 mithqals of silver (~483.88g)",
-      reasoning: "The Jaʿfarī nisab for gold coins is 20 sharʿī mithqals (one mithqal = 3.456g), slightly lower than the Sunni 85g standard. For silver, 105 common mithqals (~483.88g), also lower than the Sunni 595g. However, these apply only to minted gold/silver coins, not to cash, jewelry, or bullion.",
+      position: "20 sharʿī mithqals of gold (69.12 g) or 105 ṣayrafī mithqals of silver (about 483.84 g)",
+      reasoning: "The Jaʿfarī nisab for gold coins is 20 sharʿī mithqals (one mithqal = 3.456g), slightly lower than the Sunni 85g standard. For silver, 105 common (ṣayrafī) mithqals; at the 4.608 g per ṣayrafī mithqal implied by Sistani's gold figure (69.12 g = 15 ṣayrafī mithqals) that is about 483.84 g, also lower than the Sunni 595 g. These apply only to minted gold and silver coins in circulation, not to paper money, jewelry, or bullion (Sistani, Islamic Laws rulings 1912, 1913, 1915). The calculator uses these Jaʿfarī figures when the Jaʿfarī school is selected.",
     },
   ],
   note: "The practical difference is enormous. The gold nisab (85g) and silver nisab (595g) yield very different dollar amounts. Check the current values shown above based on live metal prices. The Jaʿfarī nisab thresholds are slightly lower but apply only to coined gold and silver.",
@@ -252,7 +252,7 @@ export const AGRICULTURE_INFO: InfoPanel = {
     {
       school: "Jaʿfarī School",
       position: "Minimum threshold of ~847 kg, on 4 specific crops only",
-      reasoning: "Agricultural Zakat is obligatory only on wheat, barley, dates, and dried grapes/raisins, not on rice, vegetables, or other crops. The nisab is approximately 847 kg (based on 288 Tabrizi mounds minus 40 mithqals). Rate is 10% for rain-fed and 5% for artificially irrigated, same as the Sunni schools.",
+      reasoning: "Agricultural Zakat is obligatory only on wheat, barley, dates, and dried grapes/raisins, not on rice, vegetables, or other crops. The nisab is 300 ṣāʿ, approximately 847 kg (Sistani, Islamic Laws ruling 1880); the calculator uses 847 kg when the Jaʿfarī school is selected. Rate is 10% for rain-fed and 5% for artificially irrigated, same as the Sunni schools.",
     },
   ],
   note: "Rate is 10% for rain-fed/natural irrigation, 5% for artificially irrigated crops, and 7.5% for mixed irrigation. Due immediately upon harvest.",

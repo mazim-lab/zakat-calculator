@@ -15,6 +15,14 @@ const SILVER_PRICE_PER_GRAM = FALLBACK_SILVER_USD_PER_GRAM; // USD per gram
 const GOLD_NISAB_GRAMS = 85;
 const SILVER_NISAB_GRAMS = 595;
 const WASQ_KG = 653; // 5 wasqs in kg
+// Jaʿfarī figures, Sistani, Islamic Laws (sistani.org/english/book/48/):
+// gold: 20 sharʿī mithqāls = 15 ṣayrafī mithqāls = 69.12 g (ruling 1912 and its
+// footnote); silver: 105 ṣayrafī mithqāls (ruling 1913), which at the same
+// 4.608 g per ṣayrafī mithqāl (69.12 / 15) is 483.84 g; wheat, barley, dates
+// and raisins: about 847 kg (ruling 1880).
+export const JAFARI_GOLD_NISAB_GRAMS = 69.12;
+export const JAFARI_SILVER_NISAB_GRAMS = 483.84;
+export const JAFARI_CROP_MINIMUM_KG = 847;
 
 /**
  * For retirement accounts holding equities, returns the zakatable fraction.
@@ -213,10 +221,11 @@ export function calculateZakat(
   silverPrice: number = SILVER_PRICE_PER_GRAM
 ): ZakatResult {
   const breakdown: ZakatBreakdown[] = [];
+  const isJafariNisab = choices.madhab === "jafari";
   const nisab =
     choices.nisabStandard === "gold"
-      ? GOLD_NISAB_GRAMS * goldPrice
-      : SILVER_NISAB_GRAMS * silverPrice;
+      ? (isJafariNisab ? JAFARI_GOLD_NISAB_GRAMS : GOLD_NISAB_GRAMS) * goldPrice
+      : (isJafariNisab ? JAFARI_SILVER_NISAB_GRAMS : SILVER_NISAB_GRAMS) * silverPrice;
 
   // AAOIFI standard: 365.25 solar days / 354.36 lunar days ≈ 1.0307
   const yearMultiplier = choices.yearType === "solar" ? 1.0307 : 1.0;
@@ -671,8 +680,9 @@ export function calculateZakat(
 
   // 9. Agriculture
   // The five-wasq minimum is a weight, so it is checked against the harvest
-  // weight in kg, never against its money value.
-  const cropMinimumKg = WASQ_KG;
+  // weight in kg, never against its money value. The Jaʿfarī minimum is about
+  // 847 kg (Sistani, Islamic Laws ruling 1880).
+  const cropMinimumKg = isJafari ? JAFARI_CROP_MINIMUM_KG : WASQ_KG;
   const cropWeightKg = inputs.cropWeightKg ?? 0;
   const visibleItems: ZakatBreakdown[] = [];
   if (inputs.cropValueOrWeight > 0) {

@@ -258,7 +258,7 @@ const CORRECTED_TOTAL: Record<string, { total: number; why: string }> = {
 };
 // Cases where the amount due is unchanged but a reported field changed:
 // totalZakatableWealth no longer counts exempt rows, row notes were reworded,
-// and the fallback prices changed.
+// the Jaʿfarī niṣāb uses Sistani's 69.12 g, and the fallback prices changed.
 const SAME_DUE = new Set<string>([
   "04 Shafii preset, above gold nisab, RRSP deferred",
   "08 Jafari preset, Khums + coins + crops + livestock + excluded assets",
@@ -450,6 +450,12 @@ describe("crop minimum is checked against weight in kg", () => {
     expect(below.totalZakatDue).toBe(0);
     expect(at.totalZakatDue).toBeCloseTo(500, 10);
   });
+  it("Jaʿfarī minimum is about 847 kg (Sistani, ruling 1880)", () => {
+    const below = calculateZakat(preset("jafari"), assets({ cropValueOrWeight: 5000, cropWeightKg: 846 }), 100, 1);
+    const at = calculateZakat(preset("jafari"), assets({ cropValueOrWeight: 5000, cropWeightKg: 847 }), 100, 1);
+    expect(below.totalZakatDue).toBe(0);
+    expect(at.totalZakatDue).toBeCloseTo(500, 10);
+  });
   it("a money value alone is charged, with a note that the minimum was not checked", () => {
     const r = calculateZakat(preset("shafii"), assets({ cropValueOrWeight: 600 }), 100, 1);
     const row = r.breakdown.find((b) => b.category === "Agricultural Produce")!;
@@ -532,6 +538,15 @@ describe("sheep schedule", () => {
   it("Jaʿfarī: 301 to 399 owe four sheep (Sistani ruling 1928)", () => {
     const r = calculateZakat(preset("jafari"), assets({ sheepGoats: 301 }), 100, 1);
     expect(r.totalZakatDue).toBeCloseTo(4 * 150, 10);
+  });
+});
+
+describe("Jaʿfarī niṣāb follows Sistani (rulings 1912, 1913)", () => {
+  it("gold 69.12 g, silver 105 ṣayrafī mithqāls = 483.84 g", () => {
+    expect(calculateZakat(preset("jafari", { nisabStandard: "gold" }), defaultAssets, 100, 1).nisabThreshold).toBeCloseTo(6912, 8);
+    expect(calculateZakat(preset("jafari", { nisabStandard: "silver" }), defaultAssets, 100, 1).nisabThreshold).toBeCloseTo(483.84, 8);
+    // Sunni schools unchanged
+    expect(calculateZakat(preset("shafii"), defaultAssets, 100, 1).nisabThreshold).toBe(8500);
   });
 });
 

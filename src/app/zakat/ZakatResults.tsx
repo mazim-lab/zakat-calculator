@@ -8,6 +8,7 @@ import {
   combinedObligation,
 } from "@/lib/zakat/page-math";
 import { tidyDash } from "@/lib/zakat/display";
+import { JAFARI_GOLD_NISAB_GRAMS, JAFARI_SILVER_NISAB_GRAMS } from "@/lib/calculate";
 
 /** Final step: niṣāb check, total, line-by-line breakdown, Khums (Jaʿfarī) and the disclaimer. */
 export function ZakatResults({
@@ -25,10 +26,11 @@ export function ZakatResults({
   pricesArePlaceholders: boolean;
   fmt: (n: number) => string;
 }) {
+  const jafari = choices.madhab === "jafari";
   const nisabBasis =
     choices.nisabStandard === "gold"
-      ? `${GOLD_NISAB_GRAMS_DISPLAY} g of gold at ${fmt(goldPrice)} per gram`
-      : `${SILVER_NISAB_GRAMS_DISPLAY} g of silver at ${fmt(silverPrice)} per gram`;
+      ? `${jafari ? JAFARI_GOLD_NISAB_GRAMS : GOLD_NISAB_GRAMS_DISPLAY} g of gold at ${fmt(goldPrice)} per gram`
+      : `${jafari ? JAFARI_SILVER_NISAB_GRAMS : SILVER_NISAB_GRAMS_DISPLAY} g of silver at ${fmt(silverPrice)} per gram`;
   // Crops and livestock have their own minimums, so something can be due even
   // when money is below the niṣāb.
   const visibleDue = result.breakdown.some(

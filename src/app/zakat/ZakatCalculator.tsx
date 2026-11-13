@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useId, type ReactNode } from "react";
 import Link from "next/link";
 import { Madhab, MethodologyChoices, AssetInputs, STEPS } from "@/lib/types";
-import { calculateZakat } from "@/lib/calculate";
+import { calculateZakat, JAFARI_GOLD_NISAB_GRAMS, JAFARI_SILVER_NISAB_GRAMS } from "@/lib/calculate";
 import {
   CURRENCIES,
   fetchExchangeRates,
@@ -361,15 +361,15 @@ export function ZakatCalculator() {
                 <OptionCard
                   selected={choices.nisabStandard === "gold"}
                   onClick={() => updateChoice("nisabStandard", "gold")}
-                  title={`Gold Standard (${GOLD_NISAB_GRAMS_DISPLAY} grams)`}
-                  subtitle={`About ${fmt(goldNisabValue(goldPrice))}`}
+                  title={`Gold Standard (${choices.madhab === "jafari" ? JAFARI_GOLD_NISAB_GRAMS : GOLD_NISAB_GRAMS_DISPLAY} grams)`}
+                  subtitle={`About ${fmt(choices.madhab === "jafari" ? JAFARI_GOLD_NISAB_GRAMS * goldPrice : goldNisabValue(goldPrice))}`}
                   description="Used by the majority of modern scholars. More accurately represents actual wealth."
                 />
                 <OptionCard
                   selected={choices.nisabStandard === "silver"}
                   onClick={() => updateChoice("nisabStandard", "silver")}
-                  title={`Silver Standard (${SILVER_NISAB_GRAMS_DISPLAY} grams)`}
-                  subtitle={`About ${fmt(silverNisabValue(silverPrice))}`}
+                  title={`Silver Standard (${choices.madhab === "jafari" ? JAFARI_SILVER_NISAB_GRAMS : SILVER_NISAB_GRAMS_DISPLAY} grams)`}
+                  subtitle={`About ${fmt(choices.madhab === "jafari" ? JAFARI_SILVER_NISAB_GRAMS * silverPrice : silverNisabValue(silverPrice))}`}
                   description="More cautious approach. It ensures more people fulfill their Zakat obligation."
                 />
               </OptionGroup>
@@ -900,7 +900,7 @@ export function ZakatCalculator() {
               suffix="kg"
               hint={
                 choices.agriculturalMinimum
-                  ? "Used only to check the minimum of five wasqs: 653 kg as this calculator counts it."
+                  ? `Used only to check the minimum of five wasqs: ${choices.madhab === "jafari" ? "about 847 kg (Sistani)" : "653 kg as this calculator counts it"}.`
                   : "No minimum threshold per Ḥanafī school, so the weight is not needed."
               }
             />
