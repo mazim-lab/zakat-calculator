@@ -79,71 +79,10 @@ const TOC = [
   { id: "privacy", label: "Privacy" },
   { id: "limits", label: "Limitations" },
   { id: "scholars", label: "Ask a scholar" },
-  { id: "corrections", label: "Corrections" },
   { id: "errors", label: "Reporting an error" },
 ];
 
 const ISSUES_URL = "https://github.com/mazim-lab/zakat-calculator/issues";
-
-// Plain-language log of the corrections made on 13 November 2026.
-const CORRECTIONS: { title: string; text: string }[] = [
-  {
-    title: "Inheritance: brothers and sisters",
-    text: "A full or paternal brother now takes what is left after the fixed shares, with his sisters at half his share (Qurʾān 4:176). Before, a wife and a brother sent three quarters to the public treasury, and a brother and sister gave the sister everything. A sister now also takes what is left beside a daughter, and a son's daughter takes 1/6 beside one daughter (Ṣaḥīḥ al-Bukhārī 6736).",
-  },
-  {
-    title: "Inheritance: maternal half-siblings",
-    text: "They now receive 1/6 (one) or share 1/3 (two or more) when there is no child, father or grandfather (Qurʾān 4:12). Before, they never inherited. Half-siblings and a son's children can now be entered in the calculator.",
-  },
-  {
-    title: "Inheritance: the mother with siblings",
-    text: "Two or more siblings reduce the mother to 1/6 even when the father excludes them (Qurʾān 4:11). Before, she kept 1/3.",
-  },
-  {
-    title: "Inheritance: grandfather with siblings",
-    text: "For the Mālikī, Shāfiʿī and Ḥanbalī schools, the grandfather takes the best of his options, not an extra 1/6 on top. A grandfather and one brother now take half each, not 7/12 and 5/12. The Ḥanafī rule, where the grandfather excludes the siblings, is unchanged.",
-  },
-  {
-    title: "Inheritance: Jaʿfarī school",
-    text: "The father and mother were reversed when they were the only heirs; the mother now takes 1/3 and the father 2/3, as Ayatollah Sistani rules. A daughter and a parent now share 3/4 and 1/4, the mother is reduced by brothers and sisters only on Sistani's conditions, and grandparents and siblings follow his rulings. Where Sistani calls the division doubtful and requires the heirs to settle part of it by agreement, that part is now shown as not assigned instead of being given to someone. A wife who is the only heir now takes 1/4, and the rest is shown as the Imam's share, as Sistani rules; before, she was given everything.",
-  },
-  {
-    title: "Inheritance: al-Mushtarakah",
-    text: "With a husband, a mother, two or more maternal half-siblings and a full brother, the Mālikī and Shāfiʿī schools let the full brothers and sisters share the maternal half-siblings' 1/3 equally with them. The calculator now does this for those two schools; the Ḥanafī and Ḥanbalī schools give the full brother nothing here.",
-  },
-  {
-    title: "Inheritance: the father and his mother",
-    text: "In the Ḥanafī, Mālikī and Shāfiʿī schools the father excludes his own mother (the paternal grandmother). Before, she received 1/6 beside him in every school. She still does in the Ḥanbalī school, which lets her inherit beside her son.",
-  },
-  {
-    title: "Zakat: debts",
-    text: "Debts were spread over exempt items, such as exempt jewellery or deferred retirement funds, which made the Zakat too high. With 20,000 in cash, 5,000 of debt and exempt jewellery, the calculator said 412.97 instead of 375. Debts now reduce only the money you are charged on. In the Mālikī school a debt reduces money only if you have no other assets to pay it from, and the results now say so.",
-  },
-  {
-    title: "Zakat: crops and livestock",
-    text: "Crops and livestock were set to zero when cash was below the niṣāb, although they have their own minimums. They now stay due on their own minimum. Debts do not reduce them in the Mālikī and Shāfiʿī schools. Where the Ḥanafī school (livestock, once money is used up) or the Ḥanbalī school (crops and livestock) lets debts reduce them, the calculator now marks those lines as not calculated and asks you to consult a scholar, rather than give a figure it cannot check. Crop value and crop weight are now separate boxes, so the five-wasq minimum is checked against kilograms, not money.",
-  },
-  {
-    title: "Zakat: livestock tables",
-    text: "Cattle above 70 head and camels from 25 head now follow the classical schedules (the hadith of Muʿādh in Sunan Abī Dāwūd 1576 and the letter of Abū Bakr in Ṣaḥīḥ al-Bukhārī 1454), with each school's rule above 120 camels. Camels due as camels are shown in kind.",
-  },
-  {
-    title: "Zakat: Jaʿfarī figures",
-    text: "The Jaʿfarī niṣāb now uses Sistani's 69.12 g of gold and 105 ṣayrafī mithqāls of silver, and his crop minimum of about 847 kg, matching the notes. Before, the code used the Sunni figures.",
-  },
-  {
-    title: "Zakat: fallback prices",
-    text: "The stored gold and silver prices, used only when the live source fails, were from March 2026. They were refreshed on 13 November 2026 from the same source, and the warning now shows their date.",
-  },
-  {
-    title: "Kaffārah",
-    text: "A feeding cost was shown for accidental killing, where the four Sunni schools allow no feeding (Qurʾān 4:92); it is no longer shown for them. For a broken oath, the Jaʿfarī three-day fast is now marked consecutive, as Sistani rules.",
-  },
-  {
-    title: "Fidya and Zakat al-Fiṭr",
-    text: "Statements that all schools agree were corrected: the Mālikī school makes fidya for the elderly recommended rather than obligatory, and the Ḥanafī school has a different rule on who must pay Zakat al-Fiṭr and does not oblige a husband to pay for his wife. The Ḥanbalī half ṣāʿ is now two mudd (about 1.02 kg), consistent with the mudd the site uses.",
-  },
-];
 
 export default function AboutPage() {
   return (
@@ -346,6 +285,13 @@ export default function AboutPage() {
             unassigned. Every rule is checked by automated tests against more than 60 classical cases, each with its
             source.
           </p>
+          <h3>How the rules were checked</h3>
+          <p>
+            We reviewed every calculator against the Qurʾān, authentic hadith, recognised references for each school
+            and, for the Jaʿfarī school, Ayatollah Sistani&apos;s published rulings. The review was done by the
+            site&apos;s maintainers with AI assistance, against the sources cited. No scholar reviewed it, and it is not
+            a scholarly endorsement.
+          </p>
         </div>
       </Section>
 
@@ -413,31 +359,6 @@ export default function AboutPage() {
           The explanations restate positions found in the works and bodies they name. They are a starting point for a
           conversation with someone qualified, not the end of it.
         </p>
-      </Section>
-
-      <Section id="corrections" title="Corrections">
-        <div className="prose">
-          <p>
-            <strong>13 November 2026.</strong> We reviewed every calculator against the Qurʾān, authentic hadith,
-            recognised references for each school and, for the Jaʿfarī school, Ayatollah Sistani&apos;s published
-            rulings. The review was done by the site&apos;s maintainers with AI assistance, against the sources cited.
-            No scholar reviewed it, and it is not a scholarly endorsement. We corrected the following. Each correction
-            names its source in the calculator&apos;s notes.
-          </p>
-          <ul>
-            {CORRECTIONS.map((c) => (
-              <li key={c.title}>
-                <strong>{c.title}.</strong> {c.text}
-              </li>
-            ))}
-          </ul>
-          <p>
-            Some questions remain where the schools or modern bodies genuinely differ and the site has no basis to
-            choose for you, such as how to value gold jewellery, how retirement accounts are counted, and whether a
-            Mālikī or Shāfiʿī user should send an inheritance surplus to a public treasury. Those are unchanged and are
-            explained in the notes beside each setting.
-          </p>
-        </div>
       </Section>
 
       <Section id="errors" title="Reporting an error">
