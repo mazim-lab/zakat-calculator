@@ -10,13 +10,16 @@ interface CurrencyInputProps {
   prefix?: string;
   suffix?: string;
   hint?: string;
+  /** Whole-number counts (head of livestock, days, people). Decimals are rounded down. */
+  integer?: boolean;
 }
 
 /**
  * Numeric input with a label, optional prefix/suffix and hint.
- * Parsing is unchanged from the original: parseFloat(value) || 0, and 0 renders as empty.
+ * Parsing: parseFloat(value) || 0, and 0 renders as empty. Every quantity on the
+ * site is non-negative, so negative entries are clamped to 0.
  */
-export function CurrencyInput({ label, value, onChange, placeholder = "0", prefix = "$", suffix, hint }: CurrencyInputProps) {
+export function CurrencyInput({ label, value, onChange, placeholder = "0", prefix = "$", suffix, hint, integer = false }: CurrencyInputProps) {
   const id = useId();
   const hintId = `${id}-hint`;
   const padStart = prefix ? `${Math.max(2, prefix.length * 0.65 + 1.2)}rem` : undefined;
@@ -34,9 +37,14 @@ export function CurrencyInput({ label, value, onChange, placeholder = "0", prefi
         <input
           id={id}
           type="number"
-          inputMode="decimal"
+          inputMode={integer ? "numeric" : "decimal"}
+          min={0}
+          step={integer ? 1 : "any"}
           value={value || ""}
-          onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+          onChange={(e) => {
+            const n = Math.max(0, parseFloat(e.target.value) || 0);
+            onChange(integer ? Math.floor(n) : n);
+          }}
           placeholder={placeholder}
           aria-describedby={hint ? hintId : undefined}
           style={{ paddingInlineStart: padStart, paddingInlineEnd: suffix ? "4.5rem" : undefined }}

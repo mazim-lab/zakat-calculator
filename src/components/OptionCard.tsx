@@ -12,6 +12,11 @@ interface OptionCardProps {
   children?: React.ReactNode;
 }
 
+/** Arabic-script strings get lang="ar", dir="rtl" and the Naskh font (via [lang="ar"] in globals.css). */
+function arabicProps(text: string): { lang?: string; dir?: "rtl" } {
+  return /^[\s؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿/()]+$/.test(text) ? { lang: "ar", dir: "rtl" } : {};
+}
+
 /** A selectable choice. Rendered as a toggle button (aria-pressed) with an optional "more info" disclosure. */
 export function OptionCard({ selected, onClick, title, subtitle, description, badge, children }: OptionCardProps) {
   const [showInfo, setShowInfo] = useState(false);
@@ -24,8 +29,16 @@ export function OptionCard({ selected, onClick, title, subtitle, description, ba
           <span className="option-radio" aria-hidden="true" />
           <span className={`flex-1 min-w-0 ${description ? "pe-10" : ""}`}>
             <span className="block font-semibold text-[15.5px] text-text leading-snug">{title}</span>
-            {badge && <span className="chip chip-amber mt-1.5 !whitespace-normal">{badge}</span>}
-            {subtitle && <span className="block text-sm text-text-2 mt-0.5 leading-snug">{subtitle}</span>}
+            {badge && (
+              <span className="chip chip-amber mt-1.5 !whitespace-normal">
+                <span {...arabicProps(badge)}>{badge}</span>
+              </span>
+            )}
+            {subtitle && (
+              <span className="block text-sm text-text-2 mt-0.5 leading-snug">
+                <span {...arabicProps(subtitle)}>{subtitle}</span>
+              </span>
+            )}
           </span>
         </button>
         {description && (

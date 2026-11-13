@@ -13,6 +13,7 @@ import { calculateFitr } from "@/lib/zakat-fitr/calculate";
 import { InfoAccordion } from "@/components/InfoAccordion";
 import { CurrencyInput } from "@/components/CurrencyInput";
 import { OptionCard } from "@/components/OptionCard";
+import { money, count } from "@/components/format";
 
 const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
   { value: "hanafi", label: "Ḥanafī", labelAr: "حنفي" },
@@ -297,11 +298,11 @@ export function ZakatFitrCalculator() {
 
               <div className="text-center py-4 rounded-[10px]" style={{ background: "var(--hue-bg)" }}>
                 <p className="text-sm text-text-2 m-0 mb-1">Total due</p>
-                <p className="num text-[40px] sm:text-[48px] font-semibold leading-tight m-0" style={{ color: "var(--hue-text)" }}>
-                  ${result.total.toFixed(2)}
+                <p className="num text-[clamp(28px,10vw,40px)] sm:text-[48px] font-semibold leading-tight m-0 whitespace-nowrap" style={{ color: "var(--hue-text)" }}>
+                  {money(result.total)}
                 </p>
                 <p className="text-sm text-text-2 m-0 mt-2">
-                  <span className="num">${result.perPerson.toFixed(2)}</span> × <span className="num">{result.totalPeople}</span>{" "}
+                  <span className="num">{money(result.perPerson)}</span> × <span className="num">{count(result.totalPeople)}</span>{" "}
                   {result.totalPeople === 1 ? "person" : "people"}
                 </p>
               </div>
@@ -309,10 +310,10 @@ export function ZakatFitrCalculator() {
               <dl className="m-0">
                 <Row label="School of jurisprudence">{madhabLabel}</Row>
                 <Row label="People in household">
-                  <span className="num">{result.totalPeople}</span>
+                  <span className="num">{count(result.totalPeople)}</span>
                 </Row>
                 <Row label="Per person">
-                  <span className="num">${result.perPerson.toFixed(2)}</span>
+                  <span className="num">{money(result.perPerson)}</span>
                 </Row>
                 <Row label="Calculation" small>
                   <span className="num">{result.method}</span>

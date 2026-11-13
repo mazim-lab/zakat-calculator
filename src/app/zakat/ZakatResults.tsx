@@ -70,7 +70,7 @@ export function ZakatResults({
       {/* Total */}
       <div className="text-center py-4">
         <p className="eyebrow">Your Zakat due</p>
-        <p className="num mt-2 text-[40px] sm:text-[52px] font-bold tracking-[-0.02em] leading-none text-text break-words">
+        <p className="num mt-2 text-[clamp(22px,8vw,40px)] sm:text-[52px] font-bold tracking-[-0.02em] leading-tight text-text whitespace-nowrap overflow-x-auto">
           {fmt(result.totalZakatDue)}
         </p>
         <p className="text-text-2 text-sm mt-3">
@@ -94,11 +94,25 @@ export function ZakatResults({
                 </div>
                 <div className="sm:text-end shrink-0">
                   <p className="num text-text">
-                    {item.amount < 0 ? "-" : ""}
-                    {fmt(Math.abs(item.amount))}
+                    {/* Livestock lines carry a head count in `amount`, not money. */}
+                    {/^(Sheep & Goats|Cattle|Camels)$/.test(item.category)
+                      ? `${item.amount.toLocaleString("en-US")} head`
+                      : `${item.amount < 0 ? "-" : ""}${fmt(Math.abs(item.amount))}`}
                   </p>
                   <p className={`num text-sm font-semibold ${item.zakatDue > 0 ? "text-indigo-text" : "text-text-2"}`}>
-                    {item.status === "in_kind" ? "Due in kind" : item.status === "not_calculated" ? "Not calculated" : item.zakatDue > 0 ? `Zakat ${fmt(item.zakatDue)}` : item.rate === 0 ? "Exempt" : fmt(0)}
+                    {/* The engine's status decides in-kind and declined lines; a camel herd
+                        below the minimum is exempt, not "due in kind". */}
+                    {item.status === "in_kind"
+                      ? "Due in kind"
+                      : item.status === "not_calculated"
+                        ? "Not calculated"
+                        : item.zakatDue > 0
+                          ? `Zakat ${fmt(item.zakatDue)}`
+                          : item.amount < 0
+                            ? "Deducted"
+                            : item.rate === 0
+                              ? "Exempt"
+                              : fmt(0)}
                   </p>
                 </div>
               </li>

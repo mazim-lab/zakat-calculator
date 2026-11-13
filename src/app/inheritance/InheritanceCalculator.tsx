@@ -40,6 +40,29 @@ const HEIR_OPTIONS: { id: Heir; title: string; description: string; type: "boole
   { id: "sonsDaughter", title: "Son's Daughters", description: "Daughters of a son who died before the deceased.", type: "count" },
 ];
 
+// Display names for result rows. The engine builds labels from camelCase keys
+// ("Sons Son", "Paternal Half Brother"), so the UI maps the heir key here.
+const HEIR_LABEL: Partial<Record<Heir, string>> = {
+  husband: "Husband",
+  wife: "Wife",
+  son: "Son",
+  daughter: "Daughter",
+  father: "Father",
+  mother: "Mother",
+  paternalGrandfather: "Paternal Grandfather",
+  paternalGrandmother: "Paternal Grandmother",
+  maternalGrandmother: "Maternal Grandmother",
+  fullBrother: "Full Brother",
+  fullSister: "Full Sister",
+  paternalHalfBrother: "Paternal Half-Brother",
+  paternalHalfSister: "Paternal Half-Sister",
+  maternalHalfBrother: "Maternal Half-Brother",
+  maternalHalfSister: "Maternal Half-Sister",
+  sonsSon: "Son's Son",
+  sonsDaughter: "Son's Daughter",
+};
+const heirLabel = (heir: Heir, fallback: string) => HEIR_LABEL[heir] ?? fallback;
+
 const MADHABS: { value: Madhab; label: string }[] = [
   { value: "hanafi", label: "Ḥanafī" },
   { value: "maliki", label: "Mālikī" },
@@ -55,7 +78,7 @@ function buildPieData(result: CalculationResult, estateValue: number): DonutSlic
   const pieData: DonutSlice[] = result.shares
     .filter((s) => (s.share ?? 0) > 0)
     .map((s) => ({
-      name: `${s.label}${s.count > 1 ? ` (×${s.count})` : ""}`,
+      name: `${heirLabel(s.heir, s.label)}${s.count > 1 ? ` (×${s.count})` : ""}`,
       value: s.amount,
       share: s.share ?? 0,
       fraction: numberToFraction(s.share ?? 0),
@@ -402,7 +425,7 @@ export default function InheritanceCalculator() {
                         <tr key={s.heir}>
                           <td>
                             <span className="font-semibold text-text">
-                              {s.label} {s.count > 1 ? `(x${s.count})` : ""}
+                              {heirLabel(s.heir, s.label)} {s.count > 1 ? `(×${s.count})` : ""}
                             </span>
                             <span className="block text-[13.5px] text-text-2 mt-0.5 leading-snug">{tidyDash(s.reason)}</span>
                           </td>
@@ -426,7 +449,7 @@ export default function InheritanceCalculator() {
                   {result.blocked.map((b) => (
                     <li key={b.heir} className="px-4 py-3">
                       <p className="text-text">
-                        <span className="font-semibold">{b.label}</span> was blocked.
+                        <span className="font-semibold">{heirLabel(b.heir, b.label)}</span> was blocked.
                       </p>
                       <p className="text-sm text-text-2">Reason: {tidyDash(b.reason)}</p>
                     </li>
@@ -497,6 +520,7 @@ function CountStepper({ label, value, onChange }: { label: string; value: number
       <input
         type="number"
         min={1}
+        step={1}
         inputMode="numeric"
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value))}

@@ -931,9 +931,9 @@ export function ZakatCalculator() {
               Zakat on livestock applies to free-grazing animals held for one lunar year. Animals kept for trade are
               classified as business inventory instead.
             </Lead>
-            <CurrencyInput label="Sheep & Goats" value={assets.sheepGoats} onChange={(v) => updateAsset("sheepGoats", v)} prefix="" suffix="head" hint="Minimum: 40 head for Zakat to be due" />
-            <CurrencyInput label="Cattle" value={assets.cattle} onChange={(v) => updateAsset("cattle", v)} prefix="" suffix="head" hint="Minimum: 30 head for Zakat to be due" />
-            <CurrencyInput label="Camels" value={assets.camels} onChange={(v) => updateAsset("camels", v)} prefix="" suffix="head" hint="Minimum: 5 head for Zakat to be due" />
+            <CurrencyInput label="Sheep & Goats" value={assets.sheepGoats} onChange={(v) => updateAsset("sheepGoats", v)} prefix="" suffix="head" integer hint="Minimum: 40 head for Zakat to be due" />
+            <CurrencyInput label="Cattle" value={assets.cattle} onChange={(v) => updateAsset("cattle", v)} prefix="" suffix="head" integer hint="Minimum: 30 head for Zakat to be due" />
+            <CurrencyInput label="Camels" value={assets.camels} onChange={(v) => updateAsset("camels", v)} prefix="" suffix="head" integer hint="Minimum: 5 head for Zakat to be due" />
           </div>
         )}
 
