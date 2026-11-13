@@ -90,6 +90,12 @@ const SCENARIOS: { name: string; heirs: RawHeirs }[] = [
 // Scenarios whose shares were deliberately corrected in November 2026. The new
 // values are asserted, with sources, in tests/inheritance-classical.test.ts.
 const CORRECTED = new Set<string>([
+  "Daughter + mother (radd)|jafari",
+  "Wife + father + mother (umariyyatan)|jafari",
+  "Father + mother only|jafari",
+  "Class 2: grandmother + maternal half-brother|jafari",
+  "Grandfather + 1 full brother|jafari",
+  "Wife + grandfather + 2 brothers + 1 sister|jafari",
   ...["maliki", "shafii", "hanbali"].flatMap((m) => [
     `Grandfather + 1 full brother|${m}`,
     `Wife + grandfather + 2 brothers + 1 sister|${m}`,
@@ -103,8 +109,15 @@ const CORRECTED = new Set<string>([
     `Wife + paternal half-brother + paternal half-sister|${m}`,
   ]),
 ]);
-// Scenarios where only the explanation text changed (shares are equal).
-const REWORDED = new Set<string>([]);
+// Jaʿfarī scenarios where only the explanation text changed (shares are equal).
+const REWORDED = new Set<string>([
+  "One daughter only", "Three daughters only", "Husband + 2 full sisters (awl)",
+  "Husband + mother + 2 full sisters (awl)", "Husband + father + mother (umariyyatan)",
+  "Mother + grandfather + 1 full sister", "Father + grandfather + brother (hajb)",
+  "Mother + both grandmothers (hajb)", "Both grandmothers + 2 daughters", "Full brother + full sister",
+  "Jafari class 1 blocks class 2", "Husband + 2 maternal half-sisters", "Daughter + full brother",
+  "Wife + paternal half-brother + paternal half-sister",
+].map((n) => `${n}|jafari`));
 
 const numeric = (r: CalculationResult) => ({
   shares: r.shares.filter((s) => (s.share ?? 0) > 0).map((s) => [s.heir, s.share, s.amount]).sort(),

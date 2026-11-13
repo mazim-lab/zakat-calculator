@@ -102,6 +102,27 @@ const ROWS: Row[] = [
   { name: "al-Muʿāddah: grandfather + full brother + paternal half-brother", heirs: { paternalGrandfather: true, fullBrother: 1, paternalHalfBrother: 1 }, madhabs: MSH, expect: { paternalGrandfather: "1/3", fullBrother: "2/3" }, blocked: ["paternalHalfBrother"], source: S.grandfather },
   { name: "al-Muʿāddah: grandfather + full sister + paternal half-brother", heirs: { paternalGrandfather: true, fullSister: 1, paternalHalfBrother: 1 }, madhabs: MSH, expect: { paternalGrandfather: "2/5", fullSister: "1/2", paternalHalfBrother: "1/10" }, source: S.grandfather },
 
+  // Jaʿfarī (Sistani)
+  { name: "Jaʿfarī: father + mother", heirs: { father: true, mother: true }, madhabs: JAFARI, expect: { mother: "1/3", father: "2/3" }, source: `${S.sistani1} (ruling 2749)` },
+  { name: "Jaʿfarī: father + mother + 2 full brothers", heirs: { father: true, mother: true, fullBrother: 2 }, madhabs: JAFARI, expect: { mother: "1/6", father: "5/6" }, blocked: ["fullBrother"], source: `${S.sistani1} (ruling 2749)` },
+  { name: "Jaʿfarī: father + mother + 1 brother + 1 sister (not enough to reduce)", heirs: { father: true, mother: true, fullBrother: 1, fullSister: 1 }, madhabs: JAFARI, expect: { mother: "1/3", father: "2/3" }, source: `${S.sistani1} (ruling 2749)` },
+  { name: "Jaʿfarī: father + mother + 2 maternal half-brothers (do not reduce)", heirs: { father: true, mother: true, maternalHalfBrother: 2 }, madhabs: JAFARI, expect: { mother: "1/3", father: "2/3" }, source: `${S.minhaj} (masʾalah 990)` },
+  { name: "Jaʿfarī: father + mother + 4 paternal half-sisters", heirs: { father: true, mother: true, paternalHalfSister: 4 }, madhabs: JAFARI, expect: { mother: "1/6", father: "5/6" }, source: `${S.sistani1} (ruling 2749)` },
+  { name: "Jaʿfarī: one daughter + father", heirs: { daughter: 1, father: true }, madhabs: JAFARI, expect: { daughter: "3/4", father: "1/4" }, source: `${S.sistani1} (ruling 2754)` },
+  { name: "Jaʿfarī: 2 daughters + mother", heirs: { daughter: 2, mother: true }, madhabs: JAFARI, expect: { daughter: "4/5", mother: "1/5" }, source: `${S.sistani1} (ruling 2755)` },
+  { name: "Jaʿfarī: daughter + father + mother", heirs: { daughter: 1, father: true, mother: true }, madhabs: JAFARI, expect: { daughter: "3/5", father: "1/5", mother: "1/5" }, source: `${S.sistani1} (ruling 2750)` },
+  { name: "Jaʿfarī: daughter + father + mother + 2 brothers (1/30 settled by agreement)", heirs: { daughter: 1, father: true, mother: true, fullBrother: 2 }, madhabs: JAFARI, expect: { daughter: "3/5", father: "1/5", mother: "1/6" }, unresolved: "1/30", source: `${S.sistani1} (ruling 2750)` },
+  { name: "Jaʿfarī: father + mother + son", heirs: { father: true, mother: true, son: 1 }, madhabs: JAFARI, expect: { father: "1/6", mother: "1/6", son: "2/3" }, source: `${S.sistani1} (ruling 2751)` },
+  { name: "Jaʿfarī: husband + father + mother (no ʿUmariyyah)", heirs: { husband: true, father: true, mother: true }, madhabs: JAFARI, expect: { husband: "1/2", mother: "1/3", father: "1/6" }, source: `${S.minhaj} (masʾalah 989)` },
+  { name: "Jaʿfarī: wife + father + mother", heirs: { wife: 1, father: true, mother: true }, madhabs: JAFARI, expect: { wife: "1/4", mother: "1/3", father: "5/12" }, source: `${S.minhaj} (masʾalah 989)` },
+  { name: "Jaʿfarī: husband + daughter + father + mother (shortfall on the daughter)", heirs: { husband: true, daughter: 1, father: true, mother: true }, madhabs: JAFARI, expect: { husband: "1/4", father: "1/6", mother: "1/6", daughter: "5/12" }, source: `${S.minhaj} (masʾalah 997)` },
+  { name: "Jaʿfarī: full brother + maternal half-sister", heirs: { fullBrother: 1, maternalHalfSister: 1 }, madhabs: JAFARI, expect: { fullBrother: "5/6", maternalHalfSister: "1/6" }, source: `${S.sistani2} (ruling 2761)` },
+  { name: "Jaʿfarī: full brother + 2 maternal half-brothers", heirs: { fullBrother: 1, maternalHalfBrother: 2 }, madhabs: JAFARI, expect: { fullBrother: "2/3", maternalHalfBrother: "1/3" }, source: `${S.sistani2} (ruling 2762)` },
+  { name: "Jaʿfarī: full brother + paternal half-brother", heirs: { fullBrother: 1, paternalHalfBrother: 1 }, madhabs: JAFARI, expect: { fullBrother: "1" }, blocked: ["paternalHalfBrother"], source: `${S.sistani2} (ruling 2759)` },
+  { name: "Jaʿfarī: paternal grandmother + maternal half-brother", heirs: { paternalGrandmother: true, maternalHalfBrother: 1 }, madhabs: JAFARI, expect: { paternalGrandmother: "5/6", maternalHalfBrother: "1/6" }, source: `${S.sistani2} (ruling 2771, case 5)` },
+  { name: "Jaʿfarī: paternal grandfather + full brother (all male, father's side: equal)", heirs: { paternalGrandfather: true, fullBrother: 1 }, madhabs: JAFARI, expect: { paternalGrandfather: "1/2", fullBrother: "1/2" }, source: `${S.sistani2} (ruling 2771, cases 2-3)` },
+  { name: "Jaʿfarī: paternal grandparents + maternal grandmother", heirs: { paternalGrandfather: true, paternalGrandmother: true, maternalGrandmother: true }, madhabs: JAFARI, expect: { paternalGrandfather: "4/9", paternalGrandmother: "2/9", maternalGrandmother: "1/3" }, source: `${S.sistani2} (ruling 2769)` },
+  { name: "Jaʿfarī: maternal grandmother + paternal half-sister (1/6 settled by agreement)", heirs: { maternalGrandmother: true, paternalHalfSister: 1 }, madhabs: JAFARI, expect: { maternalGrandmother: "1/3", paternalHalfSister: "1/2" }, unresolved: "1/6", source: `${S.sistani2} (ruling 2771, case 6)` },
 ];
 
 const ESTATE = 120000;
@@ -163,7 +184,7 @@ describe("property: every heir set allocates exactly the estate", () => {
     sets.push(h);
   }
 
-  for (const m of ["hanafi", "maliki", "shafii", "hanbali"] as Madhab[]) {
+  for (const m of ["hanafi", "maliki", "shafii", "hanbali", "jafari"] as Madhab[]) {
     it(`4000 random heir sets [${m}]`, () => {
       for (const h of sets) {
         const r = run(h, m);
