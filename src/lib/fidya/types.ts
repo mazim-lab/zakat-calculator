@@ -45,9 +45,9 @@ export const FIDYA_WEIGHTS: Record<Madhab, FidyaWeightInfo> = {
     getWeightKg: () => 0.51,
   },
   hanbali: {
-    measure: "One mudd of wheat (~0.51 kg) or half a ṣāʿ of other staples (~1.6 kg)",
-    description: "The Ḥanbalī school requires one mudd of wheat per day. For other staples (barley, dates, raisins), half a ṣāʿ (~1.6 kg) is required.",
-    getWeightKg: (unit) => unit === "wheat" ? 0.51 : 1.6, // wheat = one mudd; others = half sa'
+    measure: "One mudd of wheat (~0.51 kg) or half a ṣāʿ (two mudd) of other staples (~1.02 kg)",
+    description: "The Ḥanbalī school requires one mudd of wheat per day. For other staples (barley, dates, raisins), half a ṣāʿ is required; one ṣāʿ is four mudd, so half a ṣāʿ is two mudd, about 1.02 kg using the 0.51 kg mudd this site uses.",
+    getWeightKg: (unit) => unit === "wheat" ? 0.51 : 1.02, // wheat = one mudd; others = half sa' = 2 mudd x 0.51 kg
   },
   jafari: {
     measure: "One mudd of food (~750g, approximately 3/4 kg)",

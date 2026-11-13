@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useId, useState } from "react";
 
 interface OptionCardProps {
   selected: boolean;
@@ -13,105 +12,57 @@ interface OptionCardProps {
   children?: React.ReactNode;
 }
 
-export function OptionCard({
-  selected,
-  onClick,
-  title,
-  subtitle,
-  description,
-  badge,
-  children,
-}: OptionCardProps) {
+/** Arabic-script strings get lang="ar", dir="rtl" and the Naskh font (via [lang="ar"] in globals.css). */
+function arabicProps(text: string): { lang?: string; dir?: "rtl" } {
+  return /^[\s؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿/()]+$/.test(text) ? { lang: "ar", dir: "rtl" } : {};
+}
+
+/** A selectable choice. Rendered as a toggle button (aria-pressed) with an optional "more info" disclosure. */
+export function OptionCard({ selected, onClick, title, subtitle, description, badge, children }: OptionCardProps) {
   const [showInfo, setShowInfo] = useState(false);
+  const infoId = useId();
 
   return (
     <div>
-      <div
-        className={`w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between gap-2 ${
-          selected
-            ? "border-[var(--emerald)] bg-[var(--info-bg)] shadow-[0_0_0_3px_rgba(26,107,74,0.1)]"
-            : "border-[var(--sand)] bg-[var(--cream-light)] hover:border-[var(--sand-dark)]"
-        }`}
-      >
-        <motion.button
-          whileHover={{ scale: 1.005 }}
-          whileTap={{ scale: 0.995 }}
-          onClick={onClick}
-          className="flex-1 text-left cursor-pointer bg-transparent border-none p-0"
-        >
-          <div className="flex items-center gap-2">
-            <div
-              className={`w-5 h-5 shrink-0 rounded-full border-2 flex items-center justify-center transition-all ${
-                selected
-                  ? "border-[var(--emerald)] bg-[var(--emerald)]"
-                  : "border-[var(--sand-dark)]"
-              }`}
-            >
-              {selected && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="w-2 h-2 bg-white rounded-full"
-                />
-              )}
-            </div>
-            <div>
-              <h3 className="font-['Amiri',serif] font-bold text-lg text-[var(--ink)]">
-                {title}
-              </h3>
-              {badge && (
-                <span className="inline-block mt-0.5 px-2.5 py-0.5 bg-[var(--warning-bg)] border border-[var(--warning-border)] text-[var(--gold-dark)] text-xs font-semibold rounded-full">
-                  {badge}
-                </span>
-              )}
-              {subtitle && (
-                <p className="text-[var(--emerald-muted)] font-medium text-sm mt-0.5">
-                  {subtitle}
-                </p>
-              )}
-            </div>
-          </div>
-        </motion.button>
-
+      <div className="relative">
+        <button type="button" className="option" aria-pressed={selected} onClick={onClick}>
+          <span className="option-radio" aria-hidden="true" />
+          <span className={`flex-1 min-w-0 ${description ? "pe-10" : ""}`}>
+            <span className="block font-semibold text-[15.5px] text-text leading-snug">{title}</span>
+            {badge && (
+              <span className="chip chip-amber mt-1.5 !whitespace-normal">
+                <span {...arabicProps(badge)}>{badge}</span>
+              </span>
+            )}
+            {subtitle && (
+              <span className="block text-sm text-text-2 mt-0.5 leading-snug">
+                <span {...arabicProps(subtitle)}>{subtitle}</span>
+              </span>
+            )}
+          </span>
+        </button>
         {description && (
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowInfo(!showInfo);
-            }}
-            className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-sm cursor-pointer border transition-all ${
-              showInfo
-                ? "bg-[var(--gold)]/20 border-[var(--gold)] text-[var(--gold-dark)]"
-                : "bg-[var(--sand)]/30 border-[var(--sand)] text-[var(--ink-faint)] hover:border-[var(--gold)] hover:text-[var(--gold-dark)]"
-            }`}
-            aria-label="More info"
+            onClick={() => setShowInfo((s) => !s)}
+            className="absolute top-2.5 end-2.5 w-9 h-9 rounded-full grid place-items-center border border-border bg-surface text-text-2 hover:text-text hover:border-border-strong cursor-pointer"
+            aria-expanded={showInfo}
+            aria-controls={infoId}
+            aria-label={`More about: ${title}`}
           >
-            ℹ
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4M12 8h.01" strokeLinecap="round" />
+            </svg>
           </button>
         )}
       </div>
-
-      <AnimatePresence>
-        {showInfo && description && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <div className="mx-2 mt-1 mb-1 p-3 rounded-xl bg-[var(--parchment)] border-l-3 border-[var(--gold)] text-sm text-[var(--ink-muted)] leading-relaxed"
-                 style={{ borderLeftWidth: "3px", borderLeftColor: "var(--gold)" }}>
-              {description}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {children && (
-        <div className="mt-1 ml-7">{children}</div>
+      {description && (
+        <div id={infoId} hidden={!showInfo} className="fade-in mx-1 mt-1.5 mb-1 panel !py-3 text-sm text-text-2 leading-relaxed">
+          {description}
+        </div>
       )}
+      {children && <div className="mt-2 ms-8">{children}</div>}
     </div>
   );
 }

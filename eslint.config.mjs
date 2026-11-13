@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Frozen copy of the original code, kept byte-identical for equivalence tests.
+    "tests/reference/**",
   ]),
 ]);
 

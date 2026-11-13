@@ -6,11 +6,18 @@ export const FITR_OVERVIEW_INFO: InfoPanel = {
     "Zakat al-Fiṭr (also called Ṣadaqat al-Fiṭr or Fiṭrānah) is a mandatory charitable payment made at the end of Ramadan, before the Eid al-Fiṭr prayer. It is completely separate from annual Zakat al-Māl (wealth-based Zakat). Its purpose is to purify the fasting person from any shortcomings during Ramadan and to ensure that poor people can also celebrate Eid.",
   positions: [
     {
-      school: "All Schools (agreed)",
+      school: "Mālikī, Shāfiʿī and Ḥanbalī Schools",
       position:
-        "Zakat al-Fiṭr is obligatory (wājib) on every Muslim who has enough food/wealth for themselves and their dependents on the day of Eid",
+        "Zakat al-Fiṭr is obligatory (wājib) on every Muslim who has food left over, beyond what they and their dependents need for the day and night of Eid",
       reasoning:
-        "Based on the hadith of Ibn ʿUmar: 'The Messenger of Allah ﷺ made Zakat al-Fiṭr obligatory — one ṣāʿ of dates or one ṣāʿ of barley — on every Muslim, slave or free, male or female, young or old.' (Bukhari & Muslim)",
+        "Based on the hadith of Ibn ʿUmar: 'The Messenger of Allah ﷺ made Zakat al-Fiṭr obligatory (one ṣāʿ of dates or one ṣāʿ of barley) on every Muslim, slave or free, male or female, young or old.' (Bukhari & Muslim). The three schools' texts set the threshold at food beyond one day and night (Islamweb fatwa 57063).",
+    },
+    {
+      school: "Ḥanafī School",
+      position:
+        "Zakat al-Fiṭr is obligatory only on someone who owns the niṣāb (the Zakat threshold) beyond their basic needs and debts",
+      reasoning:
+        "Al-Durr al-Mukhtār sets the condition as owning a niṣāb surplus to one's basic needs (Dar al-Ifta al-Misriyya, fatwa 12877). Someone below that may still give it voluntarily.",
     },
   ],
   note: "This is NOT the same as your annual Zakat (Zakat al-Māl). Zakat al-Māl is 2.5% of your wealth paid once a year. Zakat al-Fiṭr is a fixed per-person amount paid once at the end of Ramadan, regardless of your total wealth.",
@@ -26,7 +33,7 @@ export const FITR_AMOUNT_INFO: InfoPanel = {
       position:
         "Half a ṣāʿ of wheat (~1.6 kg) or one ṣāʿ of other staples (~3.2 kg). Cash payment is permitted.",
       reasoning:
-        "The Ḥanafī school considers wheat the most common and valuable staple, so half a ṣāʿ suffices. For less valuable staples (barley, dates, raisins), a full ṣāʿ is required. Uniquely among the Sunni schools, Ḥanafīs explicitly permit cash equivalent, arguing that the purpose is to meet the needs of the poor — which cash can accomplish equally or better than food.",
+        "The Ḥanafī school considers wheat the most common and valuable staple, so half a ṣāʿ suffices. For less valuable staples (barley, dates, raisins), a full ṣāʿ is required. Uniquely among the Sunni schools, Ḥanafīs explicitly permit cash equivalent, arguing that the purpose is to meet the needs of the poor, which cash can accomplish as well as, or better than, food.",
     },
     {
       school: "Mālikī, Shāfiʿī, and Ḥanbalī Schools",
@@ -40,7 +47,7 @@ export const FITR_AMOUNT_INFO: InfoPanel = {
       position:
         "One ṣāʿ (~3 kg) of commonly consumed food. Cash equivalent is permitted.",
       reasoning:
-        "The Jaʿfarī ṣāʿ is measured slightly larger (~3 kg). The food should be whatever is commonly eaten in your area. Cash is permitted as an equivalent. Notably, in Jaʿfarī fiqh, the obligation extends to every person in your household at the time of sunset on the eve of Eid — including guests.",
+        "The Jaʿfarī ṣāʿ is measured slightly larger (~3 kg). The food should be whatever is commonly eaten in your area. Cash is permitted as an equivalent. Notably, in Jaʿfarī fiqh, the obligation extends to every person in your household at the time of sunset on the eve of Eid, including guests.",
     },
   ],
   note: "In practice, most Islamic organizations today publish a recommended dollar amount per person each year (typically $10–15 in North America). This makes it easy to pay even if your school technically requires food.",
@@ -84,18 +91,25 @@ export const FITR_WHO_INFO: InfoPanel = {
   description: "Zakat al-Fiṭr is paid per person, not per household. You pay for yourself and every dependent.",
   positions: [
     {
-      school: "All Schools (agreed)",
+      school: "Mālikī, Shāfiʿī and Ḥanbalī Schools",
       position:
         "You pay for yourself, your spouse, your minor children, and any dependents you are financially responsible for.",
       reasoning:
-        "The head of household pays on behalf of all members. This includes infants born before the Eid prayer and anyone you financially support.",
+        "The head of household pays on behalf of those he must support. This includes infants born before the Eid prayer.",
+    },
+    {
+      school: "Ḥanafī School",
+      position:
+        "You pay for yourself and your minor children. A husband is not obliged to pay for his wife; she pays her own if she owns the niṣāb, though he may pay it for her.",
+      reasoning:
+        "The Ḥanafī school ties the duty to full guardianship (wilāyah), which a husband does not have over his wife, while the majority tie it to the duty of maintenance (Dar al-Ifta al-Misriyya, fatwa 18439).",
     },
     {
       school: "Jaʿfarī School (additional)",
       position:
         "Also includes guests present in your home at sunset on the eve of Eid.",
       reasoning:
-        "The Jaʿfarī school extends the obligation to any person — including guests — who is in your household at the moment the obligation becomes binding (sunset on the eve of Eid).",
+        "The Jaʿfarī school extends the obligation to any person (including guests) who is in your household at the moment the obligation becomes binding (sunset on the eve of Eid).",
     },
     {
       school: "All Schools (recipients)",

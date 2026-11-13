@@ -64,6 +64,9 @@ export interface CalculationResult {
   raddExplanation?: string;
   baytAlMalAmount?: number;
   baytAlMalExplanation?: string;
+  /** A portion the cited authority leaves to be settled by agreement between the heirs. */
+  unresolvedAmount?: number;
+  unresolvedExplanation?: string;
   notes: string[];
 }
 

@@ -4,7 +4,7 @@ import { InfoPanel } from './types';
 export const awlInfo: InfoPanel = {
   title: "Understanding 'ʿAwl' (Proportional Reduction)",
   description:
-    "ʿAwl, or proportional reduction, is a mechanism applied when the fixed, Quranically-defined shares (Furūḍ) of all heirs add up to more than 100% of the estate. Instead of some heirs being denied their share, all shares are reduced proportionally to make the total equal 100%.",
+    "ʿAwl, or proportional reduction, is a mechanism applied when the fixed, Quranically defined shares (Furūḍ) of all heirs add up to more than 100% of the estate. Instead of some heirs being denied their share, all shares are reduced proportionally to make the total equal 100%.",
   positions: [
     {
       school: 'All Sunni Schools (Ḥanafī, Mālikī, Shāfiʿī, Ḥanbalī)',
@@ -28,18 +28,23 @@ export const raddInfo: InfoPanel = {
     "Radd, or redistribution, is the opposite of ʿAwl. It occurs when the fixed shares of the heirs add up to less than 100% of the estate, leaving a surplus. This surplus is then redistributed proportionally among the fixed-share heirs.",
   positions: [
     {
-      school: 'Majority (Ḥanafī, Shāfiʿī, later Ḥanbalī view)',
-      position: 'The surplus is redistributed to all fixed-share heirs *except* for the spouse (husband or wife).',
+      school: 'Ḥanafī and Ḥanbalī Schools',
+      position: 'The surplus is returned to the fixed-share heirs in proportion to their shares, *except* the spouse (husband or wife).',
       reasoning:
-        'The spouse\'s share is considered fixed and contractual, tied to the marriage itself, while the other relationships are based on blood ties (nasab), which are considered a stronger basis for receiving the surplus.',
+        'The spouse\'s share rests on the marriage, while the other heirs are blood relatives (nasab), a stronger basis for receiving the surplus. Ibn Qudāmah reports agreement that spouses take no return, apart from a report from ʿUthmān that is usually explained another way (islamqa.info/ar/answers/184914).',
     },
     {
-      school: 'Minority (Some Ḥanbalī and Shīʿa scholars)',
-      position: 'The surplus is redistributed to all fixed-share heirs, *including* the spouse.',
-      reasoning: 'They argue that the spouse is also one of the fixed-share heirs and there is no explicit text to exclude them from the redistribution of the surplus.',
+      school: 'Mālikī and Shāfiʿī Schools',
+      position: 'In the classical position the surplus goes to the public treasury (Bayt al-Māl), not back to the heirs. Later Shāfiʿī and Mālikī scholars ruled that when the treasury is not properly run, the surplus is returned to the fixed-share heirs other than the spouses.',
+      reasoning: 'The Qurʾān fixes these shares, so the classical position gives nothing beyond them. The later ruling reflects the loss of an orderly treasury (islamqa.info/ar/answers/184914; dorar.net/feqhia/13753; Mukhtaṣar Tuḥfat al-Muḥtāj, shamela.ws/book/20/1084).',
+    },
+    {
+      school: 'Some later Ḥanafī scholars',
+      position: 'When there is no other heir, the surplus may be returned to the spouse as well.',
+      reasoning: 'They held that this is better than sending it to a treasury that does not exist in practice.',
     },
   ],
-  note: 'This calculator allows choosing which madhab to follow for this ruling.',
+  note: 'For every Sunni school, this calculator returns the surplus to the fixed-share heirs other than the spouse. That is the Ḥanafī and Ḥanbalī position and the later Shāfiʿī ruling; a Mālikī or Shāfiʿī user following the classical position would send the surplus to the treasury instead. The calculator does not return any surplus to a spouse in the Sunni schools. In the Jaʿfarī school the return goes to the blood relatives, not the spouse.',
 };
 
 export const hajbInfo: InfoPanel = {
@@ -55,7 +60,7 @@ export const hajbInfo: InfoPanel = {
      {
       school: 'Example of Partial Exclusion',
       position: 'The presence of a child reduces the share of the spouse. For example, a husband inherits 1/2, but this is reduced to 1/4 if the deceased has a child. A wife inherits 1/4, but this is reduced to 1/8 in the presence of a child.',
-      reasoning: 'These reductions are explicitly mentioned in the Quran in Sūrat al-Nisāʾ, verses 12.',
+      reasoning: 'These reductions are explicitly mentioned in the Quran in Sūrat al-Nisāʾ, verse 12.',
     },
   ],
 };
@@ -67,15 +72,15 @@ export const grandfatherSiblingsInfo: InfoPanel = {
     {
       school: 'Ḥanafī School',
       position: 'The paternal grandfather is treated like the father in his absence and therefore blocks all siblings (full, paternal, and maternal) from inheriting.',
-      reasoning: 'They consider the grandfather a direct ascendant (an "usul"), just like the father, and give him the same status in the absence of the father. The Quran refers to a grandfather as "father" (e.g., 2:133).',
+      reasoning: 'They consider the grandfather a direct ascendant (aṣl), just like the father, and give him the same status in the absence of the father. The Quran refers to a grandfather as "father" (e.g., 2:133).',
     },
     {
       school: 'Mālikī, Shāfiʿī, Ḥanbalī Schools',
-      position: 'The paternal grandfather inherits alongside the full and paternal siblings, sharing the estate with them according to specific, complex formulas. He does, however, block maternal siblings.',
-      reasoning: 'They argue that both the grandfather and siblings are related to the deceased through the father, so they should inherit together. They rely on various narrations from companions like Zayd ibn Thābit who devised methods for them to share.',
+      position: 'The paternal grandfather inherits alongside the full and paternal siblings. With no fixed-share heirs he takes the better of sharing as a brother (muqāsamah) or 1/3 of the estate; with fixed-share heirs, the best of muqāsamah, 1/3 of what remains, or 1/6 of the estate. He blocks maternal siblings.',
+      reasoning: 'They argue that both the grandfather and siblings are related to the deceased through the father, so they should inherit together, following Zayd ibn Thābit. Paternal half-siblings are counted against the grandfather and then give way to full siblings (al-muʿāddah), and the case of husband, mother, grandfather and one sister has its own division (al-Akdariyyah) (islamqa.info/ar/answers/240582).',
     },
   ],
-  note: 'This calculator implements the specified madhab for this calculation.',
+  note: 'This calculator applies the selected school: the Ḥanafī exclusion, or Zayd ibn Thābit\'s method (including al-muʿāddah and al-Akdariyyah) for the Mālikī, Shāfiʿī and Ḥanbalī schools.',
 };
 
 export const jafariSystemInfo: InfoPanel = {
@@ -89,7 +94,7 @@ export const jafariSystemInfo: InfoPanel = {
     },
     {
       school: "No ʿAṣabah (Jaʿfarī)",
-      position: "There are no 'residuary' heirs. When fixed shares don't exhaust the estate, the surplus returns to the fixed-share heirs via radd — it does NOT pass to male agnatic relatives.",
+      position: "There are no 'residuary' heirs. When fixed shares don't exhaust the estate, the surplus returns to the fixed-share heirs via radd. It does NOT pass to male agnatic relatives.",
       reasoning: "The Jaʿfarī school argues that the Sunni concept of ʿaṣabah contradicts the Quranic inheritance verses, which they interpret as giving specific shares to all heirs. Surplus should return proportionally to those same heirs.",
     },
     {
@@ -110,12 +115,12 @@ export function getBaytAlMalInfo(hasSpouse: boolean): InfoPanel {
     if (hasSpouse) {
         // Spouse-only case: remainder after spouse's fixed share
         return {
-            title: "Bayt al-Māl (بيت المال) — The Public Treasury",
-            description: "When only a spouse inherits and no other heirs exist, the spouse receives their fixed Quranic share and the remainder goes to Bayt al-Māl — the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done with this remainder.",
+            title: "Bayt al-Māl (بيت المال): The Public Treasury",
+            description: "When only a spouse inherits and no other heirs exist, the spouse receives their fixed Quranic share and the remainder goes to Bayt al-Māl, the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done with this remainder.",
             positions: [
                 {
                     school: "Majority of Contemporary Scholars (Fiqh Council of North America, European Council for Fatwa and Research)",
-                    position: "The remainder should be directed to Islamic charitable causes — mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
+                    position: "The remainder should be directed to Islamic charitable causes: mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
                     reasoning: "Since no legitimate Bayt al-Māl exists in Western nations, Islamic community institutions are the closest functional equivalent. They serve the same purpose of benefiting the Muslim public. This is the most widely recommended position for Muslims living in non-Muslim-majority countries."
                 },
                 {
@@ -134,12 +139,12 @@ export function getBaytAlMalInfo(hasSpouse: boolean): InfoPanel {
     } else {
         // No heirs at all
         return {
-            title: "Bayt al-Māl (بيت المال) — The Public Treasury",
-            description: "When there are no heirs at all, the entire estate goes to Bayt al-Māl — the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done.",
+            title: "Bayt al-Māl (بيت المال): The Public Treasury",
+            description: "When there are no heirs at all, the entire estate goes to Bayt al-Māl, the Islamic public treasury. In countries without a functioning Bayt al-Māl, scholars differ on what should be done.",
             positions: [
                 {
                     school: "Majority of Contemporary Scholars (Fiqh Council of North America, European Council for Fatwa and Research)",
-                    position: "The estate should be directed to Islamic charitable causes — mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
+                    position: "The estate should be directed to Islamic charitable causes: mosques, Islamic schools, Muslim welfare organizations, and community institutions.",
                     reasoning: "Since no legitimate Bayt al-Māl exists in Western nations, Islamic community institutions are the closest functional equivalent. They serve the same purpose of benefiting the Muslim public. This is the most widely recommended position for Muslims living in non-Muslim-majority countries."
                 },
                 {
@@ -148,19 +153,19 @@ export function getBaytAlMalInfo(hasSpouse: boolean): InfoPanel {
                     reasoning: "Since Western governments provide public services (infrastructure, welfare, security), they serve a similar function. Most scholars reject this view because Western governments do not distribute wealth according to Sharīʿah priorities."
                 },
             ],
-            note: "Practical advice: Write a waṣiyyah (Islamic will) that explicitly directs your estate to specific Islamic charities. Without a will, most Western jurisdictions will distribute your estate according to their own intestacy laws — which almost certainly will not follow Islamic inheritance law. Planning ahead ensures your wealth benefits the Muslim community as intended by the Sharīʿah."
+            note: "Practical advice: Write a waṣiyyah (Islamic will) that explicitly directs your estate to specific Islamic charities. Without a will, most Western jurisdictions will distribute your estate according to their own intestacy laws, which almost certainly will not follow Islamic inheritance law. Planning ahead ensures your wealth benefits the Muslim community as intended by the Sharīʿah."
         };
     }
 }
 
 export const umariyyatanInfo: InfoPanel = {
-    title: 'The "Umariyyatān" (Two Cases of ʿUmar)',
+    title: 'The "ʿUmariyyatān" (Two Cases of ʿUmar)',
     description: 'These are two specific inheritance scenarios where the mother\'s share is calculated differently to prevent her from inheriting more than or equal to the father, which would contradict the general principle of the male receiving double the female\'s share when they are of the same class.',
     positions: [
         {
             school: 'Majority (Based on the ruling of Caliph ʿUmar)',
             position: 'In the two specific cases of (1) Husband, Mother, Father and (2) Wife, Mother, Father, the mother receives one-third of the *remainder* after the spouse has taken their share, not one-third of the total estate.',
-            reasoning: 'If the mother took 1/3 of the whole estate, in the first case she would get 1/3 while the father (as residuary) gets 1/6, and in the second she would get 1/3 while the father gets 5/12. In both cases she receives more than him. ʿUmar\'s ruling gives her 1/3 of the remainder, ensuring the father receives twice her share.'
+            reasoning: 'If the mother took 1/3 of the whole estate, in the first case she would get 1/3 while the father (as residuary) gets only 1/6, twice what he receives; in the second she would get 1/3 while the father gets 5/12, barely more than her. ʿUmar\'s ruling gives her 1/3 of what remains after the spouse, so in both cases the father receives twice her share. The four Sunni schools follow this ruling (al-Mughnī, quoted at islamqa.info/ar/answers/566119).'
         },
         {
             school: 'Ibn ʿAbbās (Minority View)',

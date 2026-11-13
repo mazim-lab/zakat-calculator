@@ -1,11 +1,16 @@
 import { NextResponse } from "next/server";
+import {
+  FALLBACK_GOLD_USD_PER_GRAM,
+  FALLBACK_SILVER_USD_PER_GRAM,
+  FALLBACK_PRICES_AS_OF,
+} from "@/lib/metal-fallback";
 
 const TROY_OZ_GRAMS = 31.1035;
 
-// Fallback prices — keep these roughly current as a safety net
-// Last updated: 2026-03-11 (gold ~$5,180/oz, silver ~$86/oz)
-const FALLBACK_GOLD_PER_GRAM = 167;
-const FALLBACK_SILVER_PER_GRAM = 2.76;
+// Fallback prices: a safety net, kept with their as-of date in
+// src/lib/metal-fallback.ts.
+const FALLBACK_GOLD_PER_GRAM = FALLBACK_GOLD_USD_PER_GRAM;
+const FALLBACK_SILVER_PER_GRAM = FALLBACK_SILVER_USD_PER_GRAM;
 
 interface YahooChartResult {
   chart: {
@@ -69,6 +74,7 @@ export async function GET() {
       goldPerOz: Math.round(FALLBACK_GOLD_PER_GRAM * TROY_OZ_GRAMS * 100) / 100,
       silverPerOz: Math.round(FALLBACK_SILVER_PER_GRAM * TROY_OZ_GRAMS * 100) / 100,
       source: "fallback",
+      asOf: FALLBACK_PRICES_AS_OF,
       timestamp: Date.now(),
     },
     {

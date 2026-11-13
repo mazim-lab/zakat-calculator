@@ -32,10 +32,12 @@ export const CURRENCIES: CurrencyInfo[] = [
   { code: "JOD", name: "Jordanian Dinar", symbol: "د.ا" },
 ];
 
-// Fallback prices in USD per gram (used only if live API fails)
-// Last updated: 2026-03-11 (gold ~$5,180/oz, silver ~$86/oz)
-const FALLBACK_GOLD_USD = 167;
-const FALLBACK_SILVER_USD = 2.76;
+import { FALLBACK_GOLD_USD_PER_GRAM, FALLBACK_SILVER_USD_PER_GRAM } from "./metal-fallback";
+
+// Fallback prices in USD per gram (used only if live API fails). The figures
+// and their as-of date live in ./metal-fallback.ts.
+const FALLBACK_GOLD_USD = FALLBACK_GOLD_USD_PER_GRAM;
+const FALLBACK_SILVER_USD = FALLBACK_SILVER_USD_PER_GRAM;
 
 export interface ExchangeRates {
   base: string;

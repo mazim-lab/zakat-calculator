@@ -2,15 +2,15 @@ import { InfoPanel } from "@/lib/scholarly-info";
 
 export const FIDYA_OVERVIEW_INFO: InfoPanel = {
   title: "What is Fidya? (فِدْيَة)",
-  description: "Fidya is a compensatory payment made when a Muslim is unable to fast during Ramadan due to a valid, permanent or long-term reason — such as chronic illness, old age, pregnancy/nursing (in some schools), or a medical condition that makes fasting dangerous. It is NOT for deliberately broken fasts (that requires Kaffārah instead).",
+  description: "Fidya is a compensatory payment made when a Muslim is unable to fast during Ramadan due to a valid, permanent or long-term reason, such as chronic illness, old age, pregnancy/nursing (in some schools), or a medical condition that makes fasting dangerous. It is NOT for deliberately broken fasts (that requires Kaffārah instead).",
   positions: [
     {
       school: "All Schools",
       position: "Fidya is feeding one poor person for each missed day of fasting",
-      reasoning: "Based on Quran 2:184 — 'And upon those who are able [to fast, but with hardship] — a ransom [as substitute] of feeding a poor person [each day].' Scholars agree this applies to those with permanent inability to fast.",
+      reasoning: "Based on Quran 2:184: 'And upon those who are able [to fast, but with hardship], a ransom [as substitute] of feeding a poor person [each day].' Scholars agree this applies to those with permanent inability to fast.",
     },
   ],
-  note: "Fidya only applies when you CANNOT fast at all — not when you choose not to. If you are temporarily ill and will recover, you should make up (qaḍāʾ) the missed fasts later. Fidya is for those who have no reasonable expectation of being able to fast in the future.",
+  note: "Fidya only applies when you CANNOT fast at all, not when you choose not to. If you are temporarily ill and will recover, you should make up (qaḍāʾ) the missed fasts later. Fidya is for those who have no reasonable expectation of being able to fast in the future.",
 };
 
 export const FIDYA_AMOUNT_INFO: InfoPanel = {
@@ -25,7 +25,7 @@ export const FIDYA_AMOUNT_INFO: InfoPanel = {
     {
       school: "Mālikī School",
       position: "One mudd (~510g) of the local staple food",
-      reasoning: "A mudd is a smaller unit — roughly the amount that fills two average cupped hands. The Mālikī school specifies it should be the predominant staple food of your area (wheat, rice, corn, etc.).",
+      reasoning: "A mudd is a smaller unit: roughly the amount that fills two average cupped hands. The Mālikī school specifies it should be the predominant staple food of your area (wheat, rice, corn, etc.).",
     },
     {
       school: "Shāfiʿī School",
@@ -34,8 +34,8 @@ export const FIDYA_AMOUNT_INFO: InfoPanel = {
     },
     {
       school: "Ḥanbalī School",
-      position: "One mudd of wheat (~510g), or half a ṣāʿ of other staples (~1.6 kg)",
-      reasoning: "The Ḥanbalī school differentiates by food type: wheat requires one mudd, while barley, dates, and raisins require half a ṣāʿ (about three times more by weight).",
+      position: "One mudd of wheat (~510 g), or half a ṣāʿ (two mudd) of other staples (~1.02 kg)",
+      reasoning: "The Ḥanbalī school differentiates by food type: wheat requires one mudd, while barley, dates, raisins and other staples require half a ṣāʿ, which is two mudd since one ṣāʿ is four mudd (al-Mughnī, mas'alah 496; al-Inṣāf). Using the same 510 g mudd this site uses for the other schools, that is about 1.02 kg.",
     },
     {
       school: "Jaʿfarī School",
@@ -51,9 +51,19 @@ export const FIDYA_ELIGIBILITY_INFO: InfoPanel = {
   description: "Fidya is specifically for those with a permanent or long-term inability to fast. The categories differ slightly between schools.",
   positions: [
     {
-      school: "All Schools (agreed)",
-      position: "Elderly persons who cannot fast, and those with chronic/terminal illness",
-      reasoning: "There is consensus that someone who is too old or too ill to fast — with no expectation of recovery — pays fidya instead.",
+      school: "Ḥanafī and Ḥanbalī Schools (and one Shāfiʿī view)",
+      position: "Elderly persons who cannot fast, and those with chronic/terminal illness, must pay fidya",
+      reasoning: "Fidya is obligatory for someone too old or too ill to fast with no expectation of recovery. The Mālikī school holds it is recommended (mustaḥab), not obligatory (Dar al-Ifta al-Misriyya, fatwa 16126).",
+    },
+    {
+      school: "Mālikī School",
+      position: "Fidya for the elderly and the chronically ill is recommended, not obligatory",
+      reasoning: "They are excused from fasting; feeding a poor person for each day is encouraged but not required (Dar al-Ifta al-Misriyya, fatwa 16126).",
+    },
+    {
+      school: "Jaʿfarī School (Sistani)",
+      position: "An elderly person for whom fasting is extremely hard pays one mudd (about 750 g) per day; one who cannot fast at all owes no fidya",
+      reasoning: "Sistani, Islamic Laws ruling 1694.",
     },
     {
       school: "Ḥanafī School",
@@ -66,5 +76,5 @@ export const FIDYA_ELIGIBILITY_INFO: InfoPanel = {
       reasoning: "These schools require both qaḍāʾ (making up the fast) and fidya when a pregnant or nursing woman breaks her fast out of fear for her child. If the fear was only for herself, only qaḍāʾ is required.",
     },
   ],
-  note: "If you are temporarily unable to fast (e.g., short-term illness, travel), you do not pay fidya — you make up the missed fasts later (qaḍāʾ). Fidya is only when making up fasts is not possible.",
+  note: "If you are temporarily unable to fast (e.g., short-term illness, travel), you do not pay fidya. You make up the missed fasts later (qaḍāʾ). Fidya is only when making up fasts is not possible.",
 };

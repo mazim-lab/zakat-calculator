@@ -1,403 +1,407 @@
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { pageMetadata, calculatorJsonLd, breadcrumbJsonLd, howToJsonLd } from "@/lib/seo";
+import { JsonLd, PageIntro, ScholarNote, Section, Faq, Toc, RelatedTools, Sources, Callout } from "@/components/ui";
+import { calculateInheritance } from "@/lib/inheritance/calculate";
+import { computeNetEstate } from "@/lib/inheritance/deductions";
+import { numberToFraction, formatUSD, formatPercent } from "@/lib/inheritance/fraction";
+import InheritanceCalculator from "./InheritanceCalculator";
+import { SharesDonut } from "./SharesDonut";
+import { EXAMPLE_FAMILY, EXAMPLE_AWL, type WorkedExample } from "./examples";
 
-'use client';
+const PATH = "/inheritance";
+const TITLE = "Islamic Inheritance Calculator (Mīrāth)";
+const DESCRIPTION =
+  "Divide an estate by the Qurʾānic shares (farāʾiḍ) for the Ḥanafī, Mālikī, Shāfiʿī, Ḥanbalī or Jaʿfarī school, with ʿawl, radd and ḥajb explained.";
 
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Heirs, CalculationResult, Heir, Madhab } from '@/lib/inheritance/types';
-import { calculateInheritance } from '@/lib/inheritance/calculate';
-import { awlInfo, raddInfo, hajbInfo, grandfatherSiblingsInfo, umariyyatanInfo, jafariSystemInfo, getBaytAlMalInfo } from '@/lib/inheritance/scholarly-info';
+export const metadata = pageMetadata({ path: PATH, title: TITLE, description: DESCRIPTION });
 
-// Simple GCD and number to fraction converter
-function gcd(a: number, b: number): number {
-    return b === 0 ? a : gcd(b, a % b);
-}
-function numberToFraction(num: number, tolerance = 1.e-9): string {
-    if (num === 0) return "0";
-    if (num === 1) return "1";
-
-    let h1 = 1, h2 = 0, k1 = 0, k2 = 1;
-    let b = num;
-    do {
-        let a = Math.floor(b);
-        let aux = h1; h1 = a * h1 + h2; h2 = aux;
-        aux = k1; k1 = a * k1 + k2; k2 = aux;
-        b = 1 / (b - a);
-    } while (Math.abs(num - h1 / k1) > num * tolerance);
-
-    return `${h1}/${k1}`;
+const Q = (verse: string) => `https://quran.com/${verse.replace(":", "/")}`;
+function Ayah({ v }: { v: string }) {
+  return (
+    <a href={Q(v)} className="lnk" target="_blank" rel="noopener noreferrer">
+      Qurʾān {v}
+    </a>
+  );
 }
 
-// Shared Components (assuming they exist in @/components/)
-import { CurrencyInput } from '@/components/CurrencyInput';
-import { OptionCard } from '@/components/OptionCard';
-import { InfoAccordion } from '@/components/InfoAccordion';
-
-const HEIR_OPTIONS: { id: Heir; title: string; description: string; type: 'boolean' | 'count' }[] = [
-  { id: 'husband', title: 'Husband', description: '', type: 'boolean' },
-  { id: 'wife', title: 'Wife / Wives', description: '', type: 'count' },
-  { id: 'son', title: 'Sons', description: '', type: 'count' },
-  { id: 'daughter', title: 'Daughters', description: '', type: 'count' },
-  { id: 'father', title: 'Father', description: '', type: 'boolean' },
-  { id: 'mother', title: 'Mother', description: '', type: 'boolean' },
-  { id: 'paternalGrandfather', title: 'Paternal Grandfather', description: 'The father of the deceased\'s father.', type: 'boolean' },
-  { id: 'paternalGrandmother', title: 'Paternal Grandmother', description: 'The mother of the deceased\'s father.', type: 'boolean' },
-  { id: 'maternalGrandmother', title: 'Maternal Grandmother', description: 'The mother of the deceased\'s mother.', type: 'boolean' },
-  { id: 'fullBrother', title: 'Full Brothers', description: '', type: 'count' },
-  { id: 'fullSister', title: 'Full Sisters', description: '', type: 'count' },
+const FIXED_SHARES: { share: string; who: ReactNode; ref: string[] }[] = [
+  {
+    share: "1/2",
+    who: "The husband, when the deceased left no children. One daughter, when there is no son. One full sister (or, if there is none, one paternal half-sister), when there are no children, no father or grandfather and no brother of the same kind.",
+    ref: ["4:11", "4:12", "4:176"],
+  },
+  { share: "1/4", who: "The husband, when there are children. The wife, when there are no children.", ref: ["4:12"] },
+  { share: "1/8", who: "The wife, when there are children. Two or more wives share this one eighth.", ref: ["4:12"] },
+  {
+    share: "2/3",
+    who: "Two or more daughters, when there is no son. Two or more full sisters (or paternal half-sisters), when there are no children, no father or grandfather and no brother of the same kind.",
+    ref: ["4:11", "4:176"],
+  },
+  {
+    share: "1/3",
+    who: "The mother, when there are no children and fewer than two siblings. Two or more maternal half-siblings share one third equally, when there is no child, no son's child, no father and no paternal grandfather.",
+    ref: ["4:11", "4:12"],
+  },
+  {
+    share: "1/6",
+    who: "Each parent, when there are children. The mother, when there are two or more siblings. One maternal half-sibling. A son's daughter beside one daughter, and a paternal half-sister beside one full sister, to complete two thirds. This calculator also gives 1/6 to a grandfather or grandmother standing in for an absent parent, as the schools do.",
+    ref: ["4:11", "4:12"],
+  },
 ];
 
+const FAQ = [
+  {
+    q: "Who inherits under Islamic law?",
+    a: "The Qurʾān names fixed shares for the spouse, children, parents and siblings (4:11, 4:12, 4:176). Closer relatives can reduce or exclude more distant ones (ḥajb). In the Sunni schools, any amount left after the fixed shares goes to the residuary heirs (ʿaṣabah): a son, then a son's son, the father, the grandfather, a full brother, then a paternal half-brother, with sisters of the same kind at half a brother's share. A sister also takes the residue alongside a daughter. The Jaʿfarī school uses classes of heirs instead.",
+  },
+  {
+    q: "What is paid before the estate is divided?",
+    a: "Funeral and burial costs, then debts, then any bequest (waṣiyyah). Only what is left is divided among the heirs. The Qurʾān says the shares apply after any bequest or debt (4:11, 4:12). Scholars generally limit a bequest to one third unless the heirs agree to more.",
+  },
+  {
+    q: "What happens if there are no heirs, or only a spouse?",
+    a: "With no heirs, the whole estate goes to Bayt al-Māl, the public treasury. With only a spouse, this calculator follows the classical Sunni position: the spouse takes their fixed share and the rest goes to Bayt al-Māl. Where no Bayt al-Māl exists, many scholars direct that portion to Islamic charitable causes, and some return it to the spouse. A will can settle this in advance.",
+  },
+  {
+    q: "What are ʿawl and radd?",
+    a: "ʿAwl applies when the fixed shares add up to more than the whole estate: every share is reduced in proportion so the total is exactly one. Radd is the opposite: when the shares add up to less than one and there is no residuary heir, the surplus is returned to the fixed-share heirs in proportion. In the Sunni schools as applied here, the spouse does not take part in radd; this follows the Ḥanafī and Ḥanbalī schools and the later Shāfiʿī ruling, while the classical Mālikī and Shāfiʿī position sends the surplus to the public treasury. The Jaʿfarī school does not apply ʿawl.",
+  },
+  {
+    q: "Do the schools give different answers?",
+    a: "For most families, the four Sunni schools agree. They differ on some cases, such as a grandfather inheriting with brothers and sisters: the Ḥanafī school lets him exclude them, while the Mālikī, Shāfiʿī and Ḥanbalī schools have him share with them by Zayd ibn Thābit's method, which the calculator follows for those schools. The Jaʿfarī school has a different structure: closer classes of heirs exclude more distant classes, there is no ʿaṣabah, and there is no ʿawl. Choose your school in step 3 and read the notes beside each choice.",
+  },
+  {
+    q: "Which relatives does this calculator cover?",
+    a: "Husband, wife or wives, sons, daughters, son's sons and son's daughters, father, mother, paternal grandfather, paternal and maternal grandmothers, full brothers and sisters, and paternal and maternal half-brothers and half-sisters. It does not ask about a daughter's children, nephews, uncles, cousins, a maternal grandfather or other relatives. If any of them survive the deceased, ask a scholar to check the division.",
+  },
+  {
+    q: "Can I use this result to distribute a real estate?",
+    a: "Use it to understand the shares and to prepare questions. A real estate also depends on the law of the country where the person lived or held property, on any will, and on facts this tool does not ask about. Please confirm the division with a qualified scholar and a local lawyer before anything is paid out.",
+  },
+];
 
-export default function InheritanceCalculatorPage() {
-  const [step, setStep] = useState(1);
-  const [heirs, setHeirs] = useState<Heirs>({});
-  const [estateValue, setEstateValue] = useState<number>(100000);
-  const [madhab, setMadhab] = useState<Madhab>('hanafi');
-  const [result, setResult] = useState<CalculationResult | null>(null);
-
-  const handleHeirToggle = (heir: Heir, type: 'boolean' | 'count') => {
-    setHeirs((prev) => {
-      const newHeirs: any = { ...prev };
-      if (newHeirs[heir]) {
-        delete newHeirs[heir];
-      } else {
-        newHeirs[heir] = type === 'boolean' ? true : 1;
-      }
-      return newHeirs;
-    });
-  };
-  
-   const handleHeirCountChange = (heir: Heir, count: number) => {
-    if(count > 0){
-        setHeirs(prev => ({ ...prev, [heir]: count }));
-    } else {
-        setHeirs(prev => {
-            const newHeirs: any = {...prev};
-            delete newHeirs[heir];
-            return newHeirs;
-        })
-    }
-  };
-
-  const runCalculation = () => {
-    const calculatedResult = calculateInheritance(estateValue, heirs, madhab);
-    setResult(calculatedResult);
-    setStep(4);
-  };
-
-  const progress = (step / 4) * 100;
-
+function ExampleResult({ ex }: { ex: WorkedExample }) {
+  const estate = computeNetEstate(ex.estate);
+  const result = calculateInheritance(estate.net, { ...ex.heirs }, ex.madhab);
+  const pie = result.shares
+    .filter((s) => (s.share ?? 0) > 0)
+    .map((s) => ({
+      name: `${s.label}${s.count > 1 ? ` (×${s.count})` : ""}`,
+      value: s.amount,
+      share: s.share ?? 0,
+      fraction: numberToFraction(s.share ?? 0),
+    }));
+  const hasDeductions = ex.estate.funeral + ex.estate.debts + ex.estate.bequest > 0;
   return (
-    <div className="container mx-auto p-4 md:p-8 max-w-4xl">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-['Amiri',serif] text-[var(--ink)] luminous-header">
-          <span className="font-['Noto_Naskh_Arabic',serif] block text-6xl md:text-7xl">حساب الميراث</span>
-          Inheritance Calculator
-        </h1>
-        <p className="text-[var(--ink)] opacity-80 mt-2">
-          Calculate the distribution of an estate according to Islamic law (Farāʾiḍ / Mīrāth).
-        </p>
+    <div className="card p-4 sm:p-5 mt-4">
+      <p className="eyebrow mb-1">Example inputs</p>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-[15px] m-0">
+        <dt className="text-text-2">Heirs</dt>
+        <dd className="m-0 text-text">{ex.heirsLabel}</dd>
+        <dt className="text-text-2">School</dt>
+        <dd className="m-0 text-text">{ex.madhabLabel}</dd>
+        {hasDeductions ? (
+          <>
+            <dt className="text-text-2">Estate</dt>
+            <dd className="m-0 num text-text">{formatUSD(ex.estate.gross)}</dd>
+            <dt className="text-text-2">Funeral costs</dt>
+            <dd className="m-0 num text-text">− {formatUSD(ex.estate.funeral)}</dd>
+            <dt className="text-text-2">Debts</dt>
+            <dd className="m-0 num text-text">− {formatUSD(ex.estate.debts)}</dd>
+            <dt className="text-text-2">Bequest</dt>
+            <dd className="m-0 num text-text">
+              − {formatUSD(ex.estate.bequest)}{" "}
+              <span className="text-text-2 font-sans text-[13.5px]">
+                (below one third of {formatUSD(estate.afterDebts)}, which is {formatUSD(estate.oneThirdAfterDebts)})
+              </span>
+            </dd>
+          </>
+        ) : null}
+        <dt className="text-text-2 font-semibold">Net estate</dt>
+        <dd className="m-0 num text-text font-semibold">{formatUSD(estate.net)}</dd>
+      </dl>
+      <div className="mt-5">
+        <SharesDonut data={pie} title={`Example: ${ex.heirsLabel}`} />
       </div>
-
-      <div className="progress-track mb-8">
-        <motion.div className="progress-fill" initial={{ width: 0 }} animate={{ width: `${progress}%` }} />
+      <div className="table-wrap mt-5" tabIndex={0} role="region" aria-label="Scrollable table">
+        <table className="table">
+          <caption className="sr-only">Computed shares for the example: {ex.heirsLabel}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Heir</th>
+              <th scope="col" className="num">Share</th>
+              <th scope="col" className="num">%</th>
+              <th scope="col" className="num">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {result.shares.map((s) => (
+              <tr key={s.heir}>
+                <td className="text-text">
+                  {s.label} {s.count > 1 ? `(x${s.count})` : ""}
+                </td>
+                <td className="num">{numberToFraction(s.share ?? 0)}</td>
+                <td className="num">{formatPercent(s.share ?? 0)}</td>
+                <td className="num">{formatUSD(s.amount)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
+      {result.wasAwlApplied && <p className="field-hint">Calculator note: {result.awlExplanation}</p>}
+      <p className="field-hint">Figures are an example only. They were computed by this page&apos;s own calculator code.</p>
+    </div>
+  );
+}
 
-      <AnimatePresence mode="wait">
-        {step === 1 && (
-          <motion.div key="step1" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}>
-            <h2 className="heading-display mb-4">Step 1: Select Heirs</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <OptionCard
-                title="No Heirs"
-                description="The deceased has no living inheritors."
-                selected={Object.keys(heirs).length === 0}
-                onClick={() => {
-                  setHeirs({});
-                  setStep(2);
-                }}
-              />
-              {HEIR_OPTIONS.map(({ id, title, description, type }) => (
-                <OptionCard
-                  key={id}
-                  title={title}
-                  description={description}
-                  selected={!!heirs[id]}
-                  onClick={() => handleHeirToggle(id, type)}
-                >
-                 {type === 'count' && heirs[id] && (
-                    <div className="mt-2">
-                        <input type="number" min="1" value={heirs[id] as number} 
-                        onChange={e => handleHeirCountChange(id, parseInt(e.target.value))}
-                        className="w-full p-2 rounded bg-[var(--sand)] border border-[var(--gold)] text-[var(--ink)]"
-                        onClick={e => e.stopPropagation()}
-                        />
-                    </div>
-                 )}
-                </OptionCard>
-              ))}
-            </div>
-          </motion.div>
-        )}
-        
-        {step === 2 && (
-           <motion.div key="step2" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}>
-                <h2 className="heading-display mb-4">Step 2: Set Estate Value</h2>
-                <div className="card p-8">
-                    <CurrencyInput 
-                        label="Total Estate Value"
-                        value={estateValue}
-                        onChange={setEstateValue}
-                        hint="Enter the final amount after all debts, funeral costs, and bequests (Waṣiyyah) have been paid."
-                        prefix="$"
-                    />
-                </div>
-           </motion.div>
-        )}
-        
-        {step === 3 && (
-             <motion.div key="step3" initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 50 }}>
-                <h2 className="heading-display mb-4">Step 3: Choose School of Law (Madhab)</h2>
-                <p className="mb-4 text-center">
-                  Different schools have minor variations in some complex cases. Choose the one you wish to follow.
-                  <a href="/find-your-school" className="block mt-3 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--emerald)] bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl px-4 py-2.5 transition-all hover:shadow-sm no-underline">
-                    🧭 Not sure which school you follow? Take our short quiz →
+const TOC = [
+  { id: "calculator", label: "Calculator" },
+  { id: "what-it-is", label: "What Islamic inheritance is" },
+  { id: "fixed-shares", label: "The fixed shares" },
+  { id: "awl-radd-hajb", label: "ʿAwl, radd and ḥajb" },
+  { id: "worked-example", label: "Worked examples" },
+  { id: "law-and-wills", label: "Local law and wills" },
+  { id: "faq", label: "Questions" },
+  { id: "related", label: "Related tools" },
+];
+
+export default function InheritancePage() {
+  return (
+    <div className="container">
+      <JsonLd
+        data={[
+          calculatorJsonLd({ path: PATH, name: TITLE, description: DESCRIPTION }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Inheritance", path: PATH },
+          ]),
+          howToJsonLd({
+            name: "How to divide an estate with the Islamic inheritance calculator",
+            description: "Select the heirs, enter the estate and deductions, choose a school, then read the shares.",
+            steps: [
+              { name: "Select heirs", text: "Choose every living relative of the deceased and how many there are of each." },
+              { name: "Set the estate value", text: "Enter the estate, then funeral costs, debts and any bequest." },
+              { name: "Choose a school", text: "Pick the Ḥanafī, Mālikī, Shāfiʿī, Ḥanbalī or Jaʿfarī school." },
+              { name: "Read the results", text: "See each heir's fraction and amount, with any ʿawl, radd or exclusion explained." },
+            ],
+          }),
+        ]}
+      />
+
+      <PageIntro
+        hue="fuchsia"
+        breadcrumb="Inheritance"
+        eyebrow="Calculator"
+        title="Islamic inheritance calculator"
+        titleAr="حساب الميراث"
+        lead="Calculate the distribution of an estate according to Islamic law (farāʾiḍ, mīrāth). Choose the heirs, enter the estate, pick your school, and see each share as a fraction and an amount."
+      />
+
+      <div className="grid gap-8 lg:grid-cols-[1fr_260px] lg:items-start">
+        <div className="min-w-0">
+          <section id="calculator" aria-label="Inheritance calculator" className="pb-8">
+            <InheritanceCalculator />
+            <ScholarNote className="mt-5" />
+          </section>
+
+          <Section id="what-it-is" title="What Islamic inheritance is">
+            <div className="prose">
+              <p>
+                Islamic inheritance (<em>mīrāth</em>, also called <em>farāʾiḍ</em>, &ldquo;the fixed shares&rdquo;) is the
+                set of rules for dividing what a Muslim leaves at death. The Qurʾān names the main heirs and their shares in
+                Sūrat al-Nisāʾ: <Ayah v="4:11" />, <Ayah v="4:12" /> and <Ayah v="4:176" />.
+              </p>
+              <p>Before anything is shared out, the estate is reduced in this order:</p>
+              <ol>
+                <li>
+                  <strong>Funeral and burial costs.</strong>
+                </li>
+                <li>
+                  <strong>Debts</strong>, including loans and unpaid bills.
+                </li>
+                <li>
+                  <strong>A bequest (waṣiyyah)</strong>, if the deceased left one. Scholars generally limit it to one third
+                  of what remains, unless the heirs agree to more. The limit comes from the hadith of Saʿd ibn Abī Waqqāṣ,
+                  who asked to bequeath his wealth and was told: &ldquo;Yes, one third, yet even one third is too much&rdquo;
+                  (
+                  <a className="lnk" href="https://sunnah.com/bukhari:2742" target="_blank" rel="noopener noreferrer">
+                    Ṣaḥīḥ al-Bukhārī 2742
                   </a>
+                  ).
+                </li>
+                <li>
+                  <strong>The heirs&apos; shares</strong> are then worked out on what is left.
+                </li>
+              </ol>
+              <p>
+                The Qurʾān states that the shares apply &ldquo;after any bequest or debt&rdquo; (<Ayah v="4:11" />,{" "}
+                <Ayah v="4:12" />). Step 2 of the calculator follows this order. It subtracts funeral costs, debts and the
+                bequest from the estate and divides the rest. If the bequest is above one third, it warns you but uses your
+                figure.
+              </p>
+              <p>
+                In the four Sunni schools, heirs with a fixed share are paid first. Anything left goes to the residuary heirs
+                (<em>ʿaṣabah</em>), for example a son, or the father when there are no sons, or a brother when there is no son or father
+                (a sister takes half a brother's share, and takes the residue herself beside a daughter). The Jaʿfarī school has no
+                ʿaṣabah: it groups heirs into classes, and a closer class excludes the more distant ones.
+              </p>
+            </div>
+          </Section>
+
+          <Section id="fixed-shares" title="The six fixed shares">
+            <p className="text-text-2 mb-4 max-w-[65ch]">
+              The Qurʾān names six fractions. Who receives each one depends on who else survives the deceased.
+            </p>
+            <div className="table-wrap" tabIndex={0} role="region" aria-label="Scrollable table">
+              <table className="table">
+                <caption className="sr-only">The six fixed shares, who can receive each, and the Qurʾān references</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Share</th>
+                    <th scope="col">Who can receive it</th>
+                    <th scope="col">Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {FIXED_SHARES.map((f) => (
+                    <tr key={f.share}>
+                      <td className="num font-semibold text-text text-[16px] whitespace-nowrap">{f.share}</td>
+                      <td className="text-text-2 leading-relaxed">{f.who}</td>
+                      <td className="whitespace-nowrap text-[14px]">
+                        {f.ref.map((r) => (
+                          <span key={r} className="block">
+                            <a href={Q(r)} className="lnk" target="_blank" rel="noopener noreferrer">
+                              {r}
+                            </a>
+                          </span>
+                        ))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="field-hint mt-3">
+              Where children and siblings inherit together, a male receives the share of two females (
+              <Ayah v="4:11" />, <Ayah v="4:176" />
+              ). Treating a son&apos;s daughter like a daughter, and a grandparent like an absent parent, comes from the
+              schools&apos; reading of these verses.
+            </p>
+          </Section>
+
+          <Section id="awl-radd-hajb" title="ʿAwl, radd and ḥajb in plain words">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="card p-4">
+                <p className="font-semibold text-text">ʿAwl: shares too large</p>
+                <p className="text-[15px] text-text-2 mt-1 leading-relaxed">
+                  Sometimes the fixed shares add up to more than the whole estate. Each share is then reduced in proportion,
+                  so everyone loses the same fraction of their share. The four Sunni schools apply ʿawl. The Jaʿfarī school
+                  does not.
                 </p>
-                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                     {([
-                       { value: 'hanafi' as Madhab, label: 'Ḥanafī' },
-                       { value: 'maliki' as Madhab, label: 'Mālikī' },
-                       { value: 'shafii' as Madhab, label: 'Shāfiʿī' },
-                       { value: 'hanbali' as Madhab, label: 'Ḥanbalī' },
-                       { value: 'jafari' as Madhab, label: 'Jaʿfarī' },
-                     ]).map(m => (
-                         <OptionCard key={m.value} title={m.label} selected={madhab === m.value} onClick={() => setMadhab(m.value)}
-                           description={m.value === 'jafari' ? 'Class-based system. No ʿaṣabah (residuary heirs). No ʿawl.' : ''}
-                         />
-                     ))}
-                 </div>
-                 <div className="mt-8 space-y-4">
-                    <InfoAccordion info={grandfatherSiblingsInfo} />
-                    <InfoAccordion info={raddInfo} />
-                    {madhab === 'jafari' && <InfoAccordion info={jafariSystemInfo} />}
-                 </div>
-            </motion.div>
-        )}
-        
-        {step === 4 && result && (
-             <motion.div key="step4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                 <h2 className="heading-display mb-4">Results</h2>
-                 <div className="card p-6 space-y-6">
-                    <div>
-                        <h3 className="text-2xl font-['Amiri',serif] mb-2">Estate Distribution</h3>
-                        {result.shares.length === 0 && result.baytAlMalAmount === estateValue ? (
-                            <div className="w-full py-8 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-300">
-                                <span className="text-emerald-800 font-semibold text-lg">
-                                    100% → Bayt al-Māl (بيت المال)
-                                </span>
-                            </div>
-                        ) : (
-                            (() => {
-                                const COLORS = [
-                                    'hsl(210, 60%, 55%)', 'hsl(340, 55%, 55%)', 'hsl(45, 70%, 50%)',
-                                    'hsl(160, 50%, 45%)', 'hsl(270, 50%, 55%)', 'hsl(20, 65%, 55%)',
-                                    'hsl(190, 55%, 45%)', 'hsl(310, 45%, 55%)', 'hsl(80, 50%, 45%)',
-                                    'hsl(0, 55%, 55%)',
-                                ];
-                                const pieData = result.shares
-                                    .filter(s => (s.share ?? 0) > 0)
-                                    .map((s, i) => ({
-                                        name: `${s.label}${s.count > 1 ? ` (×${s.count})` : ''}`,
-                                        value: s.amount,
-                                        share: s.share ?? 0,
-                                        fraction: numberToFraction(s.share ?? 0),
-                                        color: COLORS[i % COLORS.length],
-                                    }));
-                                if (result.baytAlMalAmount && result.baytAlMalAmount > 0) {
-                                    pieData.push({
-                                        name: 'Bayt al-Māl',
-                                        value: result.baytAlMalAmount,
-                                        share: result.baytAlMalAmount / estateValue,
-                                        fraction: numberToFraction(result.baytAlMalAmount / estateValue),
-                                        color: 'hsl(155, 45%, 40%)',
-                                    });
-                                }
-                                const renderLabel = (props: any) => {
-                                    const { name, share } = props;
-                                    if (share < 0.05) return null;
-                                    return `${name} ${(share * 100).toFixed(1)}%`;
-                                };
-                                const CustomTooltip = ({ active, payload }: any) => {
-                                    if (!active || !payload?.[0]) return null;
-                                    const d = payload[0].payload;
-                                    return (
-                                        <div className="bg-white/95 backdrop-blur border border-[var(--gold)] rounded-lg px-3 py-2 shadow-lg text-sm">
-                                            <p className="font-bold text-[var(--ink)]">{d.name}</p>
-                                            <p className="text-gray-600">Share: {d.fraction} ({(d.share * 100).toFixed(1)}%)</p>
-                                            <p className="font-semibold text-[var(--emerald)]">
-                                                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(d.value)}
-                                            </p>
-                                        </div>
-                                    );
-                                };
-                                return (
-                                    <ResponsiveContainer width="100%" height={320}>
-                                        <PieChart>
-                                            <Pie
-                                                data={pieData}
-                                                cx="50%"
-                                                cy="50%"
-                                                outerRadius={110}
-                                                innerRadius={45}
-                                                dataKey="value"
-                                                label={renderLabel}
-                                                labelLine={true}
-                                                animationBegin={0}
-                                                animationDuration={800}
-                                            >
-                                                {pieData.map((entry, index) => (
-                                                    <Cell key={index} fill={entry.color} stroke="white" strokeWidth={2} />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip content={<CustomTooltip />} />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                );
-                            })()
-                        )}
-                    </div>
-                    
-                    {result.wasAwlApplied && (
-                        <div className="p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
-                            <p className="font-bold">ʿAwl (Proportional Reduction) Applied</p>
-                            <p>{result.awlExplanation}</p>
-                        </div>
-                    )}
-                    {result.wasRaddApplied && (
-                        <div className="p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
-                            <p className="font-bold">Radd (Redistribution) Applied</p>
-                            <p>{result.raddExplanation}</p>
-                        </div>
-                    )}
-                    {result.baytAlMalAmount && result.baytAlMalAmount > 0 && (
-                        <div className="p-5 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-900 space-y-4">
-                            <div>
-                                <p className="font-bold text-lg flex items-center gap-2">
-                                    <span className="font-['Noto_Naskh_Arabic',serif] text-xl">بيت المال</span>
-                                    Bayt al-Māl (Public Treasury)
-                                </p>
-                                <p className="mt-1">{result.baytAlMalExplanation}</p>
-                                <p className="font-semibold mt-2">
-                                    Amount: {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(result.baytAlMalAmount)}
-                                    <span className="ml-2 text-sm font-normal">
-                                        ({((result.baytAlMalAmount / estateValue) * 100).toFixed(1)}%)
-                                    </span>
-                                </p>
-                            </div>
+              </div>
+              <div className="card p-4">
+                <p className="font-semibold text-text">Radd: shares too small</p>
+                <p className="text-[15px] text-text-2 mt-1 leading-relaxed">
+                  Sometimes the fixed shares add up to less than the estate and no residuary heir is left. The surplus is
+                  returned to the fixed-share heirs in proportion. As applied here for the Sunni schools, the spouse does not
+                  share in radd. Scholars differ on this, as the notes in step 3 explain.
+                </p>
+              </div>
+              <div className="card p-4">
+                <p className="font-semibold text-text">Ḥajb: exclusion</p>
+                <p className="text-[15px] text-text-2 mt-1 leading-relaxed">
+                  A closer heir can shut out a more distant one, for example a father excludes the grandfather. A closer heir
+                  can also reduce another&apos;s share, for example children reduce a husband from 1/2 to 1/4 (
+                  <Ayah v="4:12" />
+                  ).
+                </p>
+              </div>
+            </div>
+          </Section>
 
-                            <hr className="border-emerald-200" />
+          <Section id="worked-example" title="Worked examples">
+            <h3 className="text-[18.5px] font-[650]">1. {EXAMPLE_FAMILY.title}</h3>
+            <div className="prose mt-2">
+              <p>
+                The wife takes 1/8 because there are children. Each parent takes 1/6 because there are children. That is
+                3/24 + 4/24 + 4/24 = 11/24. The son and daughter share the remaining 13/24 as residuary heirs, the son taking
+                twice the daughter&apos;s share: 26/72 and 13/72, which simplify to 13/36 and 13/72. The four Sunni schools
+                agree on this family.
+              </p>
+            </div>
+            <ExampleResult ex={EXAMPLE_FAMILY} />
 
-                            <div>
-                                <p className="font-semibold mb-2">In countries without a Bayt al-Māl:</p>
-                                <p className="text-sm mb-3">
-                                    Most Western nations do not have an Islamic public treasury. Scholars have outlined the following options for handling this portion:
-                                </p>
-                                <div className="space-y-3 text-sm">
-                                    <div className="bg-emerald-100/60 rounded-lg p-3">
-                                        <p className="font-semibold text-emerald-800">1. Direct to Islamic charitable causes (majority scholarly position)</p>
-                                        <p className="mt-1 text-emerald-700">
-                                            Mosques, Islamic schools, Muslim welfare organizations, and community institutions serve a similar function to Bayt al-Māl. This is the position of the Fiqh Council of North America and the European Council for Fatwa and Research.
-                                        </p>
-                                    </div>
-                                    {result.shares.some(s => s.heir === 'husband' || s.heir === 'wife') && (
-                                        <div className="bg-emerald-100/60 rounded-lg p-3">
-                                            <p className="font-semibold text-emerald-800">2. Redistribute to the spouse via radd (position of ʿUthmān ibn ʿAffān)</p>
-                                            <p className="mt-1 text-emerald-700">
-                                                Some scholars hold that when no Bayt al-Māl exists, the remainder should return to the spouse. This view is adopted in the personal status codes of Egypt, Pakistan, and some Gulf states, and is recommended by some scholars specifically for Western Muslims.
-                                            </p>
-                                        </div>
-                                    )}
-                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                                        <p className="font-semibold text-yellow-800">⚠️ Write a Waṣiyyah (Islamic Will)</p>
-                                        <p className="mt-1 text-yellow-700">
-                                            The best practical step is to write a waṣiyyah that explicitly directs this portion to specific Islamic charities. Without a will, most Western jurisdictions will distribute your estate according to their own intestacy laws — which will not follow Islamic inheritance rules.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+            <h3 className="text-[18.5px] font-[650] mt-10">2. {EXAMPLE_AWL.title}</h3>
+            <div className="prose mt-2">
+              <p>
+                The husband takes 1/2 (no children). The mother takes 1/6 (two siblings are present). The two sisters take
+                2/3. In sixths that is 3 + 1 + 4 = 8 parts out of 6, more than the estate. With ʿawl the estate is divided
+                into 8 parts instead: husband 3/8, mother 1/8, sisters 4/8 (1/2) between them. The Jaʿfarī school does not
+                apply ʿawl and divides this family differently.
+              </p>
+            </div>
+            <ExampleResult ex={EXAMPLE_AWL} />
+          </Section>
 
-                    <div>
-                        <h4 className="text-xl font-['Amiri',serif] mb-2">Heir Shares</h4>
-                        <div className="divide-y divide-[var(--sand)]">
-                           {result.shares.map((s, i) => (
-                               <div key={s.heir} className="py-2 flex justify-between items-center">
-                                   <div>
-                                       <span className="font-bold text-[var(--ink)]">{s.label} {s.count > 1 ? `(x${s.count})` : ''}</span>
-                                       <p className="text-sm text-gray-600">{s.reason}</p>
-                                   </div>
-                                   <div className="text-right">
-                                       <p className="font-mono text-lg text-[var(--emerald)]">{numberToFraction(s.share ?? 0)}</p>
-                                       <p className="font-semibold">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(s.amount)}</p>
-                                   </div>
-                               </div>
-                           ))}
-                        </div>
-                    </div>
+          <Section id="law-and-wills" title="Local law, wills and advice">
+            <Callout tone="warning" title="The calculator does not replace a will or a lawyer">
+              <p>
+                In many countries, an estate is divided by the local law of intestacy unless there is a valid will. That law
+                usually does not follow the Qurʾānic shares. A properly made will (waṣiyyah) that sets out the Islamic
+                division, and names any bequest and the handling of any Bayt al-Māl portion, is the practical way to make
+                sure your wishes are followed. Ask a qualified scholar to check the shares, and a local lawyer to draft and
+                witness the will.
+              </p>
+            </Callout>
+          </Section>
 
-                    {result.blocked.length > 0 && (
-                         <div>
-                            <h4 className="text-xl font-['Amiri',serif] mb-2">Blocked Heirs</h4>
-                             <div className="divide-y divide-[var(--sand)]">
-                               {result.blocked.map((b) => (
-                                   <div key={b.heir} className="py-2">
-                                       <p><span className="font-bold">{b.label}</span> was blocked.</p>
-                                       <p className="text-sm text-gray-600">Reason: {b.reason}</p>
-                                   </div>
-                               ))}
-                            </div>
-                        </div>
-                    )}
+          <Section id="faq" title="Questions people ask">
+            <Faq items={FAQ} />
+          </Section>
 
-                 </div>
-                 <div className="mt-8 space-y-4">
-                    <InfoAccordion info={hajbInfo} />
-                    {result.wasAwlApplied && <InfoAccordion info={awlInfo} />}
-                    {result.wasRaddApplied && <InfoAccordion info={raddInfo} />}
-                    {(result.baytAlMalAmount ?? 0) > 0 && <InfoAccordion info={getBaytAlMalInfo(result.shares.some(s => s.heir === 'husband' || s.heir === 'wife'))} />}
-                    <InfoAccordion info={umariyyatanInfo} />
-                 </div>
-             </motion.div>
-        )}
-        
-      </AnimatePresence>
+          <Section id="related" title="Related tools">
+            <RelatedTools current={PATH} />
+            <p className="mt-4 text-[15px] text-text-2">
+              Not sure which school you follow?{" "}
+              <Link href="/find-your-school" className="lnk">
+                Find your school
+              </Link>
+              . New to the terms? See the{" "}
+              <Link href="/glossary" className="lnk">
+                glossary
+              </Link>
+              .
+            </p>
+            <Sources>
+              <ul className="m-0 ps-5 space-y-1">
+                <li>
+                  Qurʾān, Sūrat al-Nisāʾ <a className="lnk" href={Q("4:11")} target="_blank" rel="noopener noreferrer">4:11</a>{" "}
+                  (children and parents), <a className="lnk" href={Q("4:12")} target="_blank" rel="noopener noreferrer">4:12</a>{" "}
+                  (spouses and maternal siblings) and{" "}
+                  <a className="lnk" href={Q("4:176")} target="_blank" rel="noopener noreferrer">4:176</a> (sisters and
+                  brothers), on quran.com.
+                </li>
+                <li>
+                  On the one-third limit for bequests: Ṣaḥīḥ al-Bukhārī 2742 (Saʿd ibn Abī Waqqāṣ), on{" "}
+                  <a className="lnk" href="https://sunnah.com/bukhari:2742" target="_blank" rel="noopener noreferrer">sunnah.com</a>.
+                </li>
+                <li>
+                  The scholarly notes in the calculator (ʿawl, radd, ḥajb, grandfather and siblings, ʿUmariyyatān, the
+                  Jaʿfarī system and Bayt al-Māl) set out each school&apos;s position and its reasoning.
+                </li>
+                <li>
+                  On a Bayt al-Māl portion where no public treasury exists: the Fiqh Council of North America and the
+                  European Council for Fatwa and Research, as summarised in the calculator&apos;s Bayt al-Māl note.
+                </li>
+              </ul>
+            </Sources>
+          </Section>
+        </div>
 
-      <div className="flex justify-between mt-8">
-        <button
-          onClick={() => setStep((s) => Math.max(1, s - 1))}
-          disabled={step === 1}
-          className="px-6 py-2 rounded-md bg-[var(--sand)] text-[var(--ink)] disabled:opacity-50"
-        >
-          Back
-        </button>
-        {step < 3 && (
-            <button
-            onClick={() => setStep((s) => Math.min(4, s + 1))}
-            className="px-6 py-2 rounded-md bg-[var(--emerald)] text-white"
-            >
-            Continue
-            </button>
-        )}
-        {step === 3 && (
-             <button
-            onClick={runCalculation}
-            className="px-6 py-2 rounded-md bg-[var(--emerald)] text-white font-bold"
-            >
-            Calculate
-            </button>
-        )}
+        <aside className="hidden lg:block lg:sticky lg:top-24 pt-2">
+          <Toc items={TOC} />
+        </aside>
       </div>
     </div>
   );

@@ -1,361 +1,228 @@
-"use client";
+import { pageMetadata, calculatorJsonLd, breadcrumbJsonLd, howToJsonLd } from "@/lib/seo";
+import { PageIntro, ScholarNote, Section, Faq, RelatedTools, Sources, JsonLd } from "@/components/ui";
+import { FIDYA_WEIGHTS, type Madhab } from "@/lib/fidya/types";
+import { calculateFidya } from "@/lib/fidya/calculate";
+import { FidyaCalculator } from "./FidyaCalculator";
 
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Madhab, FIDYA_WEIGHTS } from "@/lib/fidya/types";
-import {
-  FIDYA_OVERVIEW_INFO,
-  FIDYA_AMOUNT_INFO,
-  FIDYA_ELIGIBILITY_INFO,
-} from "@/lib/fidya/scholarly-info";
-import { InfoAccordion } from "@/components/InfoAccordion";
-import { CurrencyInput } from "@/components/CurrencyInput";
-import { OptionCard } from "@/components/OptionCard";
+const PATH = "/fidya";
+const TITLE = "Fidya Calculator for Missed Fasts";
+const DESCRIPTION =
+  "Calculate fidya for Ramadan fasts you cannot make up due to old age or permanent illness, per day by school, by food weight or local meal cost.";
 
-const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
-  { value: "hanafi", label: "Ḥanafī", labelAr: "حنفي" },
-  { value: "maliki", label: "Mālikī", labelAr: "مالكي" },
-  { value: "shafii", label: "Shāfiʿī", labelAr: "شافعي" },
-  { value: "hanbali", label: "Ḥanbalī", labelAr: "حنبلي" },
-  { value: "jafari", label: "Jaʿfarī", labelAr: "جعفري" },
+export const metadata = pageMetadata({ path: PATH, title: TITLE, description: DESCRIPTION });
+
+const SCHOOLS: { value: Madhab; label: string }[] = [
+  { value: "hanafi", label: "Ḥanafī" },
+  { value: "maliki", label: "Mālikī" },
+  { value: "shafii", label: "Shāfiʿī" },
+  { value: "hanbali", label: "Ḥanbalī" },
+  { value: "jafari", label: "Jaʿfarī" },
 ];
 
-type Step = "intro" | "school" | "days" | "amount" | "result";
-const STEPS: Step[] = ["intro", "school", "days", "amount", "result"];
+// Worked example inputs. EXAMPLE figures only, not current prices.
+const EX_DAYS = 30;
+const EX_PRICE_PER_KG = 2; // example price per kg of staple food
+const EX_MEAL = 10; // example cost of one meal
 
-export default function FidyaCalculator() {
-  const [step, setStep] = useState(0);
-  const [madhab, setMadhab] = useState<Madhab>("hanafi");
-  const [missedDays, setMissedDays] = useState(0);
-  const [costPerMeal, setCostPerMeal] = useState(10);
-  const [useWeight, setUseWeight] = useState(false);
-  const [pricePerKg, setPricePerKg] = useState(2);
-  const [foodType, setFoodType] = useState<"wheat" | "barley" | "dates" | "raisins" | "rice">("wheat");
+// Computed at build time with the same function the calculator uses.
+const weightRows = SCHOOLS.map((s) => ({
+  ...s,
+  wheat: calculateFidya({ madhab: s.value, missedDays: EX_DAYS, costPerMeal: EX_MEAL, useWeight: true, pricePerKg: EX_PRICE_PER_KG, foodType: "wheat" })!,
+  dates: calculateFidya({ madhab: s.value, missedDays: EX_DAYS, costPerMeal: EX_MEAL, useWeight: true, pricePerKg: EX_PRICE_PER_KG, foodType: "dates" })!,
+}));
+const mealExample = calculateFidya({ madhab: "hanafi", missedDays: EX_DAYS, costPerMeal: EX_MEAL, useWeight: false, pricePerKg: EX_PRICE_PER_KG, foodType: "wheat" })!;
 
-  const currentStep = STEPS[step];
+const kg = (m: Madhab, f: "wheat" | "barley" | "dates" | "raisins" | "rice") => FIDYA_WEIGHTS[m].getWeightKg(f);
 
-  const result = useMemo(() => {
-    if (missedDays <= 0) return null;
-    const weight = FIDYA_WEIGHTS[madhab];
-    let perDay: number;
-    let unitDescription: string;
+const FAQ = [
+  {
+    q: "Who pays fidya?",
+    a: "Someone who cannot fast and has no reasonable expectation of being able to make the fasts up later, such as an elderly person or someone with a chronic or terminal illness. The Ḥanafī and Ḥanbalī schools, and one Shāfiʿī view, make fidya obligatory in these cases; the Mālikī school makes it recommended, not obligatory. Ayatollah Sistani requires it from an elderly person for whom fasting is extremely hard, but not from one who cannot fast at all.",
+  },
+  {
+    q: "I was ill for a few days. Do I pay fidya?",
+    a: "No. If the illness is temporary, or you missed fasts while travelling, you make up (qaḍāʾ) the missed days later. Fidya is only for when making up the fasts is not possible.",
+  },
+  {
+    q: "I broke my fast on purpose. Is fidya enough?",
+    a: "No. Fidya is for inability to fast. A deliberately broken Ramadan fast is a separate matter that may require kaffārah, depending on your school. Use the kaffārah calculator for that.",
+  },
+  {
+    q: "How much is fidya per day?",
+    a: "It is feeding one poor person for each missed day. In this calculator, the Ḥanafī amount is half a ṣāʿ of wheat (about 1.6 kg) or a full ṣāʿ of barley, dates or raisins (about 3.2 kg). The Mālikī and Shāfiʿī amount is one mudd of the local staple (about 0.51 kg). The Ḥanbalī amount is one mudd of wheat (about 0.51 kg) or half a ṣāʿ, which is two mudd, of other staples (about 1.02 kg, using the same 0.51 kg mudd). The Jaʿfarī amount is one mudd of food (about 0.75 kg).",
+  },
+  {
+    q: "Can I pay fidya in cash?",
+    a: "The Ḥanafī school permits the cash equivalent, and the Jaʿfarī notes on this site mention a monetary equivalent too. The Shāfiʿī school strongly prefers actual food, though many contemporary scholars allow cash when it is more practical for the poor. Many scholars today suggest the cost of one average local meal per missed day.",
+  },
+  {
+    q: "What about pregnant or nursing women?",
+    a: "Schools differ. In the Ḥanafī school they make up the missed fasts later, and fidya alone is not enough unless they are permanently unable to fast. In the Shāfiʿī and Ḥanbalī schools, if they broke the fast out of fear for the child, they make up the fasts and also pay fidya; if the fear was only for themselves, only the make-up fasts are required.",
+  },
+  {
+    q: "Can I give all the fidya to one person?",
+    a: "The calculator treats each missed day as feeding one poor person. This site's guidance is that it can be different people, or the same person on different days.",
+  },
+];
 
-    if (useWeight) {
-      const kg = weight.getWeightKg(foodType);
-      perDay = kg * pricePerKg;
-      unitDescription = `${kg} kg of ${foodType} × $${pricePerKg}/kg`;
-    } else {
-      perDay = costPerMeal;
-      unitDescription = `$${costPerMeal} per meal (local cost)`;
-    }
-
-    return {
-      perDay,
-      total: perDay * missedDays,
-      missedDays,
-      unitDescription,
-      weightInfo: weight,
-    };
-  }, [madhab, missedDays, costPerMeal, useWeight, pricePerKg, foodType]);
-
-  const canProceed = () => {
-    if (currentStep === "days") return missedDays > 0;
-    return true;
-  };
-
+export default function Page() {
   return (
-    <div className="min-h-screen relative">
-      <div className="arabesque-bg" />
-      <div className="luminous-header absolute inset-x-0 top-0 h-64" />
+    <div className="container-narrow pb-16">
+      <JsonLd
+        data={[
+          calculatorJsonLd({ path: PATH, name: TITLE, description: DESCRIPTION }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Fidya", path: PATH },
+          ]),
+          howToJsonLd({
+            name: "How to calculate fidya",
+            description: "Count the fasts you cannot make up, set the daily amount for your school, and multiply.",
+            steps: [
+              { name: "Choose your school", text: "Select Ḥanafī, Mālikī, Shāfiʿī, Ḥanbalī or Jaʿfarī. This sets the food weight per day." },
+              { name: "Enter the missed days", text: "Count every fasting day you cannot make up, including earlier years not yet compensated." },
+              { name: "Set the daily amount", text: "Enter the local cost of one meal, or the price of 1 kg of staple food so the calculator multiplies it by your school's weight." },
+              { name: "Read the total", text: "The total is the daily amount multiplied by the number of days." },
+            ],
+          }),
+        ]}
+      />
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <p className="font-['Noto_Naskh_Arabic',serif] text-2xl text-[var(--gold-dark)] mb-2">
-            فِدْيَة
+      <PageIntro
+        hue="green"
+        eyebrow="Calculator"
+        title={TITLE}
+        titleAr="فِدْيَة"
+        breadcrumb="Fidya"
+        lead="Compensation for missed fasts. For Ramadan fasts you cannot make up because of old age, chronic illness or another permanent condition."
+      />
+
+      <FidyaCalculator />
+
+      <ScholarNote className="mt-8" />
+
+      <Section id="what" title="What fidya is">
+        <div className="prose">
+          <p>
+            Fidya means &ldquo;ransom&rdquo; or &ldquo;compensation&rdquo;. It is feeding one poor person for each day
+            of Ramadan that you cannot fast and cannot make up later.
           </p>
-          <h1 className="heading-display text-4xl text-[var(--ink)] mb-2">
-            Fidya Calculator
-          </h1>
-          <p className="text-base text-[var(--ink-light)]">
-            Compensation for Missed Fasts
+          <p>
+            Its basis is Qur&apos;an 2:184. In Dr. Mustafa Khattab&apos;s translation (The Clear Quran): &ldquo;For
+            those who can only fast with extreme difficulty, compensation can be made by feeding a needy person
+            ˹for every day not fasted˺.&rdquo; The schools differ on whether it is obligatory or only recommended for those with a permanent inability to fast; see the eligibility notes below.
+          </p>
+          <p>
+            Fidya is different from kaffārah. Fidya compensates for <strong>inability</strong> to fast. Kaffārah is
+            expiation for a <strong>deliberate</strong> violation, such as breaking a Ramadan fast on purpose.
           </p>
         </div>
+      </Section>
 
-        {/* Progress */}
-        <div className="mb-8">
-          <div className="progress-track">
-            <div
-              className="progress-fill"
-              style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-            />
-          </div>
-          <p className="text-xs text-[var(--ink-faint)] mt-2 text-center">
-            Step {step + 1} of {STEPS.length}
+      <Section id="how" title="How this calculator works it out">
+        <div className="prose">
+          <p>The calculator multiplies one daily amount by the number of missed days you enter.</p>
+          <ul>
+            <li>
+              <strong>By local meal cost:</strong> the daily amount is the cost of one meal that you type in.
+            </li>
+            <li>
+              <strong>By food weight:</strong> the daily amount is your school&apos;s weight for the chosen food
+              multiplied by the price of 1 kg of that food. The weight only changes with the food type in the Ḥanafī
+              and Ḥanbalī schools.
+            </li>
+          </ul>
+          <p>The weights per day used for each school are:</p>
+        </div>
+        <div className="table-wrap mt-4" tabIndex={0} role="region" aria-label="Scrollable table">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">School</th>
+                <th scope="col" className="num">Wheat</th>
+                <th scope="col" className="num">Rice</th>
+                <th scope="col" className="num">Barley, dates, raisins</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SCHOOLS.map((s) => (
+                <tr key={s.value}>
+                  <td className="font-medium text-text">{s.label}</td>
+                  <td className="num">{kg(s.value, "wheat")} kg</td>
+                  <td className="num">{kg(s.value, "rice")} kg</td>
+                  <td className="num">{kg(s.value, "dates")} kg</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section id="example" title="Worked example">
+        <div className="prose">
+          <p>
+            An elderly person who cannot fast missed <strong>{EX_DAYS} days</strong>. The prices below are{" "}
+            <strong>examples only</strong>, not current prices. Use your own local figures in the calculator.
+          </p>
+          <p>
+            <strong>By meal cost, example ${EX_MEAL} per meal:</strong>{" "}
+            <span className="num">
+              ${mealExample.perDay.toFixed(2)} × {mealExample.missedDays} days = ${mealExample.total.toFixed(2)}
+            </span>
+            .
+          </p>
+          <p>
+            <strong>By food weight, example price ${EX_PRICE_PER_KG.toFixed(2)} per kg:</strong>
           </p>
         </div>
-
-        {/* Steps */}
-        <div className="card p-6 md:p-8 mb-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Step: Intro */}
-              {currentStep === "intro" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    What is Fidya?
-                  </h2>
-                  <div className="space-y-4 text-base text-[var(--ink-light)] leading-relaxed">
-                    <p>
-                      <strong>Fidya</strong> (فِدْيَة — &quot;ransom&quot; or &quot;compensation&quot;) is a
-                      payment made to feed a poor person for each day of Ramadan fasting that
-                      you are <strong>permanently unable</strong> to make up.
-                    </p>
-                    <p>
-                      It applies to people who <strong>cannot fast at all</strong> — due to
-                      old age, chronic illness, terminal illness, or other permanent conditions
-                      — and have no reasonable expectation of being able to fast in the future.
-                    </p>
-                    <div className="info-panel">
-                      <p className="text-sm font-semibold text-[var(--info-text)] mb-1">
-                        ⚠️ Fidya is NOT for:
-                      </p>
-                      <ul className="text-sm text-[var(--info-text)] list-disc list-inside space-y-1">
-                        <li>Deliberately breaking a fast — that requires <strong>Kaffārah</strong> (expiation)</li>
-                        <li>Temporary illness — you should make up (<strong>qaḍāʾ</strong>) the fasts later</li>
-                        <li>Travel — make up the fasts when you return</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <InfoAccordion info={FIDYA_OVERVIEW_INFO} />
-                  <InfoAccordion info={FIDYA_ELIGIBILITY_INFO} />
-                </div>
-              )}
-
-              {/* Step: School */}
-              {currentStep === "school" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Select Your School of Jurisprudence
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    The amount of food (and therefore cost) varies between schools.
-                    <a href="/find-your-school" className="block mt-3 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--emerald)] bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl px-4 py-2.5 transition-all hover:shadow-sm no-underline">
-                      🧭 Not sure which school you follow? Take our short quiz →
-                    </a>
-                  </p>
-                  <div className="space-y-2">
-                    {madhabOptions.map((opt) => (
-                      <OptionCard
-                        key={opt.value}
-                        selected={madhab === opt.value}
-                        onClick={() => setMadhab(opt.value)}
-                        title={opt.label}
-                        description={FIDYA_WEIGHTS[opt.value].description}
-                        badge={opt.labelAr}
-                      />
-                    ))}
-                  </div>
-                  <InfoAccordion info={FIDYA_AMOUNT_INFO} />
-                </div>
-              )}
-
-              {/* Step: Days */}
-              {currentStep === "days" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    How Many Days?
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    Enter the total number of fasting days you need to compensate for.
-                    A full Ramadan is typically 29 or 30 days.
-                  </p>
-                  <CurrencyInput
-                    label="Missed Fasting Days"
-                    value={missedDays}
-                    onChange={setMissedDays}
-                    prefix=""
-                    placeholder="30"
-                    suffix="days"
-                    hint="Include missed days from previous years if you haven't compensated for them yet"
-                  />
-                  <div className="flex gap-2">
-                    {[1, 10, 29, 30, 60].map((n) => (
-                      <button
-                        key={n}
-                        onClick={() => setMissedDays(n)}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                          missedDays === n
-                            ? "bg-[var(--emerald)] text-white"
-                            : "bg-[var(--sand)]/50 text-[var(--ink-muted)] hover:bg-[var(--sand)]"
-                        }`}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Step: Amount */}
-              {currentStep === "amount" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Calculation Method
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    Choose how you&apos;d like to calculate the fidya amount.
-                  </p>
-                  <div className="space-y-2">
-                    <OptionCard
-                      selected={!useWeight}
-                      onClick={() => setUseWeight(false)}
-                      title="By Local Meal Cost"
-                      description="Use the cost of one average meal in your area. Most practical for cash payments."
-                    />
-                    <OptionCard
-                      selected={useWeight}
-                      onClick={() => setUseWeight(true)}
-                      title="By Food Weight"
-                      description={`Classical method: ${FIDYA_WEIGHTS[madhab].measure}`}
-                    />
-                  </div>
-
-                  <div className="gold-line" />
-
-                  {!useWeight ? (
-                    <CurrencyInput
-                      label="Cost of One Meal in Your Area"
-                      value={costPerMeal}
-                      onChange={setCostPerMeal}
-                      hint="The average cost to feed one poor person one meal (e.g., $10–15 in North America, $3–5 in South Asia)"
-                    />
-                  ) : (
-                    <div className="space-y-3">
-                      {/* Food type selector — matters for Hanafi & Hanbali where weight varies */}
-                      <div>
-                        <label className="block text-sm font-semibold text-[var(--ink)] mb-1">
-                          Type of Staple Food
-                        </label>
-                        <select
-                          value={foodType}
-                          onChange={(e) => setFoodType(e.target.value as typeof foodType)}
-                          className="w-full p-3 rounded-xl border-2 border-[var(--sand)] bg-[var(--cream-light)] text-[var(--ink)] font-['Amiri',serif]"
-                        >
-                          <option value="wheat">Wheat / Flour</option>
-                          <option value="barley">Barley</option>
-                          <option value="dates">Dates</option>
-                          <option value="raisins">Raisins</option>
-                          <option value="rice">Rice</option>
-                        </select>
-                        {(madhab === "hanafi" || madhab === "hanbali") && foodType !== "wheat" && (
-                          <p className="text-xs text-[var(--gold-dark)] mt-1">
-                            ⚠️ {madhab === "hanafi" ? "Ḥanafī" : "Ḥanbalī"}: non-wheat staples require a larger amount ({FIDYA_WEIGHTS[madhab].getWeightKg(foodType)} kg vs {FIDYA_WEIGHTS[madhab].getWeightKg("wheat")} kg for wheat)
-                          </p>
-                        )}
-                      </div>
-                      <CurrencyInput
-                        label={`Price Per Kilogram of ${foodType.charAt(0).toUpperCase() + foodType.slice(1)}`}
-                        value={pricePerKg}
-                        onChange={setPricePerKg}
-                        hint={`You need ${FIDYA_WEIGHTS[madhab].getWeightKg(foodType)} kg per day (${FIDYA_WEIGHTS[madhab].measure})`}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Step: Result */}
-              {currentStep === "result" && result && (
-                <div className="space-y-6">
-                  <h2 className="heading-display text-2xl text-[var(--ink)] text-center">
-                    Your Fidya Obligation
-                  </h2>
-
-                  <div className="text-center py-6">
-                    <p className="text-sm text-[var(--ink-faint)] mb-1">Total Fidya Due</p>
-                    <p className="heading-display text-5xl text-[var(--emerald)]">
-                      ${result.total.toFixed(2)}
-                    </p>
-                    <p className="text-sm text-[var(--ink-muted)] mt-2">
-                      ${result.perDay.toFixed(2)} per day × {result.missedDays} days
-                    </p>
-                  </div>
-
-                  <div className="gold-line" />
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">School of Jurisprudence</span>
-                      <span className="font-semibold">{madhabOptions.find(m => m.value === madhab)?.label}</span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Missed Days</span>
-                      <span className="font-semibold">{result.missedDays}</span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Per Day</span>
-                      <span className="font-semibold">${result.perDay.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Classical Measure</span>
-                      <span className="font-semibold text-right text-sm max-w-[60%]">
-                        {result.weightInfo.measure}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="gold-line" />
-
-                  <div className="info-panel">
-                    <p className="text-sm text-[var(--info-text)] leading-relaxed">
-                      <strong>How to pay:</strong> Fidya can be given as actual food or as cash
-                      to a poor person or an Islamic charity. Many organizations accept fidya
-                      payments and distribute food on your behalf. The payment should be made
-                      for each day individually — meaning you are feeding one poor person per
-                      missed day (it can be different people or the same person on different days).
-                    </p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+        <div className="table-wrap mt-4" tabIndex={0} role="region" aria-label="Scrollable table">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">School</th>
+                <th scope="col">Wheat per day</th>
+                <th scope="col" className="num">Wheat, {EX_DAYS} days</th>
+                <th scope="col" className="num">Dates, {EX_DAYS} days</th>
+              </tr>
+            </thead>
+            <tbody>
+              {weightRows.map((r) => (
+                <tr key={r.value}>
+                  <td className="font-medium text-text">{r.label}</td>
+                  <td className="num text-text-2">
+                    {r.wheat.unitDescription} = ${r.wheat.perDay.toFixed(2)}
+                  </td>
+                  <td className="num">${r.wheat.total.toFixed(2)}</td>
+                  <td className="num">${r.dates.total.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        <p className="field-hint">Amounts are shown with a $ sign. Enter figures in your own currency; the arithmetic is the same.</p>
+      </Section>
 
-        {/* Navigation */}
-        <div className="flex justify-between">
-          <button
-            onClick={() => setStep(Math.max(0, step - 1))}
-            disabled={step === 0}
-            className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-              step === 0
-                ? "opacity-0 pointer-events-none"
-                : "bg-[var(--sand)]/50 text-[var(--ink-muted)] hover:bg-[var(--sand)]"
-            }`}
-          >
-            ← Back
-          </button>
-          {step < STEPS.length - 1 && (
-            <button
-              onClick={() => setStep(Math.min(STEPS.length - 1, step + 1))}
-              disabled={!canProceed()}
-              className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-                canProceed()
-                  ? "bg-[var(--emerald)] text-white hover:bg-[var(--emerald-deep)] shadow-md"
-                  : "bg-[var(--sand)] text-[var(--ink-faint)] cursor-not-allowed"
-              }`}
-            >
-              Continue →
-            </button>
-          )}
-        </div>
-      </div>
+      <Section id="faq" title="Questions people ask">
+        <Faq items={FAQ} />
+      </Section>
+
+      <Section id="related" title="Related calculators">
+        <RelatedTools current={PATH} />
+      </Section>
+
+      <Sources>
+        <p>
+          Qur&apos;an 2:184, translation by Dr. Mustafa Khattab (The Clear Quran):{" "}
+          <a href="https://quran.com/2/184" className="lnk" rel="noopener" target="_blank">
+            quran.com/2/184
+          </a>
+          .
+        </p>
+        <p className="mt-1">
+          School positions on amounts, cash and eligibility are summarised from this site&apos;s scholarly notes, shown
+          in the &ldquo;What do the scholars say?&rdquo; panels in the calculator above.
+        </p>
+      </Sources>
     </div>
   );
 }

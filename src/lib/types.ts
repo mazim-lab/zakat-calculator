@@ -86,7 +86,10 @@ export interface AssetInputs {
   cryptoValue: number;
 
   // Agricultural
+  /** Market value of the harvest, in the selected currency. */
   cropValueOrWeight: number;
+  /** Harvest weight in kilograms, used only to check the five-wasq minimum. */
+  cropWeightKg?: number;
   isIrrigated: boolean;
 
   // Livestock
@@ -116,6 +119,8 @@ export interface ZakatBreakdown {
   rate: number;
   zakatDue: number;
   notes: string;
+  /** "in_kind": due as animals, not priced. "not_calculated": the calculator declines this line. */
+  status?: "in_kind" | "not_calculated";
 }
 
 export interface KhumsResult {
@@ -136,6 +141,8 @@ export interface ZakatResult {
   breakdown: ZakatBreakdown[];
   methodology: string;
   khums?: KhumsResult;
+  /** Plain warnings the results page must show (cases the calculator does not fully support). */
+  warnings?: string[];
 }
 
 export interface StepConfig {
@@ -282,7 +289,7 @@ export const STEPS: StepConfig[] = [
   {
     id: "khums",
     title: "Khums",
-    subtitle: "20% on surplus annual income (Ja'farī)",
+    subtitle: "20% on surplus annual income (Jaʿfarī)",
     icon: "🕌",
   },
   {

@@ -12,7 +12,7 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       return {
         type, madhab, isSequential: true,
         options: [
-          { order: 1, action: "Free a slave", detail: "Historical requirement — no longer practically applicable.", isFallback: false },
+          { order: 1, action: "Free a slave", detail: "Historical requirement (no longer practically applicable).", isFallback: false },
           { order: 2, action: "Fast 60 consecutive days", detail: "If you break the continuity (miss a day without valid excuse), you must restart from day 1. Valid excuses include menstruation, illness, or travel.", isFallback: true },
           { order: 3, action: "Feed 60 poor people", detail: "Provide two meals to 60 different poor people, or the monetary equivalent (~$10–15 per person depending on your area, totaling $600–900).", isFallback: true },
         ],
@@ -28,9 +28,9 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       return {
         type, madhab, isSequential: false, // Maliki allows choice
         options: [
-          { order: 1, action: "Free a slave", detail: "Historical — no longer applicable.", isFallback: false },
+          { order: 1, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
           { order: 2, action: "Fast 60 consecutive days", detail: "Must be consecutive. Menstruation is excused and does not break continuity.", isFallback: false },
-          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of staple food per person, or the equivalent in cash.", isFallback: false },
+          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of staple food per person.", isFallback: false },
         ],
         notes: [
           "The Mālikī school uniquely allows choosing between the three options (they are not strictly sequential).",
@@ -43,12 +43,12 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       return {
         type, madhab, isSequential: true,
         options: [
-          { order: 1, action: "Free a slave", detail: "Historical — no longer applicable.", isFallback: false },
+          { order: 1, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
           { order: 2, action: "Fast 60 consecutive days", detail: "Strictly consecutive. Must restart if broken without valid excuse.", isFallback: true },
           { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of staple food per person.", isFallback: true },
         ],
         notes: [
-          "In the Shāfiʿī school, kaffārah for fasting is ONLY required for sexual intercourse during a Ramadan fast — NOT for eating or drinking.",
+          "In the Shāfiʿī school, kaffārah for fasting is ONLY required for sexual intercourse during a Ramadan fast, NOT for eating or drinking.",
           "Deliberately eating or drinking requires only qaḍāʾ (making up the day) plus sincere repentance (tawbah).",
           "This is a significant difference from the other Sunni schools.",
         ],
@@ -58,9 +58,9 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       return {
         type, madhab, isSequential: true,
         options: [
-          { order: 1, action: "Free a slave", detail: "Historical — no longer applicable.", isFallback: false },
+          { order: 1, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
           { order: 2, action: "Fast 60 consecutive days", detail: "Must be consecutive. Valid excuses (illness, menstruation) do not break continuity.", isFallback: true },
-          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of staple food per person, or cash equivalent.", isFallback: true },
+          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of wheat, or half a ṣāʿ (~1.02 kg) of other staple food, per person (al-Mughnī).", isFallback: true },
         ],
         notes: [
           "Like the Shāfiʿī school, the Ḥanbalī school requires kaffārah only for sexual intercourse during a Ramadan fast.",
@@ -73,12 +73,12 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       return {
         type, madhab, isSequential: false,
         options: [
-          { order: 1, action: "Free a slave", detail: "Historical — no longer applicable.", isFallback: false },
+          { order: 1, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
           { order: 2, action: "Fast 60 days (31 consecutive + 29 remaining)", detail: "You must fast at least 31 days consecutively; the remaining 29 can be non-consecutive.", isFallback: false },
           { order: 3, action: "Feed 60 poor people", detail: "Approximately 750g of food per person (one Jaʿfarī mudd).", isFallback: false },
         ],
         notes: [
-          "In Jaʿfarī fiqh, the three options are alternatives — you may choose any one.",
+          "In Jaʿfarī fiqh, the three options are alternatives: you may choose any one.",
           "Kaffārah applies to deliberately breaking a fast by eating, drinking, or sexual intercourse.",
           "If the fast was broken by a ḥarām (forbidden) act, some authorities require all three as a combined kaffārah (kaffārat al-jamʿ).",
           "You must also make up the broken fast day.",
@@ -93,8 +93,8 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
     const baseOptions = [
       { order: 1, action: "Feed 10 poor people", detail: "One meal each, or the equivalent in staple food (one mudd per person in most schools; half a ṣāʿ in the Ḥanafī school).", isFallback: false },
       { order: 2, action: "Clothe 10 poor people", detail: "Provide each person with clothing sufficient to cover their body for prayer (at minimum, a garment covering the ʿawrah).", isFallback: false },
-      { order: 3, action: "Free a slave", detail: "Historical — no longer applicable.", isFallback: false },
-      { order: 4, action: "Fast 3 days", detail: madhab === "hanafi" || madhab === "hanbali" ? "Must be 3 consecutive days." : "3 days (consecutive is preferred but not required in this school).", isFallback: true },
+      { order: 3, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
+      { order: 4, action: "Fast 3 days", detail: madhab === "hanafi" || madhab === "hanbali" || madhab === "jafari" ? "Must be 3 consecutive days." : "3 days (consecutive is preferred but not required in this school).", isFallback: true },
     ];
 
     return {
@@ -109,6 +109,8 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
           ? "The Ḥanafī school requires the 3 fasting days to be consecutive."
           : madhab === "hanbali"
           ? "The Ḥanbalī school also requires the 3 fasting days to be consecutive."
+          : madhab === "jafari"
+          ? "Ayatollah Sistani requires the 3 fasting days to be consecutive (Islamic Laws, ruling 2687)."
           : "In this school, the 3 fasting days do not need to be consecutive (though it is preferred).",
       ],
     };
@@ -119,12 +121,12 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
     return {
       type, madhab, isSequential: true,
       options: [
-        { order: 1, action: "Free a slave", detail: "Historical — no longer applicable.", isFallback: false },
+        { order: 1, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
         { order: 2, action: "Fast 60 consecutive days", detail: "Must be completed before resuming marital relations. Menstruation does not break continuity.", isFallback: true },
         { order: 3, action: "Feed 60 poor people", detail: "If unable to fast, feed 60 poor people one meal each.", isFallback: true },
       ],
       notes: [
-        "Ẓihār is when a husband says to his wife 'You are to me like my mother's back' — declaring her unlawful to himself.",
+        "Ẓihār is when a husband says to his wife 'You are to me like my mother's back', declaring her unlawful to himself.",
         "This was a pre-Islamic form of divorce. Islam condemned it but required kaffārah as atonement.",
         "The kaffārah must be completed BEFORE the couple can resume marital relations.",
         "Based on Quran 58:3-4.",
@@ -139,7 +141,7 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
       return {
         type, madhab, isSequential: true,
         options: [
-          { order: 1, action: "Free a believing slave", detail: "Historical — no longer applicable.", isFallback: false },
+          { order: 1, action: "Free a believing slave", detail: "Historical (no longer applicable).", isFallback: false },
           { order: 2, action: "Fast 60 consecutive days", detail: "Must be strictly consecutive. Required if freeing a slave is not possible.", isFallback: true },
           { order: 3, action: "Feed 60 poor people", detail: "Approximately 750g of food per person (one Jaʿfarī mudd). Only if unable to fast.", isFallback: true },
         ],
@@ -155,12 +157,12 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
     return {
       type, madhab, isSequential: true,
       options: [
-        { order: 1, action: "Free a believing slave", detail: "Historical — no longer applicable.", isFallback: false },
+        { order: 1, action: "Free a believing slave", detail: "Historical (no longer applicable).", isFallback: false },
         { order: 2, action: "Fast 60 consecutive days", detail: "Must be strictly consecutive. This is the primary practical option today.", isFallback: true },
       ],
       notes: [
         "Based on Quran 4:92. This kaffārah is in ADDITION to blood money (diyah) paid to the victim's family.",
-        "Most Sunni schools agree there is no feeding option for accidental killing — only freeing a slave or fasting. This is based on the Quranic text which mentions only these two options.",
+        "None of the four Sunni schools allows feeding 60 poor people in place of the fast for accidental killing, in its relied-upon position: the Qurʾān (4:92) mentions only freeing a slave and fasting. If you cannot fast, ask a scholar about your case.",
         "The blood money (diyah) amount is a separate calculation and is borne by the killer's ʿāqilah (extended family/clan) in most schools.",
       ],
     };
@@ -174,11 +176,24 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
   };
 }
 
+/**
+ * Whether feeding the poor is one of the kaffārah options for this type and
+ * school. For accidental killing the four Sunni schools allow no feeding
+ * (Qurʾān 4:92; Dar al-Ifta fatwa 17000); the Jaʿfarī school allows it as the
+ * last resort (Sistani, Minhāj al-Ṣāliḥīn, masʾalah 746).
+ */
+export function hasFeedingOption(type: KaffarahType, madhab: Madhab): boolean {
+  return !(type === "accidental_killing" && madhab !== "jafari");
+}
+
 export function estimateFeedingCost(
   type: KaffarahType,
   madhab: Madhab,
   costPerMeal: number
 ): { people: number; totalCost: number } {
+  if (!hasFeedingOption(type, madhab)) {
+    return { people: 0, totalCost: 0 };
+  }
   if (type === "broken_oath") {
     return { people: 10, totalCost: 10 * costPerMeal };
   }

@@ -1,369 +1,236 @@
-"use client";
-
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Madhab, KaffarahType, KAFFARAH_TYPES } from "@/lib/kaffarah/types";
+import { pageMetadata, calculatorJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { PageIntro, ScholarNote, Section, Faq, RelatedTools, Sources, JsonLd } from "@/components/ui";
+import { KAFFARAH_TYPES, type Madhab } from "@/lib/kaffarah/types";
 import { getKaffarahRuling, estimateFeedingCost } from "@/lib/kaffarah/rulings";
-import {
-  KAFFARAH_OVERVIEW_INFO,
-  KAFFARAH_FAST_INFO,
-  KAFFARAH_OATH_INFO,
-} from "@/lib/kaffarah/scholarly-info";
-import { InfoAccordion } from "@/components/InfoAccordion";
-import { CurrencyInput } from "@/components/CurrencyInput";
-import { OptionCard } from "@/components/OptionCard";
+import { kaffarahTotalText, kaffarahBreakdownText } from "@/lib/kaffarah/calculate";
+import { KaffarahCalculator } from "./KaffarahCalculator";
 
-const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
-  { value: "hanafi", label: "Ḥanafī", labelAr: "حنفي" },
-  { value: "maliki", label: "Mālikī", labelAr: "مالكي" },
-  { value: "shafii", label: "Shāfiʿī", labelAr: "شافعي" },
-  { value: "hanbali", label: "Ḥanbalī", labelAr: "حنبلي" },
-  { value: "jafari", label: "Jaʿfarī", labelAr: "جعفري" },
+const PATH = "/kaffarah";
+const TITLE = "Kaffārah Calculator";
+const DESCRIPTION =
+  "Kaffārah options by school for a deliberately broken Ramadan fast, a broken oath, ẓihār or accidental killing, in order, with the feeding cost estimated.";
+
+export const metadata = pageMetadata({ path: PATH, title: TITLE, description: DESCRIPTION });
+
+const SCHOOLS: { value: Madhab; label: string }[] = [
+  { value: "hanafi", label: "Ḥanafī" },
+  { value: "maliki", label: "Mālikī" },
+  { value: "shafii", label: "Shāfiʿī" },
+  { value: "hanbali", label: "Ḥanbalī" },
+  { value: "jafari", label: "Jaʿfarī" },
 ];
 
-type Step = "intro" | "type" | "school" | "cost" | "result";
-const STEPS: Step[] = ["intro", "type", "school", "cost", "result"];
+// Worked example inputs. EXAMPLE figures only, not a current or official meal cost.
+const EX_MEAL = 10; // example cost of one meal
+const EX_DAYS = 2; // example: two separate days broken
 
-export default function KaffarahCalculator() {
-  const [step, setStep] = useState(0);
-  const [kaffarahType, setKaffarahType] = useState<KaffarahType>("broken_fast");
-  const [madhab, setMadhab] = useState<Madhab>("hanafi");
-  const [costPerMeal, setCostPerMeal] = useState(10);
-  const [instances, setInstances] = useState(1);
+// Computed at build time with the same functions the calculator uses.
+const oathEstimate = estimateFeedingCost("broken_oath", "hanafi", EX_MEAL);
+const fastEstimate = estimateFeedingCost("broken_fast", "hanafi", EX_MEAL);
+const optionRows = KAFFARAH_TYPES.map((t) => ({
+  type: t,
+  bySchool: SCHOOLS.map((s) => {
+    const r = getKaffarahRuling(t.id, s.value);
+    return {
+      ...s,
+      sequential: r.isSequential,
+      practical: r.options
+        .filter((o) => !o.action.includes("slave"))
+        .map((o) => (!r.isSequential && o.isFallback ? `${o.action} (only if unable to do the others)` : o.action)),
+    };
+  }),
+}));
 
-  const currentStep = STEPS[step];
+const FAQ = [
+  {
+    q: "What is the difference between kaffārah and fidya?",
+    a: "Fidya compensates for being unable to fast. Kaffārah is expiation for a deliberate violation, such as breaking a Ramadan fast on purpose or breaking a sworn oath. They should not be confused.",
+  },
+  {
+    q: "I deliberately ate during Ramadan. Do I owe kaffārah?",
+    a: "Schools differ. In the Ḥanafī, Mālikī and Jaʿfarī rulings shown here, deliberately eating, drinking or intercourse requires kaffārah. In the Shāfiʿī and Ḥanbalī schools, kaffārah for a fast is only for sexual intercourse; deliberately eating or drinking requires making up the day (qaḍāʾ) and sincere repentance. In every case you also make up the broken day.",
+  },
+  {
+    q: "Must the options be done in order?",
+    a: "For a broken fast, the Ḥanafī, Shāfiʿī and Ḥanbalī schools require the order: freeing a slave, then fasting 60 consecutive days, then feeding 60 poor people. The Mālikī and Jaʿfarī schools let you choose any of the three. Some Jaʿfarī authorities require all three together if the fast was broken by a ḥarām act.",
+  },
+  {
+    q: "What is the kaffārah for a broken oath?",
+    a: "Feed ten poor people, or clothe ten poor people, or free a slave. Only if you cannot afford any of these, fast three days. This is based on Qur'an 5:89. The Ḥanafī and Ḥanbalī schools, and Ayatollah Sistani for the Jaʿfarī school, require the three days to be consecutive; the Mālikī and Shāfiʿī schools prefer it but do not require it.",
+  },
+  {
+    q: "Why does every ruling mention freeing a slave?",
+    a: "It is the first option named in the sources. It is shown for completeness, but this site marks it as historical and no longer practically applicable.",
+  },
+  {
+    q: "If I broke more than one fast, is it one kaffārah?",
+    a: "This site's Ḥanafī ruling says each day deliberately broken needs a separate kaffārah, so the calculator multiplies the feeding cost by the number of instances you enter. For a broken oath, enter the number of separate oaths broken.",
+  },
+  {
+    q: "Is paying money enough?",
+    a: "No. Kaffārah also needs sincere repentance (tawbah) and a real intention not to repeat the act. The payment or fast is the outward part; the inner part matters as much.",
+  },
+];
 
-  const ruling = useMemo(
-    () => getKaffarahRuling(kaffarahType, madhab),
-    [kaffarahType, madhab]
-  );
-
-  const feedingEstimate = useMemo(
-    () => estimateFeedingCost(kaffarahType, madhab, costPerMeal),
-    [kaffarahType, madhab, costPerMeal]
-  );
-
-  const contextualInfo = kaffarahType === "broken_fast"
-    ? KAFFARAH_FAST_INFO
-    : kaffarahType === "broken_oath"
-    ? KAFFARAH_OATH_INFO
-    : null;
-
+export default function Page() {
   return (
-    <div className="min-h-screen relative">
-      <div className="arabesque-bg" />
-      <div className="luminous-header absolute inset-x-0 top-0 h-64" />
+    <div className="container-narrow pb-16">
+      <JsonLd
+        data={[
+          calculatorJsonLd({ path: PATH, name: TITLE, description: DESCRIPTION }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Kaffārah", path: PATH },
+          ]),
+        ]}
+      />
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <p className="font-['Noto_Naskh_Arabic',serif] text-2xl text-[var(--gold-dark)] mb-2">
-            كَفَّارَة
+      <PageIntro
+        hue="amber"
+        eyebrow="Calculator"
+        title={TITLE}
+        titleAr="كَفَّارَة"
+        breadcrumb="Kaffārah"
+        lead="Expiation for broken obligations. Choose what happened and your school to see the required options in order, with the feeding option costed."
+      />
+
+      <KaffarahCalculator />
+
+      <ScholarNote className="mt-8" />
+
+      <Section id="what" title="What kaffārah is">
+        <div className="prose">
+          <p>
+            Kaffārah literally means &ldquo;covering&rdquo;. It is a set penalty for specific acts, and it works as both
+            spiritual purification and charity. The Qur&apos;an sets it for a broken oath (5:89), ẓihār (58:3 to 4)
+            and accidental killing (4:92).
           </p>
-          <h1 className="heading-display text-4xl text-[var(--ink)] mb-2">
-            Kaffārah Calculator
-          </h1>
-          <p className="text-base text-[var(--ink-light)]">
-            Expiation for Broken Obligations
+          <p>
+            For a deliberately broken Ramadan fast, the basis is the hadith of Abū Hurayrah in Ṣaḥīḥ al-Bukhārī 1936.
+            A man told the Prophet (ﷺ) that he had had intercourse with his wife while fasting. The Prophet asked him
+            in turn whether he could free a slave, then whether he could &ldquo;fast for two successive months&rdquo;,
+            then whether he could &ldquo;afford to feed sixty poor persons&rdquo;.
+          </p>
+          <p>
+            For a broken oath, Qur&apos;an 5:89 lists feeding ten needy people, clothing them, or freeing a slave, and
+            fasting three days for whoever cannot do any of these.
           </p>
         </div>
+      </Section>
 
-        {/* Progress */}
-        <div className="mb-8">
-          <div className="progress-track">
-            <div
-              className="progress-fill"
-              style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-            />
-          </div>
-          <p className="text-xs text-[var(--ink-faint)] mt-2 text-center">
-            Step {step + 1} of {STEPS.length}
+      <Section id="how" title="How this calculator works it out">
+        <div className="prose">
+          <p>The calculator does two separate things.</p>
+          <ul>
+            <li>
+              <strong>Shows the ruling.</strong> For your type and school it lists the options, says whether they must
+              be tried in order, and shows the school&apos;s notes. These come straight from the site&apos;s ruling
+              table.
+            </li>
+            <li>
+              <strong>Estimates the feeding cost.</strong> It multiplies the number of people to feed (10 for a broken
+              oath, 60 for every other type) by the cost of one meal you enter, then by the number of instances.
+            </li>
+          </ul>
+          <p>
+            The estimate is a guide to one option, not the whole ruling. For accidental killing, the four Sunni schools
+            have no feeding option, so the calculator shows no cost there; the Jaʿfarī ruling (Sistani) allows feeding
+            only if fasting is impossible. For a broken fast in the Shāfiʿī and
+            Ḥanbalī schools, it only applies if the fast was broken by intercourse.
           </p>
         </div>
-
-        {/* Steps */}
-        <div className="card p-6 md:p-8 mb-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Intro */}
-              {currentStep === "intro" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    What is Kaffārah?
-                  </h2>
-                  <div className="space-y-4 text-base text-[var(--ink-light)] leading-relaxed">
-                    <p>
-                      <strong>Kaffārah</strong> (كَفَّارَة — &quot;expiation&quot; or &quot;atonement&quot;) is
-                      a prescribed penalty in Islamic law for specific violations of religious
-                      obligations. It serves as both spiritual purification and charity.
-                    </p>
-                    <p>
-                      Unlike <strong>fidya</strong> (which compensates for inability to fast),
-                      kaffārah is required when you <strong>deliberately</strong> violate an
-                      obligation — such as intentionally breaking a Ramadan fast or breaking a
-                      sworn oath.
-                    </p>
-                    <p>
-                      The type and severity of kaffārah depends on what was violated, and the
-                      specific requirements differ between schools of thought.
-                    </p>
-                  </div>
-                  <InfoAccordion info={KAFFARAH_OVERVIEW_INFO} />
-                </div>
-              )}
-
-              {/* Type Selection */}
-              {currentStep === "type" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    What Happened?
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    Select the type of violation that requires kaffārah.
-                  </p>
-                  <div className="space-y-2">
-                    {KAFFARAH_TYPES.map((kt) => (
-                      <OptionCard
-                        key={kt.id}
-                        selected={kaffarahType === kt.id}
-                        onClick={() => setKaffarahType(kt.id)}
-                        title={`${kt.icon} ${kt.title}`}
-                        description={kt.description}
-                        badge={kt.titleAr}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* School */}
-              {currentStep === "school" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Select Your School of Jurisprudence
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    Requirements for kaffārah vary significantly between schools —
-                    especially for broken fasts.
-                    <a href="/find-your-school" className="block mt-3 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--emerald)] bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl px-4 py-2.5 transition-all hover:shadow-sm no-underline">
-                      🧭 Not sure which school you follow? Take our short quiz →
-                    </a>
-                  </p>
-                  <div className="space-y-2">
-                    {madhabOptions.map((opt) => (
-                      <OptionCard
-                        key={opt.value}
-                        selected={madhab === opt.value}
-                        onClick={() => setMadhab(opt.value)}
-                        title={opt.label}
-                        description=""
-                        badge={opt.labelAr}
-                      />
-                    ))}
-                  </div>
-                  {contextualInfo && <InfoAccordion info={contextualInfo} />}
-                </div>
-              )}
-
-              {/* Cost Estimation */}
-              {currentStep === "cost" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Cost Estimation
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    If the feeding option applies, we can estimate the monetary cost.
-                  </p>
-                  <CurrencyInput
-                    label="Cost of One Meal in Your Area"
-                    value={costPerMeal}
-                    onChange={setCostPerMeal}
-                    hint="Average cost to feed one poor person one meal"
-                  />
-                  <CurrencyInput
-                    label="Number of Instances"
-                    value={instances}
-                    onChange={setInstances}
-                    prefix=""
-                    suffix={kaffarahType === "broken_fast" ? "days" : "times"}
-                    hint={
-                      kaffarahType === "broken_fast"
-                        ? "How many days did you deliberately break your fast? Each day requires a separate kaffārah."
-                        : kaffarahType === "broken_oath"
-                        ? "How many separate oaths did you break?"
-                        : "Number of instances"
-                    }
-                  />
-                </div>
-              )}
-
-              {/* Result */}
-              {currentStep === "result" && (
-                <div className="space-y-6">
-                  <h2 className="heading-display text-2xl text-[var(--ink)] text-center">
-                    Your Kaffārah Obligation
-                  </h2>
-
-                  {/* Shafi'i / Hanbali eating/drinking notice */}
-                  {kaffarahType === "broken_fast" && (madhab === "shafii" || madhab === "hanbali") && (
-                    <div className="info-panel border-l-4 border-[var(--gold)]">
-                      <p className="text-sm font-bold text-[var(--gold-dark)] mb-1">
-                        ⚠️ Important: Did you break your fast by eating or drinking?
-                      </p>
-                      <p className="text-sm text-[var(--info-text)]">
-                        In the {madhab === "shafii" ? "Shāfiʿī" : "Ḥanbalī"} school, kaffārah is only
-                        required for breaking a fast by <strong>sexual intercourse</strong>. If you
-                        deliberately ate or drank, you owe only <strong>qaḍāʾ</strong> (making up
-                        the day) and sincere repentance — <strong>not</strong> kaffārah. The amounts
-                        below only apply if the fast was broken by sexual intercourse.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Feeding cost estimate */}
-                  <div className="text-center py-4">
-                    <p className="text-sm text-[var(--ink-faint)] mb-1">
-                      Estimated Cost (feeding option{instances > 1 ? ` × ${instances}` : ""})
-                    </p>
-                    <p className="heading-display text-4xl text-[var(--emerald)]">
-                      ${(feedingEstimate.totalCost * instances).toFixed(2)}
-                    </p>
-                    <p className="text-sm text-[var(--ink-muted)] mt-1">
-                      {feedingEstimate.people} people × ${costPerMeal}/meal
-                      {instances > 1 ? ` × ${instances} instances` : ""}
-                    </p>
-                  </div>
-
-                  <div className="gold-line" />
-
-                  {/* Type & School */}
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Violation</span>
-                      <span className="font-semibold">
-                        {KAFFARAH_TYPES.find((t) => t.id === kaffarahType)?.title}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">School</span>
-                      <span className="font-semibold">
-                        {madhabOptions.find((m) => m.value === madhab)?.label}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Options</span>
-                      <span className="font-semibold text-sm">
-                        {ruling.isSequential
-                          ? "Sequential (try in order)"
-                          : "Choose any option"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="gold-line" />
-
-                  {/* Options */}
-                  <div>
-                    <h3 className="font-['Amiri',serif] font-bold text-lg mb-3">
-                      {ruling.isSequential
-                        ? "Options (must be attempted in this order)"
-                        : "Options (you may choose any)"}
-                    </h3>
-                    <div className="space-y-3">
-                      {ruling.options.map((opt, i) => (
-                        <div
-                          key={i}
-                          className={`p-4 rounded-lg border ${
-                            opt.action.includes("slave")
-                              ? "bg-[var(--parchment)]/50 border-[var(--sand)] opacity-60"
-                              : "bg-white border-[var(--sand)]"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-[var(--emerald)]/10 text-[var(--emerald)] flex items-center justify-center text-sm font-bold">
-                              {opt.order}
-                            </span>
-                            <div>
-                              <p className="font-semibold text-base text-[var(--ink)]">
-                                {opt.action}
-                                {opt.isFallback && (
-                                  <span className="text-xs font-normal text-[var(--ink-faint)] ml-2">
-                                    (if previous option is impossible)
-                                  </span>
-                                )}
-                              </p>
-                              <p className="text-sm text-[var(--ink-light)] mt-1 leading-relaxed">
-                                {opt.detail}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="gold-line" />
-
-                  {/* Notes */}
-                  <div>
-                    <h3 className="font-['Amiri',serif] font-bold text-lg mb-3">
-                      Important Notes
-                    </h3>
-                    <div className="space-y-2">
-                      {ruling.notes.map((note, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <span className="text-[var(--gold)] mt-0.5">•</span>
-                          <p className="text-sm text-[var(--ink-light)] leading-relaxed">
-                            {note}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="info-panel mt-4">
-                    <p className="text-sm text-[var(--info-text)] leading-relaxed">
-                      <strong>Remember:</strong> Kaffārah is not just a financial transaction — it
-                      requires sincere repentance (<strong>tawbah</strong>) and a genuine intention not to
-                      repeat the violation. The financial or physical penalty is the outward component;
-                      the spiritual component is equally important.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
+        <div className="table-wrap mt-4" tabIndex={0} role="region" aria-label="Scrollable table">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">School</th>
+                <th scope="col">Order</th>
+                <th scope="col">Practical options</th>
+              </tr>
+            </thead>
+            {optionRows.map((row) => (
+              <tbody key={row.type.id}>
+                {row.bySchool.map((s, i) => (
+                  <tr key={s.value}>
+                    {i === 0 && (
+                      <th
+                        scope="rowgroup"
+                        rowSpan={row.bySchool.length}
+                        className="!normal-case !tracking-normal !text-[14px] !text-text !font-semibold align-top border-t border-border"
+                      >
+                        {row.type.title}
+                      </th>
+                    )}
+                    <td>{s.label}</td>
+                    <td className="text-text-2">{s.sequential ? "In order" : "Any"}</td>
+                    <td className="text-text-2">{s.practical.join("; ")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            ))}
+          </table>
         </div>
+      </Section>
 
-        {/* Navigation */}
-        <div className="flex justify-between">
-          <button
-            onClick={() => setStep(Math.max(0, step - 1))}
-            disabled={step === 0}
-            className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-              step === 0
-                ? "opacity-0 pointer-events-none"
-                : "bg-[var(--sand)]/50 text-[var(--ink-muted)] hover:bg-[var(--sand)]"
-            }`}
-          >
-            ← Back
-          </button>
-          {step < STEPS.length - 1 && (
-            <button
-              onClick={() => setStep(Math.min(STEPS.length - 1, step + 1))}
-              className="px-6 py-3 rounded-xl font-semibold text-base transition-all bg-[var(--emerald)] text-white hover:bg-[var(--emerald-deep)] shadow-md"
-            >
-              Continue →
-            </button>
-          )}
+      <Section id="example" title="Worked example">
+        <div className="prose">
+          <p>
+            The meal cost below is an <strong>example only</strong> (${EX_MEAL} per meal), not a current or official
+            figure. Use your own local cost in the calculator.
+          </p>
+          <ul>
+            <li>
+              <strong>One broken oath:</strong> <span className="num">{kaffarahBreakdownText(oathEstimate, EX_MEAL, 1)}</span> ={" "}
+              <span className="num">{kaffarahTotalText(oathEstimate, 1)}</span>.
+            </li>
+            <li>
+              <strong>Ḥanafī, fast deliberately broken on {EX_DAYS} days (feeding option):</strong>{" "}
+              <span className="num">{kaffarahBreakdownText(fastEstimate, EX_MEAL, EX_DAYS)}</span> ={" "}
+              <span className="num">{kaffarahTotalText(fastEstimate, EX_DAYS)}</span>. In the Ḥanafī school feeding is
+              only allowed if fasting 60 consecutive days is not possible, and each broken day must also be made up.
+            </li>
+          </ul>
         </div>
-      </div>
+        <p className="field-hint">Amounts are shown with a $ sign. Enter figures in your own currency; the arithmetic is the same.</p>
+      </Section>
+
+      <Section id="faq" title="Questions people ask">
+        <Faq items={FAQ} />
+      </Section>
+
+      <Section id="related" title="Related calculators">
+        <RelatedTools current={PATH} />
+      </Section>
+
+      <Sources>
+        <p>
+          Qur&apos;an 5:89 (broken oath):{" "}
+          <a href="https://quran.com/5/89" className="lnk" rel="noopener" target="_blank">
+            quran.com/5/89
+          </a>
+          ; 58:3 to 4 (ẓihār):{" "}
+          <a href="https://quran.com/58/3-4" className="lnk" rel="noopener" target="_blank">
+            quran.com/58/3-4
+          </a>
+          ; 4:92 (accidental killing):{" "}
+          <a href="https://quran.com/4/92" className="lnk" rel="noopener" target="_blank">
+            quran.com/4/92
+          </a>
+          .
+        </p>
+        <p className="mt-1">
+          Ṣaḥīḥ al-Bukhārī 1936, narrated by Abū Hurayrah (Book of Fasting):{" "}
+          <a href="https://sunnah.com/bukhari:1936" className="lnk" rel="noopener" target="_blank">
+            sunnah.com/bukhari:1936
+          </a>
+          . English quotations are from the sunnah.com translation.
+        </p>
+        <p className="mt-1">
+          School positions are summarised from this site&apos;s ruling table and scholarly notes, shown in the calculator
+          above.
+        </p>
+      </Sources>
     </div>
   );
 }

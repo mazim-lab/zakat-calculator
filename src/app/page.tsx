@@ -1,182 +1,151 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { TOOLS, SITE, SCHOOL_FINDER } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
+import { Ar, JsonLd } from "@/components/ui";
 
-const calculators = [
-  {
-    href: "/zakat",
-    icon: "☪",
-    title: "Zakat",
-    titleAr: "زكاة",
-    description: "Obligatory almsgiving — calculate your annual Zakat on cash, gold, silver, investments, real estate, business assets, cryptocurrency, and more.",
-    detail: "Supports all five major schools of Islamic jurisprudence with detailed scholarly references.",
-    status: "live" as const,
-  },
-  {
-    href: "/zakat-fitr",
-    icon: "🌙",
-    title: "Zakat al-Fiṭr",
-    titleAr: "زكاة الفطر",
-    description: "Per-person payment due before the Eid al-Fiṭr prayer at the end of Ramadan — separate from annual Zakat al-Māl.",
-    detail: "Calculate for your entire household. Covers food weight equivalents, cash permissibility by school, and timing rules.",
-    status: "live" as const,
-  },
-  {
-    href: "/inheritance",
-    icon: "📜",
-    title: "Inheritance",
-    titleAr: "مِيرَاث",
-    description: "Islamic inheritance division (Farāʾiḍ) — calculate each heir's share according to Quranic rules.",
-    detail: "Handles complex cases including ʿawl (proportional reduction), radd (redistribution), and ḥajb (exclusion of heirs).",
-    status: "live" as const,
-  },
-  {
-    href: "/fidya",
-    icon: "🌾",
-    title: "Fidya",
-    titleAr: "فِدْيَة",
-    description: "Compensation for missed fasts — for those unable to fast due to chronic illness, old age, or permanent medical conditions.",
-    detail: "Calculate the amount owed per missed day based on your school of jurisprudence and local food costs.",
-    status: "live" as const,
-  },
-  {
-    href: "/kaffarah",
-    icon: "⚖",
-    title: "Kaffārah",
-    titleAr: "كَفَّارَة",
-    description: "Expiation for broken religious obligations — deliberately broken fasts, broken oaths, and other violations requiring atonement.",
-    detail: "Different types of kaffārah with their specific requirements: fasting, feeding the poor, or freeing a slave (historical).",
-    status: "live" as const,
-  },
+export const metadata = pageMetadata({
+  path: "/",
+  title: "Islamic Ḥisāb: Zakat, inheritance, fidya and kaffārah calculators",
+  description: SITE.description,
+  absoluteTitle: true,
+});
+
+const SCHOOLS = [
+  { name: "Ḥanafī", ar: "حنفي" },
+  { name: "Mālikī", ar: "مالكي" },
+  { name: "Shāfiʿī", ar: "شافعي" },
+  { name: "Ḥanbalī", ar: "حنبلي" },
+  { name: "Jaʿfarī", ar: "جعفري" },
 ];
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
-};
 
 export default function Home() {
   return (
-    <div className="min-h-screen relative">
-      <div className="arabesque-bg" />
-      <div className="luminous-header absolute inset-x-0 top-0 h-96" />
+    <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: "Islamic calculators",
+          itemListElement: TOOLS.map((t, i) => ({
+            "@type": "ListItem",
+            position: i + 1,
+            name: `${t.title} calculator`,
+            url: SITE.url + t.href,
+          })),
+        }}
+      />
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 py-16">
-        {/* Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <p className="font-['Noto_Naskh_Arabic',serif] text-3xl text-[var(--gold-dark)] mb-4">
-            بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-          </p>
-          <h1 className="heading-display text-5xl md:text-6xl text-[var(--ink)] mb-3">
-            Islamic Ḥisāb
-          </h1>
-          <p className="font-['Noto_Naskh_Arabic',serif] text-2xl text-[var(--gold)] mb-2">
-            حساب إسلامي
-          </p>
-          <p className="text-sm text-[var(--ink-faint)] mb-6">islamichisab.com</p>
-          <p className="text-xl text-[var(--ink-light)] max-w-2xl mx-auto leading-relaxed mb-4">
-            A comprehensive suite of Islamic calculators — built with scholarly rigor,
-            supporting all major schools of jurisprudence, and designed to make
-            your religious obligations clear and accessible.
-          </p>
-          <Link
-            href="/find-your-school"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--parchment)] border border-[var(--sand)] text-sm font-medium text-[var(--ink-muted)] hover:border-[var(--gold)] hover:text-[var(--gold-dark)] transition-all no-underline"
-          >
-            🧭 Not sure which school you follow?
+      <section className="container pt-10 pb-10 sm:pt-16 sm:pb-14">
+        <p className="mb-5 text-[26px] sm:text-[30px] text-text-2">
+          <Ar>بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ</Ar>
+        </p>
+        <h1 className="text-[34px] sm:text-[52px] font-bold tracking-[-0.03em] leading-[1.08] max-w-[18ch]">
+          Islamic calculations, with the reasoning shown.
+        </h1>
+        <p className="mt-5 text-[17px] sm:text-[19px] text-text-2 max-w-[60ch] leading-relaxed">
+          Free calculators for Zakat, Zakat al-Fiṭr, inheritance, fidya and kaffārah. Pick your school of
+          jurisprudence and every setting follows it. Where the scholars differ, each position is explained so
+          you can see why the numbers come out the way they do.
+        </p>
+        <div className="mt-7 flex flex-wrap gap-3">
+          <Link href="/zakat" className="btn btn-primary">
+            Calculate Zakat
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="rtl:rotate-180">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
           </Link>
-        </motion.div>
-
-        {/* Calculator Cards */}
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="grid gap-6"
-        >
-          {calculators.map((calc) => (
-            <motion.div key={calc.href} variants={item}>
-              {calc.status === "live" ? (
-                <Link href={calc.href} className="block no-underline">
-                  <CalculatorCard calc={calc} />
-                </Link>
-              ) : (
-                <div className="opacity-75">
-                  <CalculatorCard calc={calc} />
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Footer note */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-16 text-center"
-        >
-          <div className="gold-line mb-8" />
-          <p className="text-sm text-[var(--ink-faint)] leading-relaxed max-w-lg mx-auto">
-            This tool is for educational and reference purposes. For personal rulings,
-            always consult a qualified scholar of your school of jurisprudence.
-          </p>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-function CalculatorCard({ calc }: { calc: typeof calculators[number] }) {
-  return (
-    <div className="card p-6 md:p-8 cursor-pointer group">
-      <div className="flex items-start gap-5">
-        <div className="text-4xl flex-shrink-0 mt-1">{calc.icon}</div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-2">
-            <h2 className="heading-display text-2xl text-[var(--ink)]">
-              {calc.title}
-            </h2>
-            <span className="font-['Noto_Naskh_Arabic',serif] text-lg text-[var(--gold-dark)]">
-              {calc.titleAr}
-            </span>
-            {calc.status === "live" ? (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[var(--emerald)]/10 text-[var(--emerald)]">
-                Live
-              </span>
-            ) : (
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[var(--sand)] text-[var(--ink-faint)]">
-                Coming Soon
-              </span>
-            )}
-          </div>
-          <p className="text-base text-[var(--ink-light)] leading-relaxed mb-2">
-            {calc.description}
-          </p>
-          <p className="text-sm text-[var(--ink-faint)] leading-relaxed">
-            {calc.detail}
-          </p>
+          <Link href={SCHOOL_FINDER.href} className="btn btn-ghost">
+            Not sure which school you follow?
+          </Link>
         </div>
-        {calc.status === "live" && (
-          <div className="flex-shrink-0 text-[var(--emerald)] opacity-0 group-hover:opacity-100 transition-opacity text-2xl mt-2">
-            →
+        <ul className="mt-8 flex flex-wrap gap-2 list-none p-0" aria-label="Schools of jurisprudence supported">
+          {SCHOOLS.map((s) => (
+            <li key={s.name} className="chip !font-sans !text-[13px] !py-1 !px-3">
+              {s.name} <Ar className="!font-normal text-text-3 text-[14px] leading-none">{s.ar}</Ar>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="tools-h" className="container pb-6">
+        <h2 id="tools-h" className="eyebrow mb-4">
+          Calculators
+        </h2>
+        <ul className="grid gap-4 md:grid-cols-2 list-none p-0 m-0">
+          {TOOLS.map((t, i) => (
+            <li key={t.href} className={i === 0 ? "md:col-span-2" : ""}>
+              <Link href={t.href} className={`card card-link hue-${t.hue} hue-stripe h-full p-5 sm:p-6 group`}>
+                <span className="flex items-center justify-between gap-3">
+                  <span className="flex items-baseline gap-3 flex-wrap">
+                    <span className="text-[21px] sm:text-[23px] font-bold tracking-[-0.02em] text-text">{t.title}</span>
+                    <Ar className="text-[20px] text-text-2">{t.titleAr}</Ar>
+                  </span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="text-text-3 group-hover:text-text transition-colors shrink-0 rtl:rotate-180">
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+                <span className="block mt-2 text-[15.5px] text-text-2 leading-relaxed max-w-[70ch]">{t.summary}</span>
+                <span className="block mt-3 text-[13.5px] font-medium" style={{ color: "var(--hue-text)" }}>
+                  {t.detail}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="how-h" className="container py-12">
+        <h2 id="how-h" className="text-[24px] sm:text-[28px] font-bold tracking-[-0.02em] mb-6">
+          How these calculators work
+        </h2>
+        <ol className="grid gap-4 md:grid-cols-3 list-none p-0 m-0">
+          {[
+            {
+              n: "1",
+              t: "Choose your school",
+              d: "Select Ḥanafī, Mālikī, Shāfiʿī, Ḥanbalī or Jaʿfarī. The calculator applies that school's positions to every question. You can override any single choice.",
+            },
+            {
+              n: "2",
+              t: "Enter your figures",
+              d: "Work through short steps. Each question has a plain explanation and, where it matters, a summary of what each school holds and why.",
+            },
+            {
+              n: "3",
+              t: "Read the breakdown",
+              d: "See the result line by line, not only a total, so you can check it or take it to a scholar. Nothing you enter leaves your device.",
+            },
+          ].map((s) => (
+            <li key={s.n} className="card p-5">
+              <span className="mono text-[13px] font-semibold text-text-3">0{s.n}</span>
+              <p className="mt-2 font-semibold text-[17px] text-text">{s.t}</p>
+              <p className="mt-1.5 text-[15px] text-text-2 leading-relaxed">{s.d}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section aria-labelledby="learn-h" className="container pb-4">
+        <div className="card p-5 sm:p-7 grid gap-5 md:grid-cols-[1fr_auto] md:items-center" style={{ background: "linear-gradient(135deg,var(--accent-weak),var(--surface) 55%)" }}>
+          <div>
+            <h2 id="learn-h" className="text-[20px] font-bold tracking-[-0.015em]">
+              New to these terms?
+            </h2>
+            <p className="mt-1.5 text-[15.5px] text-text-2 leading-relaxed max-w-[62ch]">
+              The glossary explains niṣāb, ḥawl, farāʾiḍ, ʿawl, radd, ṣāʿ, mudd and the other words used across
+              the site. The methodology page explains where prices come from and how each result is worked out.
+            </p>
           </div>
-        )}
-      </div>
-    </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/glossary" className="btn btn-ghost">
+              Glossary
+            </Link>
+            <Link href="/about" className="btn btn-ghost">
+              Methodology
+            </Link>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
