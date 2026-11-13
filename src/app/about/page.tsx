@@ -79,7 +79,62 @@ const TOC = [
   { id: "privacy", label: "Privacy" },
   { id: "limits", label: "Limitations" },
   { id: "scholars", label: "Ask a scholar" },
+  { id: "corrections", label: "Corrections" },
   { id: "errors", label: "Reporting an error" },
+];
+
+const ISSUES_URL = "https://github.com/mazim-lab/zakat-calculator/issues";
+
+// Plain-language log of the corrections made on 13 November 2026.
+const CORRECTIONS: { title: string; text: string }[] = [
+  {
+    title: "Inheritance: brothers and sisters",
+    text: "A full or paternal brother now takes what is left after the fixed shares, with his sisters at half his share (Qurʾān 4:176). Before, a wife and a brother sent three quarters to the public treasury, and a brother and sister gave the sister everything. A sister now also takes what is left beside a daughter, and a son's daughter takes 1/6 beside one daughter (Ṣaḥīḥ al-Bukhārī 6736).",
+  },
+  {
+    title: "Inheritance: maternal half-siblings",
+    text: "They now receive 1/6 (one) or share 1/3 (two or more) when there is no child, father or grandfather (Qurʾān 4:12). Before, they never inherited. Half-siblings and a son's children can now be entered in the calculator.",
+  },
+  {
+    title: "Inheritance: the mother with siblings",
+    text: "Two or more siblings reduce the mother to 1/6 even when the father excludes them (Qurʾān 4:11). Before, she kept 1/3.",
+  },
+  {
+    title: "Inheritance: grandfather with siblings",
+    text: "For the Mālikī, Shāfiʿī and Ḥanbalī schools, the grandfather takes the best of his options, not an extra 1/6 on top. A grandfather and one brother now take half each, not 7/12 and 5/12. The Ḥanafī rule, where the grandfather excludes the siblings, is unchanged.",
+  },
+  {
+    title: "Inheritance: Jaʿfarī school",
+    text: "The father and mother were reversed when they were the only heirs; the mother now takes 1/3 and the father 2/3, as Ayatollah Sistani rules. A daughter and a parent now share 3/4 and 1/4, the mother is reduced by brothers and sisters only on Sistani's conditions, and grandparents and siblings follow his rulings.",
+  },
+  {
+    title: "Zakat: debts",
+    text: "Debts were spread over exempt items, such as exempt jewellery or deferred retirement funds, which made the Zakat too high. With 20,000 in cash, 5,000 of debt and exempt jewellery, the calculator said 412.97 instead of 375. Debts now reduce only the money you are charged on.",
+  },
+  {
+    title: "Zakat: crops and livestock",
+    text: "Crops and livestock were set to zero when cash was below the niṣāb, although they have their own minimums. They now stay due on their own minimum, and debts no longer reduce them. Crop value and crop weight are now separate boxes, so the five-wasq minimum is checked against kilograms, not money.",
+  },
+  {
+    title: "Zakat: livestock tables",
+    text: "Cattle above 70 head and camels from 25 head now follow the classical schedules (the hadith of Muʿādh and the letter of Abū Bakr in Ṣaḥīḥ al-Bukhārī 1454), with each school's rule above 120 camels. Camels due as camels are shown in kind.",
+  },
+  {
+    title: "Zakat: Jaʿfarī figures",
+    text: "The Jaʿfarī niṣāb now uses Sistani's 69.12 g of gold and 105 ṣayrafī mithqāls of silver, and his crop minimum of about 847 kg, matching the notes. Before, the code used the Sunni figures.",
+  },
+  {
+    title: "Zakat: fallback prices",
+    text: "The stored gold and silver prices, used only when the live source fails, were from March 2026. They were refreshed on 13 November 2026 from the same source, and the warning now shows their date.",
+  },
+  {
+    title: "Kaffārah",
+    text: "A feeding cost was shown for accidental killing, where the four Sunni schools allow no feeding (Qurʾān 4:92); it is no longer shown for them. For a broken oath, the Jaʿfarī three-day fast is now marked consecutive, as Sistani rules.",
+  },
+  {
+    title: "Fidya and Zakat al-Fiṭr",
+    text: "Statements that all schools agree were corrected: the Mālikī school makes fidya for the elderly recommended rather than obligatory, and the Ḥanafī school has a different rule on who must pay Zakat al-Fiṭr and does not oblige a husband to pay for his wife. The Ḥanbalī half ṣāʿ is now two mudd (about 1.02 kg), consistent with the mudd the site uses.",
+  },
 ];
 
 export default function AboutPage() {
@@ -230,16 +285,25 @@ export default function AboutPage() {
         <div className="prose">
           <h3>Zakat</h3>
           <ul>
-            <li>The niṣāb is 85 g of gold or 595 g of silver, at the price above, depending on the standard you choose.</li>
             <li>
-              Most zakatable wealth is charged at 2.5%. Crops are charged at 10% if rain-fed or 5% if irrigated.
-              Livestock is counted by head against the classical thresholds.
+              The niṣāb is 85 g of gold or 595 g of silver, at the price above, depending on the standard you choose.
+              For the Jaʿfarī school it is Ayatollah Sistani&apos;s 69.12 g of gold or 105 ṣayrafī mithqāls (about
+              483.84 g) of silver.
             </li>
             <li>
-              Debts, where your settings allow them, reduce your zakatable wealth before the 2.5% is applied. Only the
-              principal of a loan counts, never the interest.
+              Most zakatable wealth is charged at 2.5%. Crops are charged at 10% if rain-fed or 5% if irrigated, on the
+              harvest value, with the five-wasq minimum checked against the harvest weight. Livestock is counted by head
+              against the schedules in the letter of Abū Bakr (Ṣaḥīḥ al-Bukhārī 1454) and the hadith of Muʿādh, or
+              Sistani&apos;s schedules for the Jaʿfarī school.
             </li>
-            <li>The niṣāb test uses your total wealth after any allowed debts.</li>
+            <li>
+              Debts, where your settings allow them, reduce the money you are charged on (not exempt items, crops or
+              livestock) before the 2.5% is applied. Only the principal of a loan counts, never the interest.
+            </li>
+            <li>
+              The niṣāb test uses your money wealth after any allowed debts. Crops and livestock have their own
+              minimums and are never added to money to reach a niṣāb, so they can be due when money is not.
+            </li>
             <li>If you choose a solar year instead of a lunar one, most amounts are multiplied by 1.0307.</li>
             <li>
               Worn gold jewelry is valued below the spot price, using the share of spot that a dealer pays back for
@@ -255,14 +319,21 @@ export default function AboutPage() {
           <p>
             The calculator lists the options your school requires, in order where the order matters. Where feeding
             is an option, its cost is the number of people to feed (10 for a broken oath, 60 for the other cases)
-            times the meal cost you enter.
+            times the meal cost you enter. For accidental killing the four Sunni schools have no feeding option, so no
+            cost is shown for them.
           </p>
           <h3>Inheritance</h3>
           <p>
             Shares are worked out as exact fractions, then applied to the estate you enter. The calculator applies
-            ḥajb (exclusion), the fixed shares, the residuary heirs (ʿaṣabah), and then ʿawl or radd where the shares
-            do not add up to exactly the whole estate. The Jaʿfarī school follows its own class system, with no
-            ʿaṣabah and no ʿawl.
+            ḥajb (exclusion), the fixed shares of Qurʾān 4:11, 4:12 and 4:176, the residuary heirs (ʿaṣabah: sons and
+            their sons, the father, the grandfather, then full and paternal brothers with their sisters, and sisters
+            beside daughters, following Ṣaḥīḥ al-Bukhārī 6732 and 6736), and then ʿawl or radd where the shares do not
+            add up to exactly the whole estate. For a grandfather with siblings it follows the selected school: the
+            Ḥanafī exclusion, or Zayd ibn Thābit&apos;s method for the other three. The Jaʿfarī school follows its own
+            class system, with no ʿaṣabah and no ʿawl, as set out in Ayatollah Sistani&apos;s rulings; where Sistani
+            leaves part of an estate to be settled by agreement between the heirs, the calculator shows that part
+            unassigned. Every rule is checked by automated tests against more than 60 classical cases, each with its
+            source.
           </p>
         </div>
       </Section>
@@ -308,12 +379,13 @@ export default function AboutPage() {
               pay, check the prices the calculator shows against a dealer near you.
             </li>
             <li>
-              Livestock Zakat is valued with fixed approximate amounts per animal, and the camel rules are simplified
-              for herds of 25 or more. If you own livestock, confirm the result with a scholar.
+              Livestock Zakat is valued with fixed approximate amounts per sheep and per cow, and camels due as camels
+              are shown in kind without a price. If you own livestock, confirm the result with a scholar.
             </li>
             <li>
-              The inheritance calculator covers spouses, children, a son&apos;s children, parents, grandparents and
-              siblings. It does not cover more distant relatives such as uncles, aunts, nephews or cousins.
+              The inheritance calculator covers spouses, children, a son&apos;s children, parents, the paternal
+              grandfather, both grandmothers, and full and half siblings. It does not cover a daughter&apos;s children, a
+              maternal grandfather or more distant relatives such as uncles, aunts, nephews or cousins.
             </li>
             <li>
               The calculators do not deal with local tax or estate law. Where local law applies, you may also need a
@@ -332,14 +404,37 @@ export default function AboutPage() {
         </p>
       </Section>
 
+      <Section id="corrections" title="Corrections">
+        <div className="prose">
+          <p>
+            <strong>13 November 2026.</strong> We checked every calculator against the Qurʾān, authentic hadith,
+            recognised references for each school and, for the Jaʿfarī school, Ayatollah Sistani&apos;s published
+            rulings. We corrected the following. Each correction names its source in the calculator&apos;s notes.
+          </p>
+          <ul>
+            {CORRECTIONS.map((c) => (
+              <li key={c.title}>
+                <strong>{c.title}.</strong> {c.text}
+              </li>
+            ))}
+          </ul>
+          <p>
+            Some questions remain where the schools or modern bodies genuinely differ and the site has no basis to
+            choose for you, such as how to value gold jewellery, how retirement accounts are counted, and whether a
+            Mālikī or Shāfiʿī user should send an inheritance surplus to a public treasury. Those are unchanged and are
+            explained in the notes beside each setting.
+          </p>
+        </div>
+      </Section>
+
       <Section id="errors" title="Reporting an error">
-        {/* TODO(owner): add a real way to report errors (contact form or email address),
-            then replace the paragraph below. No contact address exists in the codebase yet,
-            so none is shown here on purpose. */}
-        <Callout tone="neutral" title="There is no contact form yet">
-          If you find a mistake in a calculation or a ruling, we want to fix it. A way to report errors through this site
-          has not been set up yet. When it is, it will be listed here. If you report a problem, it helps to include
-          the page, the figures you entered and what you expected to see.
+        <Callout tone="neutral" title="Report a problem">
+          If you find a mistake in a calculation or a ruling, we want to fix it. Please{" "}
+          <a className="lnk" href={ISSUES_URL} target="_blank" rel="noopener noreferrer">
+            report a problem on the project&apos;s public issue tracker
+          </a>
+          . It helps to include the page, the figures you entered and what you expected to see. Please do not post
+          personal details.
         </Callout>
       </Section>
     </div>
