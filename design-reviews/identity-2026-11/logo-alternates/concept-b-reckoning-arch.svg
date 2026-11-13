@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>IslamicHisab mark, concept B: the reckoning arch</title>
+  <!-- Persian four-centred arch (iwan profile) framing three ledger rules; the double rule is the bookkeeper's total -->
+  <path fill="none" stroke="#4f46e5" stroke-width="4.5" stroke-linejoin="round" d="M10 60V30C10 18 20 12 28 8.5L32 4l4 4.5C44 12 54 18 54 30v30"/>
+  <path stroke="#4f46e5" stroke-width="4" stroke-linecap="round" d="M21 30h22M21 39h16"/>
+  <path stroke="#0891b2" stroke-width="3" stroke-linecap="round" d="M21 48.5h22M21 54.5h22"/>
+</svg>
