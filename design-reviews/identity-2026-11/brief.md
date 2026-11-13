@@ -46,7 +46,9 @@ of the Zakat result were already page content and stay as plain set text. No fig
 
 ## Logo concepts
 
-* **A. The share star (chosen).** A khatam divided into eight equal kites; one kite is set apart in turquoise.
+* **A. The share star (chosen).** A khatam divided into eight equal kites; the upper-right kite (exactly one eighth
+  of the area) is drawn apart from the body in turquoise. Review note: the first drawing set apart the top kite with
+  a hole at the centre, which read as an exclamation mark; the diagonal kite with true cut-outs does not.
   One eighth is a Qurʾānic share (the wife's share when there are children), so the mark says "a fair portion
   of a whole", which is what every tool on the site computes. Solid silhouette, so it holds at 16px; in one
   colour the gap alone separates the share.
@@ -56,7 +58,7 @@ of the Zakat result were already page content and stay as plain set text. No fig
 * **C. Interlaced khatam** (`logo-alternates/concept-c-interlaced-khatam.svg`). Two square bands woven over and
   under. Faithful to strapwork, but the weave turns to noise below 32px and the form is a common heritage motif.
 
-To swap the mark: replace the paths in `StarMark` (`src/components/ornament.tsx`) and the constants in
+To swap the mark: replace `MARK_BODY` and `MARK_SHARE` (`src/components/ornament.tsx`) and the constants in
 `brand-assets.py`, then run that script to regenerate the favicon, app icons and `public/og.png`.
 
 ## Theme control
