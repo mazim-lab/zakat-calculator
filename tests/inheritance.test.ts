@@ -123,6 +123,19 @@ const REWORDED = new Set<string>([
   "Wife + paternal half-brother + paternal half-sister",
 ].map((n) => `${n}|jafari`));
 
+// Senior review: same numbers, different presentation only (no em dash in the
+// Bayt al-Mal text, no zero-share row for an heir who was not entered, added
+// Ja'fari notes on grandchildren and the wife's share of land).
+const SAME_NUMBERS = new Set<string>([
+  ...["hanafi", "maliki", "shafii", "hanbali", "jafari"].map((m) => `No heirs (Bayt al-Mal)|${m}`),
+  ...["hanafi", "maliki", "shafii", "hanbali"].flatMap((m) => [
+    `Son + 2 full brothers (hajb)|${m}`, `Son blocks son's son|${m}`, `Husband + son|${m}`,
+  ]),
+  "2 wives + 2 sons + 3 daughters + parents|jafari",
+  "Husband + son's son + son's daughter|jafari",
+  "Mother + 2 son's daughters|jafari",
+]);
+
 const numeric = (r: CalculationResult) => ({
   shares: r.shares.filter((s) => (s.share ?? 0) > 0).map((s) => [s.heir, s.share, s.amount]).sort(),
   blocked: r.blocked.map((b) => b.heir).sort(),
@@ -140,6 +153,8 @@ describe("calculateInheritance: src/lib equals the frozen original", () => {
           const b: CalculationResult = calcOrig(estate, copy(sc.heirs), m);
           if (CORRECTED.has(key)) {
             expect(numeric(a)).not.toEqual(numeric(b));
+          } else if (SAME_NUMBERS.has(key)) {
+            expect(numeric(a)).toEqual(numeric(b));
           } else if (REWORDED.has(key)) {
             const na = numeric(a), nb = numeric(b);
             expect(na.blocked).toEqual(nb.blocked);

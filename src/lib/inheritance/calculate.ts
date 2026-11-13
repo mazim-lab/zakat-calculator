@@ -829,10 +829,16 @@ export function calculateInheritance(
           const daughters = heirs[femaleHeir] ?? 0;
           const parts = sons * 2 + daughters;
           if(parts > 0){
-             shares[maleHeir] = (shares[maleHeir] ?? new SimpleFraction(0, 1)).add(remainder.mul(sons * 2).div(parts));
-             shares[femaleHeir] = (shares[femaleHeir] ?? new SimpleFraction(0, 1)).add(remainder.mul(daughters).div(parts));
-             reasons[maleHeir] = `Receives remainder as residuary (ʿaṣabah) with a 2:1 ratio.`;
-             reasons[femaleHeir] = `Receives remainder as residuary (ʿaṣabah) with a 2:1 ratio.`;
+             // Only heirs who were entered get a row (a son alone must not
+             // produce a zero "daughter" row).
+             if (sons > 0) {
+               shares[maleHeir] = (shares[maleHeir] ?? new SimpleFraction(0, 1)).add(remainder.mul(sons * 2).div(parts));
+               reasons[maleHeir] = `Receives remainder as residuary (ʿaṣabah) with a 2:1 ratio.`;
+             }
+             if (daughters > 0) {
+               shares[femaleHeir] = (shares[femaleHeir] ?? new SimpleFraction(0, 1)).add(remainder.mul(daughters).div(parts));
+               reasons[femaleHeir] = `Receives remainder as residuary (ʿaṣabah) with a 2:1 ratio.`;
+             }
           }
       } else if (residuaries.includes('father')){
           shares.father = (shares.father ?? new SimpleFraction(0, 1)).add(remainder);

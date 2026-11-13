@@ -442,6 +442,10 @@ describe("senior review: debts against crops and livestock by school", () => {
     const r = calculateZakat(preset("maliki"), assets({ cashOnHand: 20000, creditCardBalance: 5000 }), 124.81, 1.58);
     expect(r.warnings?.[0]).toMatch(/Maliki/);
   });
+  it("camels due in kind are marked in kind, not exempt", () => {
+    const r = calculateZakat(preset("shafii"), assets({ camels: 30 }), 124.81, 1.58);
+    expect(r.breakdown.find((b) => b.category === "Camels")!.status).toBe("in_kind");
+  });
 });
 
 describe("debt deduction base excludes exempt and non-money items", () => {

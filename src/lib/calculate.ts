@@ -205,6 +205,7 @@ function calculateLivestockZakat(
       amount: camels,
       rate: 0,
       zakatDue: inKind ? 0 : k.sheep * SHEEP_VALUE,
+      ...(inKind ? { status: "in_kind" as const } : {}),
       notes: inKind
         ? `${camels} head: ${describeCamels(k)} due in kind${alt}. Not priced and not included in the cash total; add the market value of the animal(s) yourself.`
         : `${camels} head: ${k.sheep} sheep due, valued at about $${SHEEP_VALUE} each`,
