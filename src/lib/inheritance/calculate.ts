@@ -908,6 +908,29 @@ export function calculateInheritance(
       }
   }
 
+  // al-Mushtarakah (Mālikī and Shāfiʿī): when the fixed shares exhaust the estate
+  // and two or more maternal half-siblings take their 1/3, the full brothers (and
+  // full sisters with them) share that 1/3 with the maternal half-siblings equally
+  // per head, male and female alike, as children of the same mother. The Ḥanafī
+  // and Ḥanbalī schools leave the full brothers with nothing. Paternal
+  // half-brothers never share in it.
+  let mushtarakaNote: string | undefined;
+  const maternalCountForTashrik = (heirs.maternalHalfBrother ?? 0) + (heirs.maternalHalfSister ?? 0);
+  const isMushtarakaShape = (heirs.fullBrother ?? 0) > 0 &&
+      maternalCountForTashrik >= 2 && remainder.numerator <= 0 && !hasDescendants &&
+      !heirs.father && !heirs.paternalGrandfather;
+  if (isMushtarakaShape && (madhab === 'maliki' || madhab === 'shafii')) {
+    const fb = heirs.fullBrother ?? 0, fs = heirs.fullSister ?? 0;
+    const heads = maternalCountForTashrik + fb + fs;
+    const each = new SimpleFraction(1, 3).div(heads);
+    const why = "al-Mushtarakah: the full brothers and sisters share the maternal half-siblings' 1/3 with them equally per head, male and female alike (Mālikī and Shāfiʿī view).";
+    if ((heirs.maternalHalfBrother ?? 0) > 0) { shares.maternalHalfBrother = each.mul(heirs.maternalHalfBrother ?? 0); reasons.maternalHalfBrother = why; }
+    if ((heirs.maternalHalfSister ?? 0) > 0) { shares.maternalHalfSister = each.mul(heirs.maternalHalfSister ?? 0); reasons.maternalHalfSister = why; }
+    shares.fullBrother = each.mul(fb); reasons.fullBrother = why;
+    if (fs > 0) { shares.fullSister = each.mul(fs); reasons.fullSister = why; }
+    mushtarakaNote = "This is al-Mushtarakah (also called al-Ḥimāriyyah). In the Mālikī and Shāfiʿī schools the full brothers and sisters share the 1/3 of the maternal half-siblings equally with them. In the Ḥanafī and Ḥanbalī schools the full brothers and sisters receive nothing here.";
+  }
+
   // Residuaries left with nothing are shown as excluded rather than silently dropped.
   const possibleResiduaries: (keyof Heirs)[] = grandfatherWithSiblings
       ? [...residuaries, 'fullBrother', 'fullSister', 'paternalHalfBrother', 'paternalHalfSister']
@@ -1003,7 +1026,7 @@ export function calculateInheritance(
     raddExplanation,
     baytAlMalAmount,
     baytAlMalExplanation,
-    notes: [],
+    notes: mushtarakaNote ? [mushtarakaNote] : [],
   };
 
   // TODO: Add full implementation for all heir types and edge cases

@@ -34,6 +34,12 @@ const S = {
   sistani1: "https://www.sistani.org/english/book/48/8237/",
   sistani2: "https://www.sistani.org/english/book/48/8238/",
   minhaj: "https://www.sistani.org/arabic/book/16/936/",
+  minhajClass2: "https://www.sistani.org/arabic/book/16/938/",
+  minhajSpouses: "https://www.sistani.org/arabic/book/16/940/",
+  // Muwatta Malik, Kitab al-Fara'id (Malik's own ruling: full siblings share the
+  // maternal third, male equal to female); al-Mughni 6/... (Hanafi and Hanbali
+  // exclude, Malik and Shafi'i share); Mukhtasar Tuhfat al-Muhtaj (Shafi'i).
+  mushtaraka: "https://sunnah.com/malik/27 https://shamela.ws/book/8463/2602 https://shamela.ws/book/20/1094 https://binbaz.org.sa/fatwas/14164",
 };
 
 type Row = {
@@ -123,6 +129,10 @@ const ROWS: Row[] = [
   { name: "Jaʿfarī: paternal grandfather + full brother (all male, father's side: equal)", heirs: { paternalGrandfather: true, fullBrother: 1 }, madhabs: JAFARI, expect: { paternalGrandfather: "1/2", fullBrother: "1/2" }, source: `${S.sistani2} (ruling 2771, cases 2-3)` },
   { name: "Jaʿfarī: paternal grandparents + maternal grandmother", heirs: { paternalGrandfather: true, paternalGrandmother: true, maternalGrandmother: true }, madhabs: JAFARI, expect: { paternalGrandfather: "4/9", paternalGrandmother: "2/9", maternalGrandmother: "1/3" }, source: `${S.sistani2} (ruling 2769)` },
   { name: "Jaʿfarī: maternal grandmother + paternal half-sister (1/6 settled by agreement)", heirs: { maternalGrandmother: true, paternalHalfSister: 1 }, madhabs: JAFARI, expect: { maternalGrandmother: "1/3", paternalHalfSister: "1/2" }, unresolved: "1/6", source: `${S.sistani2} (ruling 2771, case 6)` },
+  // Senior review additions (hand-worked by the reviewer).
+  { name: "al-Mushtarakah, Ḥanafī and Ḥanbalī: full brother gets nothing", heirs: { husband: true, mother: true, maternalHalfBrother: 2, fullBrother: 1 }, madhabs: ["hanafi", "hanbali"], expect: { husband: "1/2", mother: "1/6", maternalHalfBrother: "1/3" }, blocked: ["fullBrother"], source: S.mushtaraka },
+  { name: "al-Mushtarakah, Mālikī and Shāfiʿī: full brother shares the 1/3 per head", heirs: { husband: true, mother: true, maternalHalfBrother: 2, fullBrother: 1 }, madhabs: ["maliki", "shafii"], expect: { husband: "1/2", mother: "1/6", maternalHalfBrother: "2/9", fullBrother: "1/9" }, source: S.mushtaraka },
+  { name: "al-Mushtarakah, Mālikī and Shāfiʿī: full brother and sister share per head", heirs: { husband: true, mother: true, maternalHalfSister: 2, fullBrother: 1, fullSister: 1 }, madhabs: ["maliki", "shafii"], expect: { husband: "1/2", mother: "1/6", maternalHalfSister: "1/6", fullBrother: "1/12", fullSister: "1/12" }, source: S.mushtaraka },
 ];
 
 const ESTATE = 120000;
