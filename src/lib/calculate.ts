@@ -6,10 +6,12 @@ import {
   KhumsResult,
 } from "./types";
 
-// Fallback prices — live prices fetched via /api/metals
-// Last updated: 2026-03-11 (gold ~$5,180/oz, silver ~$86/oz)
-const GOLD_PRICE_PER_GRAM = 167; // USD per gram
-const SILVER_PRICE_PER_GRAM = 2.76; // USD per gram
+import { FALLBACK_GOLD_USD_PER_GRAM, FALLBACK_SILVER_USD_PER_GRAM } from "./metal-fallback";
+
+// Fallback prices: live prices are fetched via /api/metals. The stored
+// figures and their as-of date live in ./metal-fallback.ts.
+const GOLD_PRICE_PER_GRAM = FALLBACK_GOLD_USD_PER_GRAM; // USD per gram
+const SILVER_PRICE_PER_GRAM = FALLBACK_SILVER_USD_PER_GRAM; // USD per gram
 const GOLD_NISAB_GRAMS = 85;
 const SILVER_NISAB_GRAMS = 595;
 const WASQ_KG = 653; // 5 wasqs in kg

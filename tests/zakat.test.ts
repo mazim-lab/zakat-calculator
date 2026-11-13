@@ -23,6 +23,13 @@ import {
   progressPercent,
 } from "@/lib/zakat/page-math";
 import { defaultAssets, defaultChoices, INITIAL_METAL_PRICES } from "@/lib/zakat/defaults";
+import {
+  FALLBACK_GOLD_USD_PER_GRAM,
+  FALLBACK_SILVER_USD_PER_GRAM,
+  FALLBACK_GOLD_USD_PER_OZ,
+  FALLBACK_SILVER_USD_PER_OZ,
+  FALLBACK_PRICES_AS_OF,
+} from "@/lib/metal-fallback";
 import { applyChoice, applyMadhab } from "@/lib/zakat/choices";
 import {
   EXAMPLE_ASSETS,
@@ -152,8 +159,20 @@ describe("extracted page logic matches the original page source", () => {
     expect(new Function(`return ${a![1]}`)()).toEqual(defaultAssets);
     expect(ORIGINAL_PAGE).toContain('const defaultChoices: MethodologyChoices = {\n  madhab: "hanafi",\n  ...MADHAB_PRESETS.hanafi,\n};');
     expect(defaultChoices).toEqual({ madhab: "hanafi", ...MADHAB_PRESETS.hanafi });
+    // The initial (fallback) metal prices were deliberately refreshed in
+    // November 2026; the shape is unchanged, the figures come from
+    // src/lib/metal-fallback.ts with their as-of date.
     const p = ORIGINAL_PAGE.match(/useState<MetalPrices>\((\{[\s\S]*?\})\);/);
-    expect(new Function(`return ${p![1]}`)()).toEqual(INITIAL_METAL_PRICES);
+    const original = new Function(`return ${p![1]}`)();
+    expect(Object.keys(INITIAL_METAL_PRICES).sort()).toEqual(Object.keys(original).sort());
+    expect(INITIAL_METAL_PRICES).toEqual({
+      goldPerGram: FALLBACK_GOLD_USD_PER_GRAM,
+      silverPerGram: FALLBACK_SILVER_USD_PER_GRAM,
+      goldPerOz: FALLBACK_GOLD_USD_PER_OZ,
+      silverPerOz: FALLBACK_SILVER_USD_PER_OZ,
+      source: "fallback",
+      timestamp: 0,
+    });
   });
 
   it("choice updaters are the original code, verbatim", () => {
@@ -220,11 +239,29 @@ function run(fn: typeof calculateZakat, c: Case) {
   return c.gold === undefined ? fn(ch, as) : fn(ch, as, c.gold, c.silver);
 }
 
+// Cases whose result was deliberately corrected in November 2026, with the new
+// total (each explained below) and the reason.
+const CORRECTED_TOTAL: Record<string, { total: number; why: string }> = {};
+// Cases where the amount due is unchanged but a reported field changed:
+// the stored fallback prices changed.
+const SAME_DUE = new Set<string>([
+  "26 All defaults, calculate.ts default (fallback) prices",
+]);
+
 describe("calculateZakat: current vs frozen original (deep equal)", () => {
   it.each(CASES.map((c) => [c.name, c] as const))("%s", (_name, c) => {
     const now = run(calculateZakat, c);
     const orig = run(calculateZakatOriginal as typeof calculateZakat, c);
-    expect(now).toEqual(orig);
+    if (CORRECTED_TOTAL[c.name]) {
+      expect(now.totalZakatDue).toBeCloseTo(CORRECTED_TOTAL[c.name].total, 8);
+      expect(now.totalZakatDue).not.toBeCloseTo(orig.totalZakatDue, 2);
+    } else if (SAME_DUE.has(c.name)) {
+      expect(now.totalZakatDue).toBeCloseTo(orig.totalZakatDue, 8);
+      expect(now.meetsNisab).toBe(orig.meetsNisab);
+      expect(now.khums).toEqual(orig.khums);
+    } else {
+      expect(now).toEqual(orig);
+    }
   });
 
   it("prints the comparison table", () => {
@@ -239,10 +276,11 @@ describe("calculateZakat: current vs frozen original (deep equal)", () => {
         meets: now.meetsNisab,
         khums: now.khums ? now.khums.khumsDue : "",
         match: JSON.stringify(now) === JSON.stringify(orig),
+        intended: !!CORRECTED_TOTAL[c.name] || SAME_DUE.has(c.name),
       };
     });
     console.table(rows);
-    expect(rows.every((r) => r.match)).toBe(true);
+    expect(rows.every((r) => r.match || r.intended)).toBe(true);
   });
 });
 
@@ -333,5 +371,19 @@ describe("hand-verified worked examples", () => {
         calculateZakatOriginal(exampleChoices(m), EXAMPLE_ASSETS, EXAMPLE_GOLD_PER_GRAM, EXAMPLE_SILVER_PER_GRAM)
       );
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 4. Stored fallback prices (refreshed November 2026)
+// ---------------------------------------------------------------------------
+describe("fallback metal prices", () => {
+  it("are dated and come from the same Yahoo futures source as /api/metals", () => {
+    expect(FALLBACK_PRICES_AS_OF).toBe("2026-11-13");
+    expect(FALLBACK_GOLD_USD_PER_GRAM).toBeCloseTo(FALLBACK_GOLD_USD_PER_OZ / 31.1035, 2);
+    expect(FALLBACK_SILVER_USD_PER_GRAM).toBeCloseTo(FALLBACK_SILVER_USD_PER_OZ / 31.1035, 2);
+    // calculate.ts defaults use the same stored figures
+    const r = calculateZakat(preset("shafii"), defaultAssets);
+    expect(r.nisabThreshold).toBeCloseTo(85 * FALLBACK_GOLD_USD_PER_GRAM, 8);
   });
 });

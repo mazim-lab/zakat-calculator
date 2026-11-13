@@ -2,6 +2,12 @@
 // (tests/reference/original/pages/zakat.page.tsx.txt, lines 38-91).
 // tests/zakat.test.ts checks these against the frozen original.
 import { AssetInputs, MethodologyChoices, MADHAB_PRESETS } from "@/lib/types";
+import {
+  FALLBACK_GOLD_USD_PER_GRAM,
+  FALLBACK_SILVER_USD_PER_GRAM,
+  FALLBACK_GOLD_USD_PER_OZ,
+  FALLBACK_SILVER_USD_PER_OZ,
+} from "@/lib/metal-fallback";
 
 export const defaultAssets: AssetInputs = {
   annualIncome: 0,
@@ -60,8 +66,14 @@ export const defaultChoices: MethodologyChoices = {
 
 /**
  * Initial metal prices before /api/metals answers (original lines 99-101).
- * These are the March 2026 fallback figures; the page flags them as placeholders.
+ * These are the stored fallback figures (see src/lib/metal-fallback.ts for the
+ * source and as-of date); the page flags them as placeholders.
  */
 export const INITIAL_METAL_PRICES = {
-  goldPerGram: 167, silverPerGram: 2.76, goldPerOz: 5194, silverPerOz: 85.85, source: "fallback" as const, timestamp: 0,
+  goldPerGram: FALLBACK_GOLD_USD_PER_GRAM,
+  silverPerGram: FALLBACK_SILVER_USD_PER_GRAM,
+  goldPerOz: FALLBACK_GOLD_USD_PER_OZ,
+  silverPerOz: FALLBACK_SILVER_USD_PER_OZ,
+  source: "fallback" as const,
+  timestamp: 0,
 };

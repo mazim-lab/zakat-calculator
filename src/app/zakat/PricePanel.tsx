@@ -2,6 +2,7 @@
 
 import type { MetalPrices } from "@/lib/currency";
 import { goldPricePerOunce } from "@/lib/zakat/page-math";
+import { FALLBACK_PRICES_AS_OF_LABEL } from "@/lib/metal-fallback";
 
 export type PriceStatus = "loading" | "ready";
 
@@ -84,7 +85,7 @@ export function PricePanel({
         )}
         {status === "loading" && <>Fetching the latest gold and silver prices.</>}
         {status === "ready" && metalPrices.source === "fallback" && (
-          <>Live prices could not be loaded, so the calculator is using stored fallback figures.</>
+          <>Live prices could not be loaded, so the calculator is using fallback prices from {FALLBACK_PRICES_AS_OF_LABEL}.</>
         )}
       </p>
 
@@ -92,7 +93,8 @@ export function PricePanel({
         <div className="callout callout-warning mt-2 text-[14px]">
           <p className="font-semibold text-text">These prices are placeholders</p>
           <p className="text-text-2 mt-1 leading-relaxed">
-            The figures shown were last set by hand on 11 March 2026 and may be well out of date. Gold and silver prices
+            These are fallback prices from {FALLBACK_PRICES_AS_OF_LABEL} (Yahoo Finance gold and silver futures) and may
+            be out of date. Gold and silver prices
             move every day, and the niṣāb depends on them. Please check a current price before you rely on the result.
           </p>
         </div>

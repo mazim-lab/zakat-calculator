@@ -2,6 +2,7 @@ import Link from "next/link";
 import { pageMetadata, breadcrumbJsonLd } from "@/lib/seo";
 import { absoluteUrl, SITE, TOOLS } from "@/lib/site";
 import { MADHAB_PRESETS, type MethodologyChoices } from "@/lib/types";
+import { FALLBACK_PRICES_AS_OF_LABEL } from "@/lib/metal-fallback";
 import { PageIntro, Section, Toc, JsonLd, ScholarNote, Callout } from "@/components/ui";
 
 const PATH = "/about";
@@ -207,8 +208,9 @@ export default function AboutPage() {
             </li>
             <li>
               <strong>If the price source is unreachable.</strong> The calculator falls back to a fixed price stored in
-              the code. That fallback was last updated in March 2026, so it may be far from today&apos;s price. The
-              calculator tells you whether it is showing a live price or the fallback.
+              the code. That fallback was taken from the same Yahoo Finance source on {FALLBACK_PRICES_AS_OF_LABEL}, so it
+              may be far from today&apos;s price. The calculator tells you whether it is showing a live price or the
+              fallback, and the date of the fallback.
             </li>
             <li>
               <strong>Exchange rates.</strong> To show amounts in your currency, your browser loads exchange rates against
