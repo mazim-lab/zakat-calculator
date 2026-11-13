@@ -30,7 +30,7 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
         options: [
           { order: 1, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
           { order: 2, action: "Fast 60 consecutive days", detail: "Must be consecutive. Menstruation is excused and does not break continuity.", isFallback: false },
-          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of staple food per person, or the equivalent in cash.", isFallback: false },
+          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of staple food per person.", isFallback: false },
         ],
         notes: [
           "The Mālikī school uniquely allows choosing between the three options (they are not strictly sequential).",
@@ -60,7 +60,7 @@ export function getKaffarahRuling(type: KaffarahType, madhab: Madhab): KaffarahR
         options: [
           { order: 1, action: "Free a slave", detail: "Historical (no longer applicable).", isFallback: false },
           { order: 2, action: "Fast 60 consecutive days", detail: "Must be consecutive. Valid excuses (illness, menstruation) do not break continuity.", isFallback: true },
-          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of staple food per person, or cash equivalent.", isFallback: true },
+          { order: 3, action: "Feed 60 poor people", detail: "One mudd (~510g) of wheat, or half a ṣāʿ (~1.02 kg) of other staple food, per person (al-Mughnī).", isFallback: true },
         ],
         notes: [
           "Like the Shāfiʿī school, the Ḥanbalī school requires kaffārah only for sexual intercourse during a Ramadan fast.",

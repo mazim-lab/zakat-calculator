@@ -50,7 +50,10 @@ function structural(r: KaffarahRuling) {
 // - accidental killing, Sunni schools: no feeding option, so no feeding cost;
 // - broken oath, Jaʿfarī: Sistani ruling 2687 requires the 3 days to be consecutive.
 const NO_FEEDING = (t: KaffarahType, m: Madhab) => t === "accidental_killing" && m !== "jafari";
-const RULING_CHANGED = (t: KaffarahType, m: Madhab) => NO_FEEDING(t, m) || (t === "broken_oath" && m === "jafari");
+// - broken fast, Maliki and Hanbali: the unsourced "or cash" feeding option was removed,
+//   and the Hanbali amount now reads a mudd of wheat or half a sa' of other food.
+const RULING_CHANGED = (t: KaffarahType, m: Madhab) =>
+  NO_FEEDING(t, m) || (t === "broken_oath" && m === "jafari") || (t === "broken_fast" && (m === "maliki" || m === "hanbali"));
 
 describe("Kaffārah: rulings.ts equals the frozen original for every type × school", () => {
   for (const t of TYPES) {

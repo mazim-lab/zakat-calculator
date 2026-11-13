@@ -35,8 +35,8 @@ export const raddInfo: InfoPanel = {
     },
     {
       school: 'Mālikī and Shāfiʿī Schools',
-      position: 'In the classical position the surplus goes to the public treasury (Bayt al-Māl), not back to the heirs. Later Shāfiʿī scholars ruled that when the treasury is not properly run, the surplus is returned to the fixed-share heirs other than the spouses.',
-      reasoning: 'The Qurʾān fixes these shares, so the classical position gives nothing beyond them. The later ruling reflects the loss of an orderly treasury (islamqa.info/ar/answers/184914; Mukhtaṣar Tuḥfat al-Muḥtāj, shamela.ws/book/20/1084).',
+      position: 'In the classical position the surplus goes to the public treasury (Bayt al-Māl), not back to the heirs. Later Shāfiʿī and Mālikī scholars ruled that when the treasury is not properly run, the surplus is returned to the fixed-share heirs other than the spouses.',
+      reasoning: 'The Qurʾān fixes these shares, so the classical position gives nothing beyond them. The later ruling reflects the loss of an orderly treasury (islamqa.info/ar/answers/184914; dorar.net/feqhia/13753; Mukhtaṣar Tuḥfat al-Muḥtāj, shamela.ws/book/20/1084).',
     },
     {
       school: 'Some later Ḥanafī scholars',

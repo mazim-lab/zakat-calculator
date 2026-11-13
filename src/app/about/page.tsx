@@ -105,7 +105,15 @@ const CORRECTIONS: { title: string; text: string }[] = [
   },
   {
     title: "Inheritance: Jaʿfarī school",
-    text: "The father and mother were reversed when they were the only heirs; the mother now takes 1/3 and the father 2/3, as Ayatollah Sistani rules. A daughter and a parent now share 3/4 and 1/4, the mother is reduced by brothers and sisters only on Sistani's conditions, and grandparents and siblings follow his rulings.",
+    text: "The father and mother were reversed when they were the only heirs; the mother now takes 1/3 and the father 2/3, as Ayatollah Sistani rules. A daughter and a parent now share 3/4 and 1/4, the mother is reduced by brothers and sisters only on Sistani's conditions, and grandparents and siblings follow his rulings. Where Sistani calls the division doubtful and requires the heirs to settle part of it by agreement, that part is now shown as not assigned instead of being given to someone. A wife who is the only heir now takes 1/4, and the rest is shown as the Imam's share, as Sistani rules; before, she was given everything.",
+  },
+  {
+    title: "Inheritance: al-Mushtarakah",
+    text: "With a husband, a mother, two or more maternal half-siblings and a full brother, the Mālikī and Shāfiʿī schools let the full brothers and sisters share the maternal half-siblings' 1/3 equally with them. The calculator now does this for those two schools; the Ḥanafī and Ḥanbalī schools give the full brother nothing here.",
+  },
+  {
+    title: "Inheritance: the father and his mother",
+    text: "In the Ḥanafī, Mālikī and Shāfiʿī schools the father excludes his own mother (the paternal grandmother). Before, she received 1/6 beside him in every school. She still does in the Ḥanbalī school, which lets her inherit beside her son.",
   },
   {
     title: "Zakat: debts",
@@ -117,7 +125,7 @@ const CORRECTIONS: { title: string; text: string }[] = [
   },
   {
     title: "Zakat: livestock tables",
-    text: "Cattle above 70 head and camels from 25 head now follow the classical schedules (the hadith of Muʿādh and the letter of Abū Bakr in Ṣaḥīḥ al-Bukhārī 1454), with each school's rule above 120 camels. Camels due as camels are shown in kind.",
+    text: "Cattle above 70 head and camels from 25 head now follow the classical schedules (the hadith of Muʿādh in Sunan Abī Dāwūd 1576 and the letter of Abū Bakr in Ṣaḥīḥ al-Bukhārī 1454), with each school's rule above 120 camels. Camels due as camels are shown in kind.",
   },
   {
     title: "Zakat: Jaʿfarī figures",
@@ -294,7 +302,7 @@ export default function AboutPage() {
             <li>
               Most zakatable wealth is charged at 2.5%. Crops are charged at 10% if rain-fed or 5% if irrigated, on the
               harvest value, with the five-wasq minimum checked against the harvest weight. Livestock is counted by head
-              against the schedules in the letter of Abū Bakr (Ṣaḥīḥ al-Bukhārī 1454) and the hadith of Muʿādh, or
+              against the schedules in the letter of Abū Bakr (Ṣaḥīḥ al-Bukhārī 1454) and the hadith of Muʿādh (Sunan Abī Dāwūd 1576), or
               Sistani&apos;s schedules for the Jaʿfarī school.
             </li>
             <li>

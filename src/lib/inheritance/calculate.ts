@@ -91,7 +91,7 @@ function calculateJafari(
       wasAwlApplied: false,
       wasRaddApplied: false,
       baytAlMalAmount: estate,
-      baytAlMalExplanation: "No eligible heirs were selected. In Islamic law, when there are no heirs, the entire estate goes to Bayt al-Māl (بيت المال — the public treasury).",
+      baytAlMalExplanation: "No eligible heirs were selected. In Islamic law, when there are no heirs, the entire estate goes to Bayt al-Māl (بيت المال, the public treasury).",
       notes: [
         "Jaʿfarī inheritance uses a class-based system: Class 1 (parents/children) blocks Class 2 (grandparents/siblings), which blocks Class 3 (uncles/aunts).",
         "The Jaʿfarī school rejects ʿaṣabah (residuary heirs). Surplus always returns to fixed-share heirs via radd.",
@@ -441,6 +441,12 @@ function calculateJafari(
       "The Jaʿfarī school rejects ʿaṣabah (residuary heirs). Surplus always returns to fixed-share heirs via radd.",
       "ʿAwl (proportional reduction) is not applied in Jaʿfarī fiqh.",
       ...jafariNotes,
+      ...(shares.sonsSon || shares.sonsDaughter
+        ? ["Grandchildren take the share of the son they descend from (Sistani, Minhāj al-Ṣāliḥīn 1003, 1004; Islamic Laws ruling 2756). The calculator assumes all the son's children entered are children of the same son. If they descend from different sons, each son's share is divided among his own children; consult a scholar."]
+        : []),
+      ...(shares.wife
+        ? ["Under Ayatollah Sistani's rulings the wife does not inherit from land, neither the land itself nor its value; she inherits from the value of buildings and trees on it (Islamic Laws ruling 2782; Minhāj al-Ṣāliḥīn 1065). The figures above treat the estate as one sum; if it includes land, her share must be worked out on the rest of the estate."]
+        : []),
       ...(!hasClass1 && hasClass2 && hasGrandparent
         ? ["Grandparents and siblings were divided by the father's-side and mother's-side rules in Sistani, Islamic Laws rulings 2767-2771. The calculator does not ask about maternal grandfathers, great-grandparents or nephews and nieces; if any survive, consult a scholar."]
         : []),
@@ -495,7 +501,7 @@ export function calculateInheritance(
       wasAwlApplied: false,
       wasRaddApplied: false,
       baytAlMalAmount: estate,
-      baytAlMalExplanation: "No eligible heirs were selected. In Islamic law, when there are no heirs, the entire estate goes to Bayt al-Māl (بيت المال — the public treasury).",
+      baytAlMalExplanation: "No eligible heirs were selected. In Islamic law, when there are no heirs, the entire estate goes to Bayt al-Māl (بيت المال, the public treasury).",
       notes: [],
     };
   }

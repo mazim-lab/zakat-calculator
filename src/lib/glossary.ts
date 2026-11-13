@@ -216,7 +216,7 @@ const ENTRIES: GlossaryEntry[] = [
     ar: "صاع",
     also: "saa, sa'",
     definition:
-      "A measure of volume from the time of the Prophet ﷺ, equal to four mudd. Its weight depends on the food and on the school. This calculator uses about 2.5 kg for one ṣāʿ (Mālikī, Shāfiʿī, Ḥanbalī), about 3 kg (Jaʿfarī), and 1.6 kg for the Ḥanafī half ṣāʿ of wheat.",
+      "A measure of volume from the time of the Prophet ﷺ, equal to four mudd. Its weight depends on the food and on the school. This calculator uses about 2.5 kg for one ṣāʿ (Mālikī, Shāfiʿī, Ḥanbalī), about 3 kg (Jaʿfarī), and 1.6 kg for the Ḥanafī half ṣāʿ of wheat. By the 0.51 kg mudd used for fidya and kaffārah, a Sunni ṣāʿ is about 2.04 kg; the 2.5 kg used for Zakat al-Fiṭr is a cautious, rounded-up figure.",
     ...FITR,
   },
   {

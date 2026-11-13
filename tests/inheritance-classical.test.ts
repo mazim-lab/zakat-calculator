@@ -22,7 +22,7 @@ const S = {
   b6732: "https://sunnah.com/bukhari:6732",
   b6736: "https://sunnah.com/bukhari:6736",
   sisterWithDaughter: "https://islamqa.info/ar/answers/317709",
-  fullBlocksPaternal: "https://binbaz.org.sa/fatwas/19189",
+  fullBlocksPaternal: "https://www.dar-alifta.org/ar/fatwa/details/15909",
   motherSixth: "https://islamqa.info/ar/answers/13632",
   umariyyatan: "https://islamqa.info/ar/answers/566119",
   paternalSister: "https://islamqa.info/ar/answers/160012",
@@ -30,7 +30,7 @@ const S = {
   radd: "https://islamqa.info/ar/answers/184914",
   awl8: "https://www.dar-alifta.org/ar/fatwa/details/13421",
   awl27: "https://dar-alifta.org/ar/fatwa/details/14206",
-  maternalExcluded: "https://binbaz.org.sa/fatwas/19202",
+  maternalExcluded: "https://shamela.ws/book/8463/2590",
   sistani1: "https://www.sistani.org/english/book/48/8237/",
   sistani2: "https://www.sistani.org/english/book/48/8238/",
   minhaj: "https://www.sistani.org/arabic/book/16/936/",
@@ -139,6 +139,7 @@ const ROWS: Row[] = [
   { name: "Jaʿfarī: wife alone takes 1/4, rest is the Imam's share", heirs: { wife: 1 }, madhabs: JAFARI, expect: { wife: "1/4" }, unresolved: "3/4", source: `${S.minhajSpouses} (mas'ala 1059)` },
   { name: "Jaʿfarī: husband alone takes everything", heirs: { husband: true }, madhabs: JAFARI, expect: { husband: "1" }, source: `${S.minhajSpouses} (mas'ala 1059)` },
   { name: "Jaʿfarī: full sister + maternal half-brother (surplus to the full sister)", heirs: { fullSister: 1, maternalHalfBrother: 1 }, madhabs: JAFARI, expect: { fullSister: "5/6", maternalHalfBrother: "1/6" }, source: `${S.minhajClass2} (mas'ala 1023)` },
+  { name: "Jaʿfarī: son's daughter + both parents", heirs: { sonsDaughter: 1, father: true, mother: true }, madhabs: JAFARI, expect: { father: "1/6", mother: "1/6", sonsDaughter: "2/3" }, source: `${S.minhaj} (mas'ala 1005)` },
 ];
 
 const ESTATE = 120000;

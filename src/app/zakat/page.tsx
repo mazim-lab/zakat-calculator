@@ -211,13 +211,14 @@ export default function ZakatPage() {
             <li>
               <strong>Crops.</strong> 10% for rain-fed crops and 5% for irrigated crops, charged on the harvest value
               you enter. Every preset except the Ḥanafī one applies a minimum of five wasqs, checked against the harvest
-              weight in kilograms: 653 kg as this calculator counts it, or about 847 kg for the Jaʿfarī school
+              weight in kilograms: 653 kg as this calculator counts it (published estimates range from about 612 kg to
+              653 kg, so check with your scholar if your harvest falls in that range), or about 847 kg for the Jaʿfarī school
               (Sistani). Below it, crops are exempt. If you enter no weight, the minimum is not checked.
             </li>
             <li>
               <strong>Livestock.</strong> Sheep and goats from 40 head, cattle from 30 and camels from 5. The number of
               animals due follows the schedules in the letter of Abū Bakr (Ṣaḥīḥ al-Bukhārī 1454) and the hadith of
-              Muʿādh for cattle (a tabīʿ per 30, a musinnah per 40), with each school's rule above 120 camels and
+              Muʿādh for cattle (Sunan Abī Dāwūd 1576: a tabīʿ per 30, a musinnah per 40), with each school's rule above 120 camels and
               Sistani's schedule for the Jaʿfarī school. Sheep and cattle due are converted to money with fixed estimates
               built into the code (150 per sheep, 300 per tabīʿ, 500 per musinnah), not market prices. Camels due as
               camels are shown in kind and not priced. If you own livestock, value the animals due at local prices.
