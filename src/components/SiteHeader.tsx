@@ -28,8 +28,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // Close the mobile menu on navigation and on Escape.
-  useEffect(() => setOpen(false), [pathname]);
+  // Close the mobile menu on Escape (links close it on click).
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -77,14 +76,15 @@ export function SiteHeader() {
               href={l.href}
               className="nav-link !justify-start !text-base !min-h-[44px]"
               aria-current={isActive(l.href) ? "page" : undefined}
+              onClick={() => setOpen(false)}
             >
               {l.label}
             </Link>
           ))}
-          <Link href="/glossary" className="nav-link !text-base !min-h-[44px]" aria-current={isActive("/glossary") ? "page" : undefined}>
+          <Link href="/glossary" onClick={() => setOpen(false)} className="nav-link !text-base !min-h-[44px]" aria-current={isActive("/glossary") ? "page" : undefined}>
             Glossary
           </Link>
-          <Link href="/about" className="nav-link !text-base !min-h-[44px]" aria-current={isActive("/about") ? "page" : undefined}>
+          <Link href="/about" onClick={() => setOpen(false)} className="nav-link !text-base !min-h-[44px]" aria-current={isActive("/about") ? "page" : undefined}>
             About &amp; methodology
           </Link>
         </nav>

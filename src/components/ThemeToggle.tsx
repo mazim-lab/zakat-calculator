@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 type Mode = "light" | "dark" | "system";
 const KEY = "ih-theme";
@@ -15,28 +15,28 @@ function apply(mode: Mode) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#0d0f16" : "#ffffff");
 }
 
+// The current mode lives on <html data-theme-mode> (set before paint by themeInitScript).
+const listeners = new Set<() => void>();
+function subscribe(cb: () => void) {
+  listeners.add(cb);
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const onOs = () => {
+    if ((document.documentElement.dataset.themeMode || "system") === "system") apply("system");
+  };
+  mq.addEventListener("change", onOs);
+  return () => {
+    listeners.delete(cb);
+    mq.removeEventListener("change", onOs);
+  };
+}
+function getSnapshot(): Mode {
+  const m = document.documentElement.dataset.themeMode;
+  return m === "light" || m === "dark" ? m : "system";
+}
+
 /** Three-way theme toggle (system / light / dark), as on FAEConf. */
 export function ThemeToggle() {
-  const [mode, setMode] = useState<Mode>("system");
-
-  useEffect(() => {
-    let saved: Mode = "system";
-    try {
-      const v = localStorage.getItem(KEY);
-      if (v === "light" || v === "dark" || v === "system") saved = v;
-    } catch {}
-    setMode(saved);
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => {
-      let cur: string | null = null;
-      try {
-        cur = localStorage.getItem(KEY);
-      } catch {}
-      if (!cur || cur === "system") apply("system");
-    };
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  const mode = useSyncExternalStore(subscribe, getSnapshot, () => "system" as Mode);
 
   const next = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length];
 
@@ -45,11 +45,11 @@ export function ThemeToggle() {
       type="button"
       className="btn btn-ghost !min-h-[40px] !w-10 !p-0"
       onClick={() => {
-        setMode(next);
         try {
           localStorage.setItem(KEY, next);
         } catch {}
         apply(next);
+        listeners.forEach((l) => l());
       }}
       aria-label={`${LABEL[mode]}. Switch to ${LABEL[next].toLowerCase()}`}
       title={LABEL[mode]}

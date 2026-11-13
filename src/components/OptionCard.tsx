@@ -24,7 +24,7 @@ export function OptionCard({ selected, onClick, title, subtitle, description, ba
           <span className="option-radio" aria-hidden="true" />
           <span className={`flex-1 min-w-0 ${description ? "pe-10" : ""}`}>
             <span className="block font-semibold text-[15.5px] text-text leading-snug">{title}</span>
-            {badge && <span className="chip chip-amber mt-1.5">{badge}</span>}
+            {badge && <span className="chip chip-amber mt-1.5 !whitespace-normal">{badge}</span>}
             {subtitle && <span className="block text-sm text-text-2 mt-0.5 leading-snug">{subtitle}</span>}
           </span>
         </button>

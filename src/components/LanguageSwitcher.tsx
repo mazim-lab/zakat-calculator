@@ -145,10 +145,10 @@ export function LanguageSwitcher() {
         id="lang-select"
         defaultValue="en"
         onChange={(e) => handleChange(e.target.value)}
-        className="!min-h-[40px] !w-[96px] sm:!w-[150px] !py-1.5 !ps-8 !text-[14px] text-text-2"
+        className="!min-h-[40px] !w-[52px] !text-transparent sm:!text-text-2 sm:!w-[150px] !py-1.5 !ps-8 !text-[14px]"
       >
         {LANGUAGES.map((l) => (
-          <option key={l.code} value={l.code} lang={l.code}>
+          <option key={l.code} value={l.code} lang={l.code} className="text-text bg-surface">
             {l.label}
           </option>
         ))}

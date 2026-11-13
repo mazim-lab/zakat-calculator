@@ -1,415 +1,254 @@
-"use client";
+import Link from "next/link";
+import { pageMetadata, calculatorJsonLd, breadcrumbJsonLd, howToJsonLd } from "@/lib/seo";
+import { PageIntro, Callout, ScholarNote, Section, Faq, RelatedTools, Sources, JsonLd } from "@/components/ui";
+import { FITR_AMOUNTS, type Madhab } from "@/lib/zakat-fitr/types";
+import { calculateFitr } from "@/lib/zakat-fitr/calculate";
+import { ZakatFitrCalculator } from "./ZakatFitrCalculator";
 
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Madhab, FITR_AMOUNTS } from "@/lib/zakat-fitr/types";
-import {
-  FITR_OVERVIEW_INFO,
-  FITR_AMOUNT_INFO,
-  FITR_TIMING_INFO,
-  FITR_WHO_INFO,
-} from "@/lib/zakat-fitr/scholarly-info";
-import { InfoAccordion } from "@/components/InfoAccordion";
-import { CurrencyInput } from "@/components/CurrencyInput";
-import { OptionCard } from "@/components/OptionCard";
+const PATH = "/zakat-fitr";
+const TITLE = "Zakat al-Fiṭr Calculator";
+const DESCRIPTION =
+  "Work out Zakat al-Fiṭr for your household before Eid, by food weight or local cash amount, with the per-person measure of each of the five schools.";
 
-const madhabOptions: { value: Madhab; label: string; labelAr: string }[] = [
-  { value: "hanafi", label: "Ḥanafī", labelAr: "حنفي" },
-  { value: "maliki", label: "Mālikī", labelAr: "مالكي" },
-  { value: "shafii", label: "Shāfiʿī", labelAr: "شافعي" },
-  { value: "hanbali", label: "Ḥanbalī", labelAr: "حنبلي" },
-  { value: "jafari", label: "Jaʿfarī", labelAr: "جعفري" },
+export const metadata = pageMetadata({ path: PATH, title: TITLE, description: DESCRIPTION });
+
+const SCHOOLS: { value: Madhab; label: string }[] = [
+  { value: "hanafi", label: "Ḥanafī" },
+  { value: "maliki", label: "Mālikī" },
+  { value: "shafii", label: "Shāfiʿī" },
+  { value: "hanbali", label: "Ḥanbalī" },
+  { value: "jafari", label: "Jaʿfarī" },
 ];
 
-type Step = "intro" | "school" | "household" | "cost" | "result";
-const STEPS: Step[] = ["intro", "school", "household", "cost", "result"];
+// Worked example inputs. These are EXAMPLE figures only, not current prices or official amounts.
+const EX_ADULTS = 2;
+const EX_CHILDREN = 3;
+const EX_PEOPLE = EX_ADULTS + EX_CHILDREN;
+const EX_PRICE_PER_KG = 2; // example price per kg of staple food
+const EX_CASH_PER_PERSON = 12; // example local per-person amount
 
-export default function ZakatFitrCalculator() {
-  const [step, setStep] = useState(0);
-  const [madhab, setMadhab] = useState<Madhab>("hanafi");
-  const [adults, setAdults] = useState(1);
-  const [children, setChildren] = useState(0);
-  const [otherDependents, setOtherDependents] = useState(0);
-  const [useWeight, setUseWeight] = useState(false);
-  const [pricePerKg, setPricePerKg] = useState(2);
-  const [costPerPerson, setCostPerPerson] = useState(12);
+// Computed at build time with the same function the calculator uses.
+const exampleWeightRows = SCHOOLS.map((s) => ({
+  ...s,
+  info: FITR_AMOUNTS[s.value],
+  result: calculateFitr({
+    fitrInfo: FITR_AMOUNTS[s.value],
+    totalPeople: EX_PEOPLE,
+    useWeight: true,
+    pricePerKg: EX_PRICE_PER_KG,
+    costPerPerson: EX_CASH_PER_PERSON,
+  })!,
+}));
+const exampleCash = calculateFitr({
+  fitrInfo: FITR_AMOUNTS.hanafi,
+  totalPeople: EX_PEOPLE,
+  useWeight: false,
+  pricePerKg: EX_PRICE_PER_KG,
+  costPerPerson: EX_CASH_PER_PERSON,
+})!;
 
-  const currentStep = STEPS[step];
-  const totalPeople = adults + children + otherDependents;
-  const fitrInfo = FITR_AMOUNTS[madhab];
+const FAQ = [
+  {
+    q: "Is Zakat al-Fiṭr the same as my annual Zakat?",
+    a: "No. Annual Zakat (Zakat al-Māl) is 2.5% of zakatable wealth held for a year above the niṣāb. Zakat al-Fiṭr is a fixed amount per person, paid once at the end of Ramadan, whatever your total wealth.",
+  },
+  {
+    q: "Who do I pay Zakat al-Fiṭr for?",
+    a: "All schools agree you pay for yourself, your spouse, your minor children and any dependents you support, including infants born before the Eid prayer. The Jaʿfarī school also includes guests who are in your home at sunset on the eve of Eid.",
+  },
+  {
+    q: "How much is it per person?",
+    a: "It is measured in ṣāʿ, a prophetic unit of volume. In this calculator the Ḥanafī amount is half a ṣāʿ of wheat (about 1.6 kg). The Mālikī, Shāfiʿī and Ḥanbalī amount is one ṣāʿ of the local staple (about 2.5 kg). The Jaʿfarī amount is one ṣāʿ of commonly eaten food (about 3 kg).",
+  },
+  {
+    q: "Can I pay in cash instead of food?",
+    a: "The Ḥanafī and Jaʿfarī schools permit the cash equivalent. The classical Mālikī, Shāfiʿī and Ḥanbalī position is that actual food is given, though many contemporary scholars and most Islamic charities accept cash and buy food on your behalf. If this matters to you, ask a scholar of your school.",
+  },
+  {
+    q: "When is it due?",
+    a: "All schools agree it must be paid before the Eid prayer. The Ḥanafī school ties the obligation to dawn on Eid day; the Mālikī, Shāfiʿī, Ḥanbalī and Jaʿfarī schools tie it to sunset on the last day of Ramadan. Paying a few days early, so the recipient can use it for Eid, is widely recommended. Paid after the Eid prayer, it counts as ordinary charity (ṣadaqah).",
+  },
+  {
+    q: "Who can receive it?",
+    a: "The same categories as Zakat al-Māl, including the poor (fuqarāʾ) and the needy (masākīn). Its main purpose is that poor people can celebrate Eid with dignity.",
+  },
+];
 
-  const result = useMemo(() => {
-    if (totalPeople <= 0) return null;
-    let perPerson: number;
-    let method: string;
-
-    if (useWeight) {
-      perPerson = fitrInfo.weightKg * pricePerKg;
-      method = `${fitrInfo.weightKg} kg × $${pricePerKg}/kg = $${perPerson.toFixed(2)}/person`;
-    } else {
-      perPerson = costPerPerson;
-      method = `$${costPerPerson.toFixed(2)} per person (local equivalent)`;
-    }
-
-    return {
-      perPerson,
-      total: perPerson * totalPeople,
-      totalPeople,
-      method,
-    };
-  }, [madhab, totalPeople, useWeight, pricePerKg, costPerPerson, fitrInfo]);
-
-  const canProceed = () => {
-    if (currentStep === "household") return totalPeople > 0;
-    return true;
-  };
-
+export default function Page() {
   return (
-    <div className="min-h-screen relative">
-      <div className="arabesque-bg" />
-      <div className="luminous-header absolute inset-x-0 top-0 h-64" />
+    <div className="container-narrow pb-16">
+      <JsonLd
+        data={[
+          calculatorJsonLd({ path: PATH, name: TITLE, description: DESCRIPTION }),
+          breadcrumbJsonLd([
+            { name: "Home", path: "/" },
+            { name: "Zakat al-Fiṭr", path: PATH },
+          ]),
+          howToJsonLd({
+            name: "How to calculate Zakat al-Fiṭr",
+            description: "Count everyone you pay for, choose the per-person amount for your school, and multiply.",
+            steps: [
+              { name: "Choose your school", text: "Select Ḥanafī, Mālikī, Shāfiʿī, Ḥanbalī or Jaʿfarī. This sets the food weight per person." },
+              { name: "Count your household", text: "Add yourself, your spouse, your children (including infants) and other dependents." },
+              { name: "Set the amount per person", text: "Enter a local per-person amount, or the price of 1 kg of staple food so the calculator multiplies it by your school's weight." },
+              { name: "Read the total", text: "The total is the per-person amount multiplied by the number of people. Pay it before the Eid prayer." },
+            ],
+          }),
+        ]}
+      />
 
-      <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <p className="font-['Noto_Naskh_Arabic',serif] text-2xl text-[var(--gold-dark)] mb-2">
-            زكاة الفطر
+      <PageIntro
+        hue="cyan"
+        eyebrow="Calculator"
+        title={TITLE}
+        titleAr="زكاة الفطر"
+        breadcrumb="Zakat al-Fiṭr"
+        lead="The per-person payment due before the Eid al-Fiṭr prayer. Count your household, pick your school, and see the total by food weight or local cash amount."
+      />
+
+      <Callout tone="warning" title="This is not your annual Zakat" className="mb-6">
+        Zakat al-Fiṭr (Fiṭrānah) is a separate, per-person payment due before the Eid al-Fiṭr prayer at the end of
+        Ramadan. Your annual wealth-based Zakat (Zakat al-Māl) is calculated in the{" "}
+        <Link href="/zakat" className="lnk font-semibold">
+          Zakat calculator
+        </Link>
+        .
+      </Callout>
+
+      <ZakatFitrCalculator />
+
+      <ScholarNote className="mt-8" />
+
+      <Section id="what" title="What Zakat al-Fiṭr is">
+        <div className="prose">
+          <p>
+            Zakat al-Fiṭr is a small, fixed charity paid at the end of Ramadan. It is due on every Muslim who has more
+            than enough food for themselves and their dependents on the day of Eid. The head of the household pays it
+            for each person they support.
           </p>
-          <h1 className="heading-display text-4xl text-[var(--ink)] mb-2">
-            Zakat al-Fiṭr Calculator
-          </h1>
-          <p className="text-base text-[var(--ink-light)]">
-            Per-Person Payment Before Eid al-Fiṭr
+          <p>
+            Its basis is the hadith of Ibn ʿUmar in Ṣaḥīḥ al-Bukhārī: &ldquo;Allah&apos;s Messenger (ﷺ) enjoined the
+            payment of one Sa&apos; of dates or one Sa&apos; of barley as Zakat-ul-Fitr on every Muslim slave or free,
+            male or female, young or old, and he ordered that it be paid before the people went out to offer the
+            `Id prayer.&rdquo; (Bukhārī 1503)
+          </p>
+          <p>
+            It has two aims: to purify the fasting person from idle talk and small faults during Ramadan, and to make
+            sure poor people can celebrate Eid too.
           </p>
         </div>
+      </Section>
 
-        {/* Distinction banner */}
-        <div className="info-panel mb-6">
-          <p className="text-sm text-[var(--info-text)] leading-relaxed">
-            <strong>⚠️ This is NOT your annual Zakat.</strong> Zakat al-Fiṭr (Fiṭrānah) is a
-            separate, per-person payment due before the Eid al-Fiṭr prayer at the end of Ramadan.
-            Your annual wealth-based Zakat (Zakat al-Māl) is calculated in the{" "}
-            <a href="/zakat" className="underline font-semibold">
-              Zakat Calculator
-            </a>.
+      <Section id="how" title="How this calculator works it out">
+        <div className="prose">
+          <p>The calculator multiplies one per-person amount by the number of people you enter.</p>
+          <ul>
+            <li>
+              <strong>People:</strong> adults, children and other dependents are added together. Each box only accepts
+              whole numbers of zero or more.
+            </li>
+            <li>
+              <strong>By local equivalent (cash):</strong> the per-person amount is the figure you type in, for example
+              the amount your local mosque publishes this year.
+            </li>
+            <li>
+              <strong>By food weight:</strong> the per-person amount is your school&apos;s weight multiplied by the price
+              of 1 kg of staple food that you enter.
+            </li>
+          </ul>
+          <p>The weights used for each school are:</p>
+        </div>
+        <div className="table-wrap mt-4" tabIndex={0} role="region" aria-label="Scrollable table">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">School</th>
+                <th scope="col" className="num">kg per person</th>
+                <th scope="col">Classical measure</th>
+                <th scope="col">Cash permitted?</th>
+              </tr>
+            </thead>
+            <tbody>
+              {exampleWeightRows.map((r) => (
+                <tr key={r.value}>
+                  <td className="font-medium text-text">{r.label}</td>
+                  <td className="num">{r.info.weightKg}</td>
+                  <td className="text-text-2">{r.info.measure}</td>
+                  <td className="text-text-2">{r.info.cashPermitted ? "Yes" : "Classically no"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="field-hint">
+          The Ḥanafī figure is the wheat amount. The Ḥanafī measure for barley, dates or raisins is a full ṣāʿ (about
+          3.2 kg); this calculator uses the wheat figure in food-weight mode.
+        </p>
+      </Section>
+
+      <Section id="example" title="Worked example">
+        <div className="prose">
+          <p>
+            A household of <strong>{EX_ADULTS} adults and {EX_CHILDREN} children</strong> ({EX_PEOPLE} people). The
+            prices below are <strong>examples only</strong>, not current or official amounts. Use your own local
+            figures in the calculator.
+          </p>
+          <p>
+            <strong>Cash, example amount ${EX_CASH_PER_PERSON.toFixed(2)} per person:</strong>{" "}
+            <span className="num">{exampleCash.method}</span>, so the total is{" "}
+            <span className="num">
+              ${exampleCash.perPerson.toFixed(2)} × {exampleCash.totalPeople} = ${exampleCash.total.toFixed(2)}
+            </span>
+            .
+          </p>
+          <p>
+            <strong>Food weight, example price ${EX_PRICE_PER_KG.toFixed(2)} per kg:</strong>
           </p>
         </div>
-
-        {/* Progress */}
-        <div className="mb-8">
-          <div className="progress-track">
-            <div
-              className="progress-fill"
-              style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
-            />
-          </div>
-          <p className="text-xs text-[var(--ink-faint)] mt-2 text-center">
-            Step {step + 1} of {STEPS.length}
-          </p>
+        <div className="table-wrap mt-4" tabIndex={0} role="region" aria-label="Scrollable table">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">School</th>
+                <th scope="col">Per person</th>
+                <th scope="col" className="num">Total for {EX_PEOPLE}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {exampleWeightRows.map((r) => (
+                <tr key={r.value}>
+                  <td className="font-medium text-text">{r.label}</td>
+                  <td className="num text-text-2">{r.result.method}</td>
+                  <td className="num">${r.result.total.toFixed(2)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        <p className="field-hint">Amounts are shown with a $ sign. Enter figures in your own currency; the arithmetic is the same.</p>
+      </Section>
 
-        {/* Steps */}
-        <div className="card p-6 md:p-8 mb-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {/* Intro */}
-              {currentStep === "intro" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    What is Zakat al-Fiṭr?
-                  </h2>
-                  <div className="space-y-4 text-base text-[var(--ink-light)] leading-relaxed">
-                    <p>
-                      <strong>Zakat al-Fiṭr</strong> (زكاة الفطر — also called{" "}
-                      <strong>Fiṭrānah</strong> or <strong>Ṣadaqat al-Fiṭr</strong>) is a
-                      mandatory charitable payment made at the end of Ramadan, before the
-                      Eid al-Fiṭr prayer.
-                    </p>
-                    <p>
-                      It has two purposes: <strong>(1)</strong> to purify the fasting person from
-                      any shortcomings during Ramadan (idle talk, minor sins), and{" "}
-                      <strong>(2)</strong> to ensure that poor people can also celebrate Eid
-                      with dignity and joy.
-                    </p>
-                    <p>
-                      Unlike annual Zakat (which is based on your total wealth), Zakat al-Fiṭr
-                      is a <strong>flat per-person amount</strong> — you pay it for yourself and
-                      every person you are financially responsible for (spouse, children, dependents).
-                    </p>
-                  </div>
-                  <InfoAccordion info={FITR_OVERVIEW_INFO} />
-                  <InfoAccordion info={FITR_TIMING_INFO} />
-                  <InfoAccordion info={FITR_WHO_INFO} />
-                </div>
-              )}
+      <Section id="faq" title="Questions people ask">
+        <Faq items={FAQ} />
+      </Section>
 
-              {/* School */}
-              {currentStep === "school" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Select Your School of Jurisprudence
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    Schools differ on the amount of food required and whether cash payment is
-                    acceptable.
-                    <a href="/find-your-school" className="block mt-3 text-sm font-semibold text-[var(--gold-dark)] hover:text-[var(--emerald)] bg-[var(--warning-bg)] border border-[var(--warning-border)] rounded-xl px-4 py-2.5 transition-all hover:shadow-sm no-underline">
-                      🧭 Not sure which school you follow? Take our short quiz →
-                    </a>
-                  </p>
-                  <div className="space-y-2">
-                    {madhabOptions.map((opt) => (
-                      <OptionCard
-                        key={opt.value}
-                        selected={madhab === opt.value}
-                        onClick={() => setMadhab(opt.value)}
-                        title={opt.label}
-                        description={FITR_AMOUNTS[opt.value].description}
-                        badge={opt.labelAr}
-                      />
-                    ))}
-                  </div>
-                  <InfoAccordion info={FITR_AMOUNT_INFO} />
-                </div>
-              )}
+      <Section id="related" title="Related calculators">
+        <RelatedTools current={PATH} />
+      </Section>
 
-              {/* Household */}
-              {currentStep === "household" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Your Household
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    You pay Zakat al-Fiṭr for yourself and every person you are financially
-                    responsible for — including infants.
-                    {madhab === "jafari" && (
-                      <span className="block mt-2 font-semibold text-[var(--emerald)]">
-                        Jaʿfarī note: This includes any guests in your home at sunset on the
-                        eve of Eid.
-                      </span>
-                    )}
-                  </p>
-                  <div className="space-y-3">
-                    <CurrencyInput
-                      label="Adults (including yourself)"
-                      value={adults}
-                      onChange={(v) => setAdults(Math.max(0, Math.round(v)))}
-                      prefix=""
-                      suffix="people"
-                      hint="You, your spouse, adult dependents"
-                    />
-                    <CurrencyInput
-                      label="Children"
-                      value={children}
-                      onChange={(v) => setChildren(Math.max(0, Math.round(v)))}
-                      prefix=""
-                      suffix="children"
-                      hint="Minor children you are financially responsible for (including infants)"
-                    />
-                    <CurrencyInput
-                      label={madhab === "jafari" ? "Other Dependents & Guests" : "Other Dependents"}
-                      value={otherDependents}
-                      onChange={(v) => setOtherDependents(Math.max(0, Math.round(v)))}
-                      prefix=""
-                      suffix="people"
-                      hint={
-                        madhab === "jafari"
-                          ? "Elderly parents, household staff, guests present at sunset on the eve of Eid"
-                          : "Elderly parents, household staff, or anyone else you financially support"
-                      }
-                    />
-                  </div>
-                  <div className="p-3 rounded-lg bg-[var(--parchment)] text-center">
-                    <p className="text-sm text-[var(--ink-muted)]">Total people</p>
-                    <p className="heading-display text-3xl text-[var(--ink)]">{totalPeople}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Cost */}
-              {currentStep === "cost" && (
-                <div className="space-y-5">
-                  <h2 className="heading-display text-2xl text-[var(--ink)]">
-                    Amount Per Person
-                  </h2>
-                  <p className="text-base text-[var(--ink-light)]">
-                    Choose how you&apos;d like to calculate the per-person amount.
-                    {!fitrInfo.cashPermitted && (
-                      <span className="block mt-2 text-sm text-[var(--gold-dark)]">
-                        ⚠️ The {madhabOptions.find((m) => m.value === madhab)?.label} school
-                        classically requires giving actual food, not cash.
-                        {fitrInfo.modernCashNote && (
-                          <span className="block mt-1 text-[var(--ink-faint)]">
-                            {fitrInfo.modernCashNote}
-                          </span>
-                        )}
-                      </span>
-                    )}
-                  </p>
-                  <div className="space-y-2">
-                    <OptionCard
-                      selected={!useWeight}
-                      onClick={() => setUseWeight(false)}
-                      title="By Local Equivalent"
-                      description="Use a flat dollar amount per person. Most Islamic organizations publish recommended amounts ($10–15 in North America)."
-                    />
-                    <OptionCard
-                      selected={useWeight}
-                      onClick={() => setUseWeight(true)}
-                      title="By Food Weight"
-                      description={`Classical method: ${fitrInfo.measure}`}
-                    />
-                  </div>
-
-                  <div className="gold-line" />
-
-                  {!useWeight ? (
-                    <CurrencyInput
-                      label="Amount Per Person"
-                      value={costPerPerson}
-                      onChange={setCostPerPerson}
-                      hint="Check your local mosque or Islamic organization for this year's recommended amount. Typically $10–15 in North America, $3–5 in South Asia."
-                    />
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="p-3 rounded-lg bg-[var(--parchment)]">
-                        <p className="text-sm text-[var(--ink-muted)]">Required per person:</p>
-                        <p className="font-semibold text-[var(--ink)]">
-                          {fitrInfo.weightKg} kg of staple food
-                        </p>
-                        <p className="text-xs text-[var(--ink-faint)] mt-1">
-                          {fitrInfo.measure}
-                        </p>
-                      </div>
-                      <CurrencyInput
-                        label="Price Per Kilogram of Staple Food"
-                        value={pricePerKg}
-                        onChange={setPricePerKg}
-                        hint="Price of rice, wheat, or your local staple per kilogram"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Result */}
-              {currentStep === "result" && result && (
-                <div className="space-y-6">
-                  <h2 className="heading-display text-2xl text-[var(--ink)] text-center">
-                    Your Zakat al-Fiṭr
-                  </h2>
-
-                  <div className="text-center py-6">
-                    <p className="text-sm text-[var(--ink-faint)] mb-1">Total Due</p>
-                    <p className="heading-display text-5xl text-[var(--emerald)]">
-                      ${result.total.toFixed(2)}
-                    </p>
-                    <p className="text-sm text-[var(--ink-muted)] mt-2">
-                      ${result.perPerson.toFixed(2)} × {result.totalPeople} {result.totalPeople === 1 ? "person" : "people"}
-                    </p>
-                  </div>
-
-                  <div className="gold-line" />
-
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">School of Jurisprudence</span>
-                      <span className="font-semibold">
-                        {madhabOptions.find((m) => m.value === madhab)?.label}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">People in Household</span>
-                      <span className="font-semibold">{result.totalPeople}</span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Per Person</span>
-                      <span className="font-semibold">${result.perPerson.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Calculation</span>
-                      <span className="font-semibold text-right text-sm max-w-[60%]">
-                        {result.method}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Cash Permitted?</span>
-                      <span className="font-semibold">
-                        {fitrInfo.cashPermitted ? (
-                          <span className="text-[var(--emerald)]">Yes ✓</span>
-                        ) : (
-                          <span className="text-[var(--gold-dark)]">
-                            Classically no — but widely accepted via charities
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-base">
-                      <span className="text-[var(--ink-light)]">Classical Measure</span>
-                      <span className="font-semibold text-right text-sm max-w-[60%]">
-                        {fitrInfo.measure}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="gold-line" />
-
-                  <div className="info-panel">
-                    <p className="text-sm text-[var(--info-text)] leading-relaxed">
-                      <strong>When to pay:</strong> Before the Eid al-Fiṭr prayer. Most scholars
-                      recommend paying a few days early so recipients can use it for Eid
-                      preparations. Paying after the Eid prayer is considered a regular charity
-                      (ṣadaqah), not Zakat al-Fiṭr.
-                    </p>
-                  </div>
-
-                  <div className="info-panel">
-                    <p className="text-sm text-[var(--info-text)] leading-relaxed">
-                      <strong>How to pay:</strong> Give directly to a poor person, or through
-                      your local mosque or an Islamic charity that distributes food/funds before
-                      Eid. Many organizations accept Zakat al-Fiṭr online and distribute it in
-                      communities where it is most needed.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex justify-between">
-          <button
-            onClick={() => setStep(Math.max(0, step - 1))}
-            disabled={step === 0}
-            className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-              step === 0
-                ? "opacity-0 pointer-events-none"
-                : "bg-[var(--sand)]/50 text-[var(--ink-muted)] hover:bg-[var(--sand)]"
-            }`}
-          >
-            ← Back
-          </button>
-          {step < STEPS.length - 1 && (
-            <button
-              onClick={() => setStep(Math.min(STEPS.length - 1, step + 1))}
-              disabled={!canProceed()}
-              className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-                canProceed()
-                  ? "bg-[var(--emerald)] text-white hover:bg-[var(--emerald-deep)] shadow-md"
-                  : "bg-[var(--sand)] text-[var(--ink-faint)] cursor-not-allowed"
-              }`}
-            >
-              Continue →
-            </button>
-          )}
-        </div>
-      </div>
+      <Sources>
+        <p>
+          Ṣaḥīḥ al-Bukhārī 1503, narrated by Ibn ʿUmar (Book of Zakat):{" "}
+          <a href="https://sunnah.com/bukhari:1503" className="lnk" rel="noopener" target="_blank">
+            sunnah.com/bukhari:1503
+          </a>
+          .
+        </p>
+        <p className="mt-1">
+          School positions on amount, timing, cash and who pays are summarised from this site&apos;s scholarly notes,
+          shown in the &ldquo;What do the scholars say?&rdquo; panels in the calculator above.
+        </p>
+      </Sources>
     </div>
   );
 }
