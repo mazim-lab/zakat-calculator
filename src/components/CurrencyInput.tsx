@@ -22,7 +22,7 @@ interface CurrencyInputProps {
 export function CurrencyInput({ label, value, onChange, placeholder = "0", prefix = "$", suffix, hint, integer = false }: CurrencyInputProps) {
   const id = useId();
   const hintId = `${id}-hint`;
-  const padStart = prefix ? `${Math.max(2, prefix.length * 0.65 + 1.2)}rem` : undefined;
+  const padStart = prefix ? `${Math.max(2.2, prefix.length * 0.65 + 1.4)}rem` : undefined;
   return (
     <div>
       <label htmlFor={id} className="field-label">
@@ -30,7 +30,7 @@ export function CurrencyInput({ label, value, onChange, placeholder = "0", prefi
       </label>
       <div className="relative">
         {prefix && (
-          <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-text-3 mono text-[15px]" aria-hidden="true">
+          <span className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-text-2 num text-[17px] ui" aria-hidden="true">
             {prefix}
           </span>
         )}
@@ -50,7 +50,7 @@ export function CurrencyInput({ label, value, onChange, placeholder = "0", prefi
           style={{ paddingInlineStart: padStart, paddingInlineEnd: suffix ? "4.5rem" : undefined }}
         />
         {suffix && (
-          <span className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-text-3 text-sm" aria-hidden="true">
+          <span className="pointer-events-none absolute end-4 top-1/2 -translate-y-1/2 text-text-2 text-[15.5px] ui" aria-hidden="true">
             {suffix}
           </span>
         )}

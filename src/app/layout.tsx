@@ -1,26 +1,34 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
-import { Inter, IBM_Plex_Mono, Noto_Naskh_Arabic } from "next/font/google";
+import { Alegreya, Alegreya_Sans, Amiri } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import { themeInitScript } from "@/components/ThemeToggle";
 import { JsonLd, Ar } from "@/components/ui";
+import { StarMark } from "@/components/ornament";
 import { SITE, TOOLS, SCHOOL_FINDER, REFERENCE_PAGES } from "@/lib/site";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter", display: "swap" });
-const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-plex-mono",
+// Alegreya (text) and Alegreya Sans (controls): Juan Pablo del Peral / Huerta Tipografica, SIL OFL 1.1.
+// Amiri (Arabic): Khaled Hosny, after the Bulaq Press Naskh, SIL OFL 1.1.
+const alegreya = Alegreya({
+  subsets: ["latin", "latin-ext"],
+  style: ["normal", "italic"],
+  variable: "--font-alegreya",
   display: "swap",
 });
-const naskh = Noto_Naskh_Arabic({
+const alegreyaSans = Alegreya_Sans({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "700"],
+  variable: "--font-alegreya-sans",
+  display: "swap",
+});
+const amiri = Amiri({
   subsets: ["arabic"],
-  weight: ["400", "600"],
-  variable: "--font-naskh",
+  weight: ["400", "700"],
+  variable: "--font-amiri",
   display: "swap",
 });
 
@@ -43,7 +51,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning className={`${inter.variable} ${plexMono.variable} ${naskh.variable}`}>
+    <html lang="en" dir="ltr" suppressHydrationWarning className={`${alegreya.variable} ${alegreyaSans.variable} ${amiri.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <JsonLd
@@ -76,53 +84,59 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 }
 
 function SiteFooter() {
+  const linkCls = "text-text-2 hover:text-indigo-text underline-offset-4 hover:underline inline-flex min-h-[32px] items-center";
   return (
-    <footer className="site-footer mt-16 border-t border-border bg-surface-2/60">
-      <div className="container py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr]">
-        <div>
-          <p className="font-bold text-text">
-            {SITE.name} <Ar className="font-normal text-text-2 ms-1">{SITE.nameAr}</Ar>
-          </p>
-          <p className="mt-2 text-sm text-text-2 leading-relaxed max-w-[46ch]">
-            These tools are for education and reference. For personal rulings, always consult a qualified scholar of
-            your school of jurisprudence.
-          </p>
+    <footer className="site-footer mt-20">
+      <div className="lattice h-10 border-t-[3px] border-double border-border-strong" aria-hidden="true" />
+      <div className="bg-surface-2/70">
+        <div className="container py-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr]">
+          <div>
+            <p className="flex items-center gap-3">
+              <StarMark size={30} />
+              <span className="wordmark">{SITE.name}</span>
+              <Ar className="wordmark-ar">{SITE.nameAr}</Ar>
+            </p>
+            <p className="mt-4 text-[16.5px] text-text-2 leading-relaxed max-w-[44ch]">
+              These tools are for education and reference. For personal rulings, always consult a qualified scholar of
+              your school of jurisprudence.
+            </p>
+          </div>
+          <nav aria-label="Calculators">
+            <p className="eyebrow mb-2">Calculators</p>
+            <ul className="list-none p-0 m-0 grid gap-0.5 text-[16.5px] ui">
+              {TOOLS.map((t) => (
+                <li key={t.href}>
+                  <Link href={t.href} className={linkCls}>
+                    {t.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <nav aria-label="Reference">
+            <p className="eyebrow mb-2">Reference</p>
+            <ul className="list-none p-0 m-0 grid gap-0.5 text-[16.5px] ui">
+              <li>
+                <Link href={SCHOOL_FINDER.href} className={linkCls}>
+                  Find your school
+                </Link>
+              </li>
+              {REFERENCE_PAGES.map((p) => (
+                <li key={p.href}>
+                  <Link href={p.href} className={linkCls}>
+                    {p.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
-        <nav aria-label="Calculators">
-          <p className="eyebrow mb-2">Calculators</p>
-          <ul className="list-none p-0 m-0 space-y-1.5 text-sm">
-            {TOOLS.map((t) => (
-              <li key={t.href}>
-                <Link href={t.href} className="text-text-2 hover:text-text hover:underline underline-offset-4">
-                  {t.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <nav aria-label="Reference">
-          <p className="eyebrow mb-2">Reference</p>
-          <ul className="list-none p-0 m-0 space-y-1.5 text-sm">
-            <li>
-              <Link href={SCHOOL_FINDER.href} className="text-text-2 hover:text-text hover:underline underline-offset-4">
-                Find your school
-              </Link>
-            </li>
-            {REFERENCE_PAGES.map((p) => (
-              <li key={p.href}>
-                <Link href={p.href} className="text-text-2 hover:text-text hover:underline underline-offset-4">
-                  {p.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-      <div className="container pb-8 flex flex-wrap items-center justify-between gap-2 text-xs text-text-2">
-        <span>islamichisab.com</span>
-        <a href="https://saleel.ca" target="_blank" rel="noopener noreferrer" className="hover:text-text hover:underline underline-offset-4">
-          Created by Saleel
-        </a>
+        <div className="container pb-10 flex flex-wrap items-center justify-between gap-2 text-[15px] text-text-2 ui">
+          <span>islamichisab.com</span>
+          <a href="https://saleel.ca" target="_blank" rel="noopener noreferrer" className="hover:text-indigo-text hover:underline underline-offset-4">
+            Created by Saleel
+          </a>
+        </div>
       </div>
     </footer>
   );
