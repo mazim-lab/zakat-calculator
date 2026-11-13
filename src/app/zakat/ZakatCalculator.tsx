@@ -45,6 +45,7 @@ import {
   SILVER_NISAB_GRAMS_DISPLAY,
 } from "@/lib/zakat/page-math";
 import { PricePanel, type PriceStatus } from "./PricePanel";
+import { Ornament, Rosette } from "@/components/ornament";
 import { ZakatResults } from "./ZakatResults";
 
 const MADHAB_ORDER: Madhab[] = ["hanafi", "maliki", "shafii", "hanbali", "jafari", "custom"];
@@ -57,7 +58,7 @@ function OptionGroup({ title, children, level = 3 }: { title: string; children: 
   const H = level === 3 ? "h3" : "h4";
   return (
     <div>
-      <H id={id} className="text-[17px] font-semibold mb-3 text-text">
+      <H id={id} className="text-[21px] font-bold mb-4 text-text">
         {title}
       </H>
       {/* Long badges (e.g. school regions) must wrap at 390px instead of overflowing. */}
@@ -71,22 +72,22 @@ function OptionGroup({ title, children, level = 3 }: { title: string; children: 
 
 function SubHeading({ children, id }: { children: ReactNode; id?: string }) {
   return (
-    <h3 id={id} className="text-[17px] font-semibold text-text">
+    <h3 id={id} className="text-[21px] font-bold text-text">
       {children}
     </h3>
   );
 }
 
 function Divider() {
-  return <hr className="border-0 border-t border-border my-1" />;
+  return <Ornament className="my-2" />;
 }
 
 function ValueLine({ children }: { children: ReactNode }) {
-  return <p className="mt-1.5 text-[14px] text-text-2 num">{children}</p>;
+  return <p className="mt-2 text-[16.5px] text-text-2 num">{children}</p>;
 }
 
 function Lead({ children }: { children: ReactNode }) {
-  return <p className="text-text-2 leading-relaxed">{children}</p>;
+  return <p className="text-[18.5px] text-text-2 leading-relaxed">{children}</p>;
 }
 
 /** Money input showing the selected currency's symbol. Defined at module level so inputs keep focus. */
@@ -204,26 +205,15 @@ export function ZakatCalculator() {
               onClick={() => goTo(i)}
               aria-current={i === step ? "step" : undefined}
               aria-label={`Step ${i + 1}: ${s.title}${state === "done" ? " (visited)" : ""}`}
-              className={`w-full min-h-[44px] flex items-center gap-2 px-2.5 py-1.5 rounded-[var(--radius)] border text-start text-[13px] leading-tight cursor-pointer transition-colors ${
+              className={`ui w-full min-h-[48px] flex items-center gap-2.5 px-2.5 py-1.5 rounded-[var(--radius)] border text-start text-[15px] leading-tight cursor-pointer transition-colors ${
                 state === "current"
-                  ? "border-[var(--hue)] bg-[var(--hue-bg)] text-text font-semibold"
+                  ? "border-[var(--hue-text)] bg-[var(--hue-bg)] text-text font-bold"
                   : state === "done"
-                  ? "border-border bg-surface text-text hover:border-border-strong"
-                  : "border-border bg-surface text-text-2 hover:border-border-strong hover:text-text"
+                  ? "border-border bg-surface text-text hover:border-text-3"
+                  : "border-border bg-surface text-text-2 hover:border-text-3 hover:text-text"
               }`}
             >
-              <span
-                aria-hidden="true"
-                className={`num shrink-0 w-6 h-6 rounded-full grid place-items-center text-[11.5px] ${
-                  state === "current"
-                    ? "bg-[var(--hue)] text-on-accent"
-                    : state === "done"
-                    ? "bg-surface-2 text-text"
-                    : "bg-surface-2 text-text-2"
-                }`}
-              >
-                {i + 1}
-              </span>
+              <Rosette n={i + 1} state={state} size={28} />
               <span className="min-w-0 break-words">{s.title}</span>
             </button>
           </li>
@@ -235,20 +225,20 @@ export function ZakatCalculator() {
   return (
     <div className="hue-indigo" id="calculator">
       {/* Progress + step navigation */}
-      <nav aria-label="Calculator steps" className="mb-5">
-        <div className="flex items-center justify-between gap-3 mb-2">
-          <span className="text-sm text-text-2">
+      <nav aria-label="Calculator steps" className="mb-6">
+        <p className="stepper-caption">
+          <span className="text-text-2">
             Step <span className="num">{step + 1}</span> of <span className="num">{STEPS.length}</span>
           </span>
-          <span className="text-sm font-semibold text-text truncate">{currentStep.title}</span>
-        </div>
+          <span className="stepper-name">{currentStep.title}</span>
+        </p>
         <div className="progress-track" aria-hidden="true">
           <div className="progress-fill" style={{ width: `${progress}%` }} />
         </div>
 
         {/* Mobile: steps collapse into a disclosure so nothing overflows. */}
         <details ref={mobileStepsRef} className="disclosure mt-3 sm:hidden">
-          <summary className="text-[15px]">Jump to a step</summary>
+          <summary>Jump to a step</summary>
           <div className="disclosure-body">{stepButtons("grid-cols-2")}</div>
         </details>
         {/* Tablet and up: all steps visible. */}
@@ -256,16 +246,15 @@ export function ZakatCalculator() {
       </nav>
 
       {/* Step content */}
-      <div key={step} className="card p-5 sm:p-7 fade-in">
-        <div className="mb-6">
-          <p className="eyebrow flex items-center gap-2 mb-1.5">
-            <span className="hue-dot" aria-hidden="true" />
+      <div key={step} className="card p-5 sm:p-9 fade-in">
+        <div className="mb-8">
+          <p className="eyebrow mb-2" style={{ color: "var(--hue-text)" }}>
             Step {step + 1}
           </p>
-          <h2 ref={headingRef} tabIndex={-1} className="text-[24px] sm:text-[28px] font-bold tracking-[-0.02em] outline-none">
+          <h2 ref={headingRef} tabIndex={-1} className="text-[30px] sm:text-[36px] font-bold leading-tight outline-none">
             {currentStep.title}
           </h2>
-          <p className="text-text-2 mt-1">{currentStep.subtitle}</p>
+          <p className="text-[18.5px] text-text-2 mt-2">{currentStep.subtitle}</p>
         </div>
 
         {/* Step 0: Welcome / Madhab selection */}
@@ -277,14 +266,14 @@ export function ZakatCalculator() {
             </Lead>
             <Link
               href="/find-your-school"
-              className="card card-link hue-neutral hue-stripe flex items-center justify-between gap-3 px-4 py-3 text-[15px] font-semibold text-text"
+              className="card card-link hue-neutral flex items-center justify-between gap-3 px-5 py-4 min-h-[56px] text-[17px] font-bold text-text ui"
             >
               Not sure which school you follow? Take our short quiz
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="shrink-0 rtl:rotate-180">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </Link>
-            <div className="callout callout-info text-[14.5px]">
+            <div className="callout callout-info">
               <p className="text-text-2 leading-relaxed">
                 <strong className="text-text">How it works:</strong> selecting a school sets that school&apos;s position
                 for every step of the calculator: niṣāb standard, jewelry treatment, stock method, debt deduction and
@@ -339,7 +328,7 @@ export function ZakatCalculator() {
         {step === 1 && (
           <div className="space-y-6">
             {choices.madhab !== "custom" && (
-              <div className="callout callout-info text-[14.5px]">
+              <div className="callout callout-info">
                 <p className="text-text-2 leading-relaxed">
                   These options have been pre-configured based on the{" "}
                   <strong className="text-text">{MADHAB_INFO[choices.madhab]?.name}</strong> school. You may override
@@ -348,7 +337,7 @@ export function ZakatCalculator() {
               </div>
             )}
             {choices.madhab === "custom" && (
-              <div className="callout callout-warning text-[14.5px]">
+              <div className="callout callout-warning">
                 <p className="text-text-2 leading-relaxed">
                   <strong className="text-text">Custom configuration:</strong> you have either selected Custom or changed
                   an option from the school default. Each choice below is independent.
@@ -646,7 +635,7 @@ export function ZakatCalculator() {
             {/* TFSA / Roth IRA */}
             <div className="space-y-3">
               <SubHeading>TFSA / Roth IRA</SubHeading>
-              <div className="callout callout-info text-[14.5px]">
+              <div className="callout callout-info">
                 <p className="text-text-2 leading-relaxed">
                   <strong className="text-text">Near-unanimous:</strong> fully zakatable. You have unrestricted access,
                   contributions are post-tax, and growth is tax-free. All scholars agree these accounts are subject to
@@ -682,7 +671,7 @@ export function ZakatCalculator() {
                         suffix="%"
                         hint="About 30% is the CRI approximation for broad index funds. Use your fund's actual zakatable % if known."
                       />
-                      <p className="text-[13.5px] text-text-2 num">
+                      <p className="text-[16px] text-text-2 num">
                         {assets.tfsaEquityPercent}% equities × {assets.tfsaZakatableAssetsPercent}% zakatable +{" "}
                         {100 - assets.tfsaEquityPercent}% cash at full value
                       </p>
@@ -767,7 +756,7 @@ export function ZakatCalculator() {
                           suffix="%"
                           hint="About 30% is the CRI approximation for broad index funds. Use your fund's actual zakatable % if known."
                         />
-                        <p className="text-[13.5px] text-text-2 num">
+                        <p className="text-[16px] text-text-2 num">
                           {assets.rrspEquityPercent}% equities × {assets.rrspZakatableAssetsPercent}% zakatable +{" "}
                           {100 - assets.rrspEquityPercent}% cash at full value
                         </p>
@@ -779,7 +768,7 @@ export function ZakatCalculator() {
             )}
 
             {choices.rrspApproach === "defer_to_withdrawal" && (
-              <div className="callout callout-warning text-[14.5px]">
+              <div className="callout callout-warning">
                 <p className="text-text-2 leading-relaxed">
                   <strong className="text-text">Deferred approach:</strong> you may enter your balance for reference.
                   No Zakat is calculated annually, but you must pay accumulated Zakat for all past years each time you
@@ -801,7 +790,7 @@ export function ZakatCalculator() {
             {/* Employer match */}
             <div className="space-y-3">
               <SubHeading>Employer-matched retirement</SubHeading>
-              <p className="text-[14px] text-text-2 leading-relaxed">
+              <p className="text-[17px] text-text-2 leading-relaxed">
                 FCNA: only <strong className="text-text">vested</strong> employer contributions count. Unvested matching
                 can be revoked by the employer and is not truly owned by you.
               </p>
@@ -822,7 +811,7 @@ export function ZakatCalculator() {
                 </div>
               )}
               {choices.rrspApproach === "exclude" && (
-                <p className="text-[14px] text-text-2">
+                <p className="text-[17px] text-text-2">
                   Excluded per your methodology. Employer match follows the same treatment as your retirement accounts.
                 </p>
               )}
@@ -833,7 +822,7 @@ export function ZakatCalculator() {
             {/* Defined-benefit pension */}
             <div className="space-y-3">
               <SubHeading>Defined-benefit pension (CPP, OAS, public pension)</SubHeading>
-              <div className="callout callout-info text-[14.5px]">
+              <div className="callout callout-info">
                 <p className="text-text-2 leading-relaxed">
                   <strong className="text-text">Generally not zakatable</strong> until received as income. You have no
                   individual account balance, no access before retirement age, and the government controls the funds.
@@ -979,7 +968,7 @@ export function ZakatCalculator() {
                 <Divider />
                 <div className="space-y-3">
                   <SubHeading>Short-term debts</SubHeading>
-                  <p className="text-[14px] text-text-2">Debts due in full within 12 months. These are fully deductible.</p>
+                  <p className="text-[17px] text-text-2">Debts due in full within 12 months. These are fully deductible.</p>
                   <Money symbol={currencySymbol}
                     label="Credit Card Balance"
                     value={assets.creditCardBalance}
@@ -1004,7 +993,7 @@ export function ZakatCalculator() {
 
                 <div className="space-y-3">
                   <SubHeading>Long-term debts</SubHeading>
-                  <p className="text-[14px] text-text-2 leading-relaxed">
+                  <p className="text-[17px] text-text-2 leading-relaxed">
                     Enter your <strong className="text-text">monthly</strong> amounts below. The calculator multiplies
                     them by 12 to find your annual deductible debt. Only the{" "}
                     <strong className="text-text">principal portion</strong> is deductible, because interest (ribā) is not
@@ -1019,7 +1008,7 @@ export function ZakatCalculator() {
                     ] as const
                   ).map(([title, key, hint]) => (
                     <fieldset key={key} className="panel border-0 m-0 space-y-2">
-                      <legend className="float-start w-full text-[15px] font-semibold text-text mb-2">{title}</legend>
+                      <legend className="float-start w-full text-[18px] font-bold text-text mb-2">{title}</legend>
                       <Money symbol={currencySymbol} label="Monthly Principal Portion" value={assets[key]} onChange={(v) => updateAsset(key, v)} hint={hint} />
                     </fieldset>
                   ))}
@@ -1056,14 +1045,14 @@ export function ZakatCalculator() {
                     (() => {
                       const k = khumsPreview(assets.annualIncome, assets.annualExpenses);
                       return (
-                        <div className="card hue-indigo hue-stripe p-4">
+                        <div className="card jadwal hue-indigo p-6">
                           <p className="text-text-2">
-                            Surplus: <span className="num text-text font-semibold">{fmt(k.surplus)}</span>
+                            Surplus: <span className="num text-text font-bold">{fmt(k.surplus)}</span>
                           </p>
-                          <p className="text-[20px] font-bold mt-1">
+                          <p className="text-[24px] font-bold mt-1">
                             Khums due: <span className="num">{fmt(k.khumsDue)}</span>
                           </p>
-                          <div className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-sm text-text-2">
+                          <div className="flex flex-wrap gap-x-6 gap-y-1 mt-2 text-[16px] text-text-2">
                             <span>
                               Sahm al-Imam: <span className="num">{fmt(k.sahmImam)}</span>
                             </span>
@@ -1079,8 +1068,8 @@ export function ZakatCalculator() {
               </>
             ) : (
               <div className="text-center py-6">
-                <p className="text-text text-[17px]">Khums as an income tax is specific to the Ja&apos;farī (Twelver Shia) school.</p>
-                <p className="text-text-2 text-sm mt-2">
+                <p className="text-text text-[19px]">Khums as an income tax is specific to the Ja&apos;farī (Twelver Shia) school.</p>
+                <p className="text-text-2 text-[17px] mt-2">
                   You may skip this step. In the Sunni schools, Khums applies only to war booty (ghanīma).
                 </p>
               </div>
@@ -1105,7 +1094,7 @@ export function ZakatCalculator() {
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between gap-3 mt-5">
+      <div className="flex items-center justify-between gap-3 mt-6">
         <button type="button" onClick={goBack} disabled={!canGoBack} className="btn btn-ghost">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true" className="rtl:rotate-180">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -1115,8 +1104,8 @@ export function ZakatCalculator() {
 
         {step >= 2 && step < RESULTS_STEP && (
           <div className="text-center min-w-0">
-            <p className="text-[12px] text-text-2">Running total</p>
-            <p className="num font-semibold text-[16px] text-text truncate">{fmt(result.totalZakatDue)}</p>
+            <p className="text-[14px] text-text-2 ui">Running total</p>
+            <p className="num font-bold text-[19px] text-text truncate">{fmt(result.totalZakatDue)}</p>
           </div>
         )}
 

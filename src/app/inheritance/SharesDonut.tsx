@@ -63,21 +63,21 @@ export function SharesDonut({ data, title = "Estate distribution" }: { data: Don
   });
 
   return (
-    <div className="grid gap-5 sm:grid-cols-[200px_1fr] sm:items-center">
-      <svg viewBox="0 0 120 120" width="200" height="200" role="img" aria-label={summary} className="mx-auto max-w-full h-auto">
-        <circle cx="60" cy="60" r="44" fill="none" stroke="var(--surface-2)" strokeWidth="22" />
+    <div className="grid gap-6 sm:grid-cols-[210px_1fr] sm:items-center">
+      <svg viewBox="0 0 120 120" width="210" height="210" role="img" aria-label={summary} className="mx-auto max-w-full h-auto">
+        <circle cx="60" cy="60" r="44" fill="none" stroke="var(--surface)" strokeWidth="22" />
         {slices}
       </svg>
       <ul className="list-none p-0 m-0 grid gap-2" aria-label={`${title} legend`}>
         {data.map((d, i) => (
-          <li key={i} className="flex items-start gap-3 text-[15px]">
+          <li key={i} className="flex items-start gap-3 text-[17px]">
             <span
               aria-hidden="true"
-              className="mt-1.5 inline-block w-3 h-3 rounded-sm shrink-0"
+              className="mt-1.5 inline-block w-3.5 h-3.5 shrink-0 [mask:var(--star-fill)_center/contain_no-repeat] [-webkit-mask:var(--star-fill)_center/contain_no-repeat]"
               style={{ background: colorFor(i) }}
             />
             <span className="flex-1 min-w-0 text-text">{d.name}</span>
-            <span className="num text-text-2 whitespace-nowrap">
+            <span className="num text-text-2 whitespace-nowrap ui">
               {d.fraction} · {formatPercent(d.share)}
             </span>
           </li>

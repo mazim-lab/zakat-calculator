@@ -66,21 +66,21 @@ export default function GlossaryPage() {
         lead="The Arabic words used across the calculators, in plain English. Each entry links to the calculator where the term comes up. Where the schools understand a term differently, the entry says so."
       />
 
-      <nav aria-label="Jump to letter" className="panel">
+      <nav aria-label="Jump to letter" className="card jadwal p-4 sm:p-5">
         <ul className="flex flex-wrap gap-1 list-none p-0 m-0">
           {ALPHABET.map((l) =>
             groups.has(l) ? (
               <li key={l}>
                 <a
                   href={`#letter-${l}`}
-                  className="mono inline-flex items-center justify-center min-w-[36px] min-h-[36px] rounded-[6px] text-[14px] font-semibold text-text hover:bg-surface-2"
+                  className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-full text-[19px] font-bold text-indigo-text hover:bg-indigo-bg"
                 >
                   {l}
                 </a>
               </li>
             ) : (
               <li key={l} aria-hidden="true">
-                <span className="mono inline-flex items-center justify-center min-w-[36px] min-h-[36px] text-[14px] text-text-3">
+                <span className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] text-[19px] text-text-3">
                   {l}
                 </span>
               </li>
@@ -91,21 +91,21 @@ export default function GlossaryPage() {
 
       <div className="mt-6">
         {ALPHABET.filter((l) => groups.has(l)).map((l) => (
-          <section key={l} id={`letter-${l}`} aria-labelledby={`letter-${l}-h`} className="py-6 border-t border-border first:border-t-0">
-            <h2 id={`letter-${l}-h`} className="mono text-[22px] font-semibold text-text-2 mb-3">
+          <section key={l} id={`letter-${l}`} aria-labelledby={`letter-${l}-h`} className="py-8 border-t-[3px] border-double border-border first:border-t-0">
+            <h2 id={`letter-${l}-h`} className="text-[34px] font-bold mb-4" style={{ color: "var(--rubric)" }}>
               {l}
             </h2>
-            <dl className="m-0 grid gap-5">
+            <dl className="m-0 grid gap-7">
               {groups.get(l)!.map((e) => (
                 <div key={e.id} id={e.id}>
                   <dt className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-                    <a href={`#${e.id}`} className="text-[18px] font-semibold text-text hover:underline underline-offset-4">
+                    <a href={`#${e.id}`} className="text-[22px] font-bold text-text hover:underline underline-offset-4">
                       {e.term}
                     </a>
-                    <Ar className="text-[19px] text-text-2">{e.ar}</Ar>
-                    {e.also && <span className="text-[13.5px] text-text-2">also {e.also}</span>}
+                    <Ar className="text-[24px] text-indigo-text">{e.ar}</Ar>
+                    {e.also && <span className="text-[16px] text-text-2 italic">also {e.also}</span>}
                   </dt>
-                  <dd className="m-0 mt-1 text-[15.5px] text-text-2 leading-relaxed">
+                  <dd className="m-0 mt-1.5 text-[18px] text-text-2 leading-relaxed max-w-[68ch]">
                     {e.definition}{" "}
                     <Link href={e.href} className="lnk whitespace-nowrap">
                       {e.hrefLabel}
