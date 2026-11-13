@@ -28,24 +28,24 @@ function Ayah({ v }: { v: string }) {
 const FIXED_SHARES: { share: string; who: ReactNode; ref: string[] }[] = [
   {
     share: "1/2",
-    who: "The husband, when the deceased left no children. One daughter, when there is no son. One full sister, when there are no children, no father and no full brother.",
+    who: "The husband, when the deceased left no children. One daughter, when there is no son. One full sister (or, if there is none, one paternal half-sister), when there are no children, no father or grandfather and no brother of the same kind.",
     ref: ["4:11", "4:12", "4:176"],
   },
   { share: "1/4", who: "The husband, when there are children. The wife, when there are no children.", ref: ["4:12"] },
   { share: "1/8", who: "The wife, when there are children. Two or more wives share this one eighth.", ref: ["4:12"] },
   {
     share: "2/3",
-    who: "Two or more daughters, when there is no son. Two or more full sisters, when there are no children, no father and no full brother.",
+    who: "Two or more daughters, when there is no son. Two or more full sisters (or paternal half-sisters), when there are no children, no father or grandfather and no brother of the same kind.",
     ref: ["4:11", "4:176"],
   },
   {
     share: "1/3",
-    who: "The mother, when there are no children and fewer than two siblings. Two or more maternal half-siblings share one third (this calculator does not yet ask about them).",
+    who: "The mother, when there are no children and fewer than two siblings. Two or more maternal half-siblings share one third equally, when there is no child, no son's child, no father and no paternal grandfather.",
     ref: ["4:11", "4:12"],
   },
   {
     share: "1/6",
-    who: "Each parent, when there are children. The mother, when there are two or more siblings. One maternal half-sibling. This calculator also gives 1/6 to a grandfather or grandmother standing in for an absent parent, as the schools do.",
+    who: "Each parent, when there are children. The mother, when there are two or more siblings. One maternal half-sibling. A son's daughter beside one daughter, and a paternal half-sister beside one full sister, to complete two thirds. This calculator also gives 1/6 to a grandfather or grandmother standing in for an absent parent, as the schools do.",
     ref: ["4:11", "4:12"],
   },
 ];
@@ -53,7 +53,7 @@ const FIXED_SHARES: { share: string; who: ReactNode; ref: string[] }[] = [
 const FAQ = [
   {
     q: "Who inherits under Islamic law?",
-    a: "The Qurʾān names fixed shares for the spouse, children, parents and siblings (4:11, 4:12, 4:176). Closer relatives can reduce or exclude more distant ones (ḥajb). In the Sunni schools, any amount left after the fixed shares goes to the residuary heirs (ʿaṣabah), such as a son or the father. The Jaʿfarī school uses classes of heirs instead.",
+    a: "The Qurʾān names fixed shares for the spouse, children, parents and siblings (4:11, 4:12, 4:176). Closer relatives can reduce or exclude more distant ones (ḥajb). In the Sunni schools, any amount left after the fixed shares goes to the residuary heirs (ʿaṣabah): a son, then a son's son, the father, the grandfather, a full brother, then a paternal half-brother, with sisters of the same kind at half a brother's share. A sister also takes the residue alongside a daughter. The Jaʿfarī school uses classes of heirs instead.",
   },
   {
     q: "What is paid before the estate is divided?",
@@ -65,15 +65,15 @@ const FAQ = [
   },
   {
     q: "What are ʿawl and radd?",
-    a: "ʿAwl applies when the fixed shares add up to more than the whole estate: every share is reduced in proportion so the total is exactly one. Radd is the opposite: when the shares add up to less than one and there is no residuary heir, the surplus is returned to the fixed-share heirs in proportion. In the Sunni schools as applied here, the spouse does not take part in radd. The Jaʿfarī school does not apply ʿawl.",
+    a: "ʿAwl applies when the fixed shares add up to more than the whole estate: every share is reduced in proportion so the total is exactly one. Radd is the opposite: when the shares add up to less than one and there is no residuary heir, the surplus is returned to the fixed-share heirs in proportion. In the Sunni schools as applied here, the spouse does not take part in radd; this follows the Ḥanafī and Ḥanbalī schools and the later Shāfiʿī ruling, while the classical Mālikī and Shāfiʿī position sends the surplus to the public treasury. The Jaʿfarī school does not apply ʿawl.",
   },
   {
     q: "Do the schools give different answers?",
-    a: "For most families, the four Sunni schools agree. They differ on some cases, such as a grandfather inheriting with brothers and sisters. The Jaʿfarī school has a different structure: closer classes of heirs exclude more distant classes, there is no ʿaṣabah, and there is no ʿawl. Choose your school in step 3 and read the notes beside each choice.",
+    a: "For most families, the four Sunni schools agree. They differ on some cases, such as a grandfather inheriting with brothers and sisters: the Ḥanafī school lets him exclude them, while the Mālikī, Shāfiʿī and Ḥanbalī schools have him share with them by Zayd ibn Thābit's method, which the calculator follows for those schools. The Jaʿfarī school has a different structure: closer classes of heirs exclude more distant classes, there is no ʿaṣabah, and there is no ʿawl. Choose your school in step 3 and read the notes beside each choice.",
   },
   {
     q: "Which relatives does this calculator cover?",
-    a: "Husband, wife or wives, sons, daughters, father, mother, paternal grandfather, paternal and maternal grandmothers, full brothers and full sisters. It does not yet ask about half-siblings, grandchildren, uncles, cousins or other relatives. If any of them survive the deceased, ask a scholar to check the division.",
+    a: "Husband, wife or wives, sons, daughters, son's sons and son's daughters, father, mother, paternal grandfather, paternal and maternal grandmothers, full brothers and sisters, and paternal and maternal half-brothers and half-sisters. It does not ask about a daughter's children, nephews, uncles, cousins, a maternal grandfather or other relatives. If any of them survive the deceased, ask a scholar to check the division.",
   },
   {
     q: "Can I use this result to distribute a real estate?",
@@ -242,7 +242,8 @@ export default function InheritancePage() {
               </p>
               <p>
                 In the four Sunni schools, heirs with a fixed share are paid first. Anything left goes to the residuary heirs
-                (<em>ʿaṣabah</em>), for example a son, or the father when there are no sons. The Jaʿfarī school has no
+                (<em>ʿaṣabah</em>), for example a son, or the father when there are no sons, or a brother when there is no son or father
+                (a sister takes half a brother's share, and takes the residue herself beside a daughter). The Jaʿfarī school has no
                 ʿaṣabah: it groups heirs into classes, and a closer class excludes the more distant ones.
               </p>
             </div>

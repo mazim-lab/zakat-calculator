@@ -32,6 +32,12 @@ const HEIR_OPTIONS: { id: Heir; title: string; description: string; type: "boole
   { id: "maternalGrandmother", title: "Maternal Grandmother", description: "The mother of the deceased's mother.", type: "boolean" },
   { id: "fullBrother", title: "Full Brothers", description: "", type: "count" },
   { id: "fullSister", title: "Full Sisters", description: "", type: "count" },
+  { id: "paternalHalfBrother", title: "Paternal Half-Brothers", description: "Same father, different mother.", type: "count" },
+  { id: "paternalHalfSister", title: "Paternal Half-Sisters", description: "Same father, different mother.", type: "count" },
+  { id: "maternalHalfBrother", title: "Maternal Half-Brothers", description: "Same mother, different father.", type: "count" },
+  { id: "maternalHalfSister", title: "Maternal Half-Sisters", description: "Same mother, different father.", type: "count" },
+  { id: "sonsSon", title: "Son's Sons", description: "Sons of a son who died before the deceased.", type: "count" },
+  { id: "sonsDaughter", title: "Son's Daughters", description: "Daughters of a son who died before the deceased.", type: "count" },
 ];
 
 const MADHABS: { value: Madhab; label: string }[] = [
