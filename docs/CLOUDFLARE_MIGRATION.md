@@ -55,9 +55,10 @@ you made for finterminal.ca. The registrar stays Namecheap.
 
 Do these in order. Vercel keeps serving the site until step 8.
 
-Progress: steps 1, 2, 3, 4, 6, 7 and 8 were done on 2026-11-15. Step 5 was
-skipped (no Cloudflare Web Analytics; the About page now says the site loads
-no analytics). Step 10 is still open.
+Progress: steps 1 to 8 were done on 2026-11-15. Step 5 was done later the
+same day: Cloudflare Web Analytics is on for islamichisab.com with automatic
+setup (beacon injected at the edge), and the About page privacy section says
+so. Step 10 is still open.
 
 1. **Merge the branch.** Merge `cloudflare-migration` into `main`. This is safe
    while Vercel is live: the new files are ignored by Vercel, and the branch's

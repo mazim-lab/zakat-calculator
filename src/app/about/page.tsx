@@ -308,7 +308,12 @@ export default function AboutPage() {
             </li>
             <li>
               <strong>Hosting.</strong> The site is served through Cloudflare, which processes request data such as IP
-              addresses to deliver and protect the site. The site itself loads no analytics or tracking scripts.
+              addresses to deliver and protect the site.
+            </li>
+            <li>
+              <strong>Visit counts.</strong> The site uses Cloudflare Web Analytics to count visits and measure how fast
+              pages load. Cloudflare says this uses no cookies or local storage, does not fingerprint visitors, and does
+              not track you across sites. It never sees the figures you enter.
             </li>
             <li>
               <strong>Translation.</strong> Google Translate is loaded only when you pick a language from the language
