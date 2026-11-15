@@ -108,15 +108,21 @@ export function getSilverPricePerGram(
   return baseUsdPrice * rates[currency];
 }
 
+// Fixed locale on purpose. This runs during the server render and again in the
+// browser during hydration. With the runtime default locale the two can differ
+// (for example "$124.85" on the server and "US$124.85" in an en-CA browser),
+// which makes React throw a hydration mismatch (error #418).
+export const MONEY_LOCALE = "en-US";
+
 export function formatCurrency(amount: number, currencyCode: string): string {
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat(MONEY_LOCALE, {
       style: "currency",
       currency: currencyCode,
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
   } catch {
-    return `${currencyCode} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return `${currencyCode} ${amount.toLocaleString(MONEY_LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 }
