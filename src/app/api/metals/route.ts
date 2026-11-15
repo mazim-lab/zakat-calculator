@@ -41,7 +41,48 @@ async function fetchYahooPrice(ticker: string): Promise<number | null> {
   return null;
 }
 
+// Edge cache for Cloudflare Workers only.
+//
+// On Vercel the CDN caches this route using the s-maxage header below. On
+// Cloudflare Workers the CDN does not cache a Worker's own response, so
+// without this every visit to /zakat would call Yahoo Finance. The Workers
+// Cache API (caches.default) keeps one copy per Cloudflare data centre for the
+// same s-maxage time (1 hour for live prices, 5 minutes for the fallback).
+//
+// Node.js (Vercel, next dev, the tests) has no caches.default, so there this
+// is skipped and the route behaves exactly as before. Any cache error is
+// ignored and the route answers from Yahoo or the fallback as usual.
+const EDGE_CACHE_KEY = "https://www.islamichisab.com/__edge-cache/api/metals";
+
+function workersEdgeCache(): Cache | null {
+  const storage = (globalThis as unknown as { caches?: { default?: Cache } }).caches;
+  return storage?.default ?? null;
+}
+
 export async function GET() {
+  const cache = workersEdgeCache();
+  if (cache) {
+    try {
+      const hit = await cache.match(EDGE_CACHE_KEY);
+      if (hit) return new Response(hit.body, hit);
+    } catch {
+      // fall through to a fresh fetch
+    }
+  }
+
+  const response = await buildPricesResponse();
+
+  if (cache) {
+    try {
+      await cache.put(EDGE_CACHE_KEY, response.clone());
+    } catch {
+      // caching is best effort
+    }
+  }
+  return response;
+}
+
+async function buildPricesResponse(): Promise<Response> {
   // Fetch gold (GC=F) and silver (SI=F) futures from Yahoo Finance
   const [goldOz, silverOz] = await Promise.all([
     fetchYahooPrice("GC=F"),
