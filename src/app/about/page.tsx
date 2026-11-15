@@ -307,8 +307,8 @@ export default function AboutPage() {
               service and open.er-api.com. These requests carry no information about what you entered.
             </li>
             <li>
-              <strong>Analytics.</strong> The site uses Vercel Web Analytics and Vercel Speed Insights for anonymous
-              page metrics, such as page views and how fast pages load.
+              <strong>Hosting.</strong> The site is served through Cloudflare, which processes request data such as IP
+              addresses to deliver and protect the site. The site itself loads no analytics or tracking scripts.
             </li>
             <li>
               <strong>Translation.</strong> Google Translate is loaded only when you pick a language from the language

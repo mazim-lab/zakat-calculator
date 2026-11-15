@@ -1,7 +1,9 @@
 # Moving islamichisab.com from Vercel to Cloudflare Workers
 
-Status: prepared on branch `cloudflare-migration`, not cut over. Vercel still
-serves the live site. Nothing in this branch changes the Vercel build.
+Status: cut over on 2026-11-15. Cloudflare Workers serves
+`www.islamichisab.com` and `islamichisab.com` (redirect to `www`). The Vercel
+project is kept, unchanged, as the rollback path until step 10. Nothing in the
+code changes the Vercel build.
 
 The site runs on Cloudflare Workers through OpenNext
 ([@opennextjs/cloudflare](https://opennext.js.org/cloudflare)), the same way
@@ -30,16 +32,20 @@ the site's Next.js 16.1.6. Releases 1.19.0 and later require Next.js 16.2.3 or
 newer. FinTerminal runs the same pair in production. When Next.js is upgraded
 (recommended anyway, see "Known points"), upgrade the adapter with it.
 
-## Where DNS lives today (checked 2026-11-15)
+## Where DNS lived before the move (checked 2026-11-15)
 
 - Registrar: Namecheap.
 - Nameservers: `dns1.registrar-servers.com`, `dns2.registrar-servers.com`
   (Namecheap BasicDNS).
-- `islamichisab.com`: A record `216.198.79.1` (Vercel). Vercel redirects it to
-  `www`.
+- `islamichisab.com`: A record `216.198.79.1` (Vercel). Vercel redirected it to
+  `www` with a 307 (temporary). Cloudflare now uses a 301.
 - `www.islamichisab.com`: CNAME `fe16d845f301ec41.vercel-dns-017.com` (Vercel).
-- Email: MX records `eforward3/4/5.registrar-servers.com` and an SPF TXT record
-  for Namecheap email forwarding.
+- Email: five MX records `eforward1` to `eforward5.registrar-servers.com` and an
+  SPF TXT record for Namecheap email forwarding.
+
+Since 2026-11-15 the nameservers are `cora.ns.cloudflare.com` and
+`cosmin.ns.cloudflare.com`. The five MX records and the SPF TXT record were
+copied into the Cloudflare zone unchanged.
 
 Cloudflare Workers custom domains need the domain to be a Cloudflare zone, so
 the nameservers must move from Namecheap to Cloudflare. This is the same move
@@ -48,6 +54,10 @@ you made for finterminal.ca. The registrar stays Namecheap.
 ## Owner steps
 
 Do these in order. Vercel keeps serving the site until step 8.
+
+Progress: steps 1, 2, 3, 4, 6, 7 and 8 were done on 2026-11-15. Step 5 was
+skipped (no Cloudflare Web Analytics; the About page now says the site loads
+no analytics). Step 10 is still open.
 
 1. **Merge the branch.** Merge `cloudflare-migration` into `main`. This is safe
    while Vercel is live: the new files are ignored by Vercel, and the branch's
@@ -93,7 +103,7 @@ Do these in order. Vercel keeps serving the site until step 8.
    1. Write down the current Namecheap nameservers (above) for rollback.
    2. Cloudflare dashboard > Add a domain > `islamichisab.com` > Free plan.
       Let it scan the existing records. Check that it imported the A record,
-      the `www` CNAME, the three MX records and the SPF TXT record. Set the A
+      the `www` CNAME, the five MX records and the SPF TXT record. Set the A
       and CNAME records to "DNS only" (grey cloud) for now so nothing changes
       when nameservers switch.
    3. Email: Namecheap email forwarding works only while Namecheap runs the
@@ -113,6 +123,14 @@ Do these in order. Vercel keeps serving the site until step 8.
       Redirect Rules > create from template "Redirect from root to WWW", status
       301, keep query string.
    Cloudflare issues the TLS certificates by itself.
+
+   Finding (2026-11-15): Cloudflare refuses to add a custom domain while the
+   zone still has a DNS record for that name ("already has externally managed
+   DNS records... Delete them first"). The API option to override the record
+   did not help. What worked: delete the `www` CNAME in the zone's DNS records
+   page, then add the custom domain at once (a gap of a few seconds). Then the
+   same for the apex A record. The apex custom domain lets the redirect rule
+   fire, so no placeholder record was needed.
 
 8. **Verify the live site.**
    - `curl -I https://www.islamichisab.com` shows `server: cloudflare`.
@@ -167,5 +185,9 @@ Do these in order. Vercel keeps serving the site until step 8.
 - `/api/metals` on Vercel was cached by the Vercel CDN for 1 hour. On Cloudflare
   the same 1 hour applies per Cloudflare data centre, so Yahoo sees a few more
   requests in total, still far below one per visit.
+- HTTP to HTTPS: Vercel redirected `http://` to `https://`. In the Cloudflare
+  zone "Always Use HTTPS" (SSL/TLS > Edge Certificates) is still off, so
+  `http://www.islamichisab.com` is served over plain HTTP. Turning it on restores
+  the redirect. HSTS was left off on purpose. SSL/TLS mode is Full.
 - Trailing slashes behave the same: `/zakat/` redirects to `/zakat` (308) on
   both Vercel and the local Workers preview.
