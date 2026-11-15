@@ -32,6 +32,12 @@ const amiri = Amiri({
   display: "swap",
 });
 
+// Vercel Web Analytics and Speed Insights only work on Vercel. Cloudflare
+// Workers Builds sets WORKERS_CI=1 during its build, so a Cloudflare build
+// leaves both out instead of requesting /_vercel/ scripts that do not exist
+// there. Vercel never sets WORKERS_CI, so the Vercel site is unchanged.
+const BUILT_ON_CLOUDFLARE = process.env.WORKERS_CI === "1";
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: { default: `${SITE.name}: Islamic calculators for Zakat, inheritance and more`, template: `%s | ${SITE.name}` },
@@ -76,8 +82,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </main>
         <SiteFooter />
         <ServiceWorkerRegister />
-        <Analytics />
-        <SpeedInsights />
+        {!BUILT_ON_CLOUDFLARE && <Analytics />}
+        {!BUILT_ON_CLOUDFLARE && <SpeedInsights />}
       </body>
     </html>
   );
