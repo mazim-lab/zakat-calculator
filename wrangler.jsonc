@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "islamichisab",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "islamichisab"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+  // No KV, R2 or D1 binding. Every page is prerendered at build time and
+  // served from the static-assets incremental cache (see open-next.config.ts).
+  // The only server route, /api/metals, caches its answer in the Workers
+  // Cache API (caches.default), which needs no binding and no paid plan.
+  //
+  // This file is ignored by Vercel. It is used only by OpenNext and Wrangler.
+}
